@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
         }
 
         delete ff;
-        delete opts.mout;
     }
+    delete opts.mout;
     return 0;
 }
