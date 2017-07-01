@@ -1,0 +1,5 @@
+*.o
+audiotag
+a.out
+.backup
+*.swp
