@@ -82,6 +82,51 @@ void  _usage()
 }
 
 
+/* returns the name of the succesful locale
+ */
+const char*  _setlocale(const char*& locale_)
+{
+    const char*  attempts[] = {
+        locale_,
+        "en_US.UTF-8",
+        "en_GB.UTF-8",
+        "C.utf8"
+    };
+
+    static const char* const  mbdata = "香港hōtiあいうえお";
+    const size_t  n = strlen(mbdata)*sizeof(wchar_t);
+
+    const char*  what = NULL;
+    const char*  l = NULL;
+    for (int i=(locale_ == NULL ? 1 : 0); i<sizeof(attempts)/sizeof(const char*); ++i)
+    {
+        what = attempts[i];
+        if ( (l = setlocale(LC_ALL, what)) == NULL) {
+            if (i == 0) {
+                MP3_TAG_WARN("failed for requested locale=" << locale_ << " - attempting fallbacks");
+            }
+        }
+        else
+        {
+            // validate mb conversion possible with this locale
+
+            wchar_t*  w = (wchar_t*)malloc(n+1);
+            memset(w, 0, n+1);
+            size_t  res = mbstowcs(w, mbdata, n);
+            free(w);
+            if (res != (size_t)-1) {
+                // all done, found it
+                break;
+            }
+            MP3_TAG_WARN("failed for requested locale=" << locale_ << "  res=" << res);
+        }
+        what = NULL;
+    }
+
+    return what;
+}
+
+
 extern int    optind;
 extern char*  optarg;
 
@@ -108,6 +153,8 @@ int main(int argc, char *argv[])
         AudioTag::Input  iflds;
 
         AudioTag::MetaOut*  mout;
+
+        const char*  locale;
     } opts;
     opts.list = false;
     opts.listP = false;
@@ -116,6 +163,7 @@ int main(int argc, char *argv[])
     opts.preserve = false;
     opts.sync = false;
     opts.mout = NULL;
+    opts.locale = NULL;
 
     /* what we're encoding from */
     TagLib::String::Type  mbenc = TagLib::String::UTF8;
@@ -124,13 +172,8 @@ int main(int argc, char *argv[])
     /* this is encoding for the frames, default it to utf8 */
     TagLib::String::Type  enc = TagLib::String::UTF8;
 
-    const char*  l;
-    if ( (l = setlocale(LC_ALL, "en_US.UTF-8")) == NULL) {
-        MP3_TAG_NOTICE_VERBOSE("locale set");
-    }
-
     int c;
-    while ( (c = getopt(argc, argv, "e:12hla:pt:A:y:c:T:g:Dd:n:VM:Ci:O:")) != EOF)
+    while ( (c = getopt(argc, argv, "e:12hla:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -186,6 +229,10 @@ int main(int argc, char *argv[])
                 opts.mout = AudioTag::MetaOut::create(optarg);
                 break;
 
+            case 'u':
+                opts.locale = optarg;
+                break;
+
 	    case 'h':
 	    default: _usage();
 	}
@@ -195,6 +242,18 @@ int main(int argc, char *argv[])
         MP3_TAG_ERR("no files specified");
 	_usage();
     }
+
+    const char*  l;
+    if ( (l = _setlocale(opts.locale)) == NULL) {
+        MP3_TAG_ERR("failed to set valid UTF8 locale - tried all fallbacks; verify locales (locale -a)");
+        return -1;
+    }
+    if (opts.locale && l != opts.locale) {
+        MP3_TAG_WARN("requested locale=" << opts.locale << " not suitable for mbyte conversions, using local=" << l);
+    }
+    MP3_TAG_NOTICE_VERBOSE("using locale=" << l);
+
+
     if (opts.to && opts.from && opts.to.operator!=(opts.from) && 
         opts.to.all == false && opts.from.all == false) {
         opts.sync = true;
