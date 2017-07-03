@@ -54,7 +54,8 @@ void  _usage()
     cout << "usage: " << _argv0 << " [OPTION]... [mp3 FILES]" << endl
 	 << endl
 	 << "  [tag encoding options]" << endl
-	 << "       -e  encoding  = utf16be [latin1|utf8|utf16|utf16be|utf18le]" << endl
+         << "      [-e  encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]" << endl
+	 << "      [-u  locale]    locale to use for multibyte conversion" << endl
 	 << endl
 	 << "  [tagging options]" << endl
 	 << "       -t  title" << endl
@@ -64,16 +65,18 @@ void  _usage()
 	 << "       -g  genre" << endl
 	 << "       -y  year" << endl
 	 << "       -T  track" << endl
-	 << "       -1             add ID3v1 tag" << endl
-	 << "       -2             add ID3v2 tag" << endl
 	 << endl
 	 << "  [maintainence options]" << endl
 	 << "       -l             list tags (exclusive maintanence option" << endl
-	 << "       -i [1|2|a|f|A] add tags" << endl
+	 << "       -i [1|2|a|f|A] add meta to tags types; defaults to ID3v2/mp3 " << endl
 	 << "       -d [1|2|a|f|A] delete tags" << endl
+	 << "       -n X:Y         clone tag from X to Y only if X exists" << endl
 	 << "       -C             clean tags, leaving only basic info" << endl
 	 << "       -M encoding    parse current tags and convert from -M <E> -e <E'>" << endl
 	 << "               [warn] will damage tags if you get the E wrong!" << endl
+         << endl
+	 << "  [out options]" << endl
+	 << "      [-O {base,basic,json}]  format for tag output" << endl
 	 << endl
 	 << "  [misc options]" << endl
 	 << "       -V             verbose" << endl;
@@ -364,6 +367,11 @@ int main(int argc, char *argv[])
 #endif
         }
 
+        if ((opts.iflds || opts.clean || opts.sync || opts.remove) && access(ff->taglibfile().name(), W_OK) < 0) {
+            MP3_TAG_ERR(ff->taglibfile().name() << ": no write permissions, write ops ignored");
+        }
+        else
+        {
         bool  mod = false;
 
         // remove tags
@@ -427,7 +435,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-
+        }
         delete ff;
     }
     delete opts.mout;
