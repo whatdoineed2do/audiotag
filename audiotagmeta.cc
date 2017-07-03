@@ -242,7 +242,7 @@ void  MetaMP3::save()
      * other tags have modified
      */
     MP3_TAG_DEBUG("mp3 savetag=" << _svtag);
-    ((FileMP3::value_type&)(_f.taglibfile())).save(_svtag);
+    _tf.save(_svtag, true);
 }
 
 void MetaMP3::remove(const MetaTOI& toi_)
@@ -261,7 +261,7 @@ void MetaMP3::remove(const MetaTOI& toi_)
         }
         if (toi_.id3v1) {
             rmtag |= TagLib::MPEG::File::ID3v1;  
-            //_svtag &= ~TagLib::MPEG::File::ID3v1;  // dont add this back!
+            _svtag &= ~TagLib::MPEG::File::ID3v1;  // dont add this back!
             _id3v1 = NULL;
         }
         if (toi_.ape) {
@@ -274,7 +274,13 @@ void MetaMP3::remove(const MetaTOI& toi_)
     if (rmtag == TagLib::MPEG::File::NoTags) {
         return;
     }
+    MP3_TAG_DEBUG("mp3 strip=" << rmtag);
     _tf.strip(rmtag, true);
+
+    /* BUG - if you ask to remove APE/ID3v1, both appear to be removed but when
+     *       saved the ID3v2 tag is duplicated onto ID3v1; save tag values are 
+     *       correct (0x0002)
+     */
 
     if (toi_.id3v2 || toi_.deflt) {
         _id3v2 = _tf.ID3v2Tag(true);
@@ -390,6 +396,14 @@ bool  MetaMP3::coverart() const
     return (_id3v2 == NULL) ? false : !_id3v2->frameList("APIC").isEmpty();
 }
 
+void  MetaMP3::removeart()
+{
+    if (_id3v2) {
+        _id3v2->removeFrames("APIC");
+    }
+}
+
+
 Meta::Tags  MetaMP3::tags() const
 {
     Meta::Tags  tag;
@@ -417,7 +431,7 @@ MetaMP3::MetaMP3(FileMP3& f_, MetaOut& mo_)
     if (_id3v2 && !_id3v2->isEmpty())  _svtag |= TagLib::MPEG::File::ID3v2;
     if (_ape   && !_ape->isEmpty())    _svtag |= TagLib::MPEG::File::APE;
 
-    MP3_TAG_DEBUG("ctor: " << _svtag << "  1:" << std::hex << _id3v1 << " 2: "<< _id3v2 << " a: " << _ape);
+    MP3_TAG_DEBUG("mp3 ctor: " << _svtag << "  1:" << std::hex << _id3v1 << " 2: "<< _id3v2 << " a: " << _ape);
 }
 
 const char*  MetaMP3::_id3v2TxtEnc(const TagLib::ID3v2::Frame* f_)
@@ -568,7 +582,12 @@ void MetaFlac::assign(const MetaTOI& toi_, const Input& rhs_)
 
 bool  MetaFlac::coverart() const
 {
-    return !  _tag->pictureList().isEmpty();
+    return ! _tag->pictureList().isEmpty();
+}
+
+void  MetaFlac::removeart()
+{
+    _tag->removeAllPictures();
 }
 
 MetaM4a::MetaM4a(FileM4a& f_, MetaOut& mo_)
@@ -608,6 +627,12 @@ bool  MetaM4a::coverart() const
     return !coverArtList.isEmpty();
 }
 
+void  MetaM4a::removeart()
+{
+    // what about the other art... ???
+    _tag->removeItem("covr");
+}
+
 void MetaM4a::assign(const MetaTOI& toi_, const Input& rhs_)
 {
     if (toi_.mp4 || toi_.deflt) {
@@ -617,5 +642,6 @@ void MetaM4a::assign(const MetaTOI& toi_, const Input& rhs_)
         _assign(*_tag, rhs_);
     }
 }
+
 
 };

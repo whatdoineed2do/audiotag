@@ -238,6 +238,7 @@ class Meta
     virtual void  trackno(TagLib::Tag&, const int);
 
     virtual bool  coverart() const { return false; }
+    virtual void  removeart() { }
 
 
     // force any changes to underlying file
@@ -341,6 +342,7 @@ class MetaMP3 : public _MetaMulti
     void  sanitize();
 
     bool  coverart() const;
+    void  removeart();
 
   private:
     MetaMP3(const MetaMP3&);
@@ -404,6 +406,7 @@ class MetaFlac : public Meta
 
     void  assign(const MetaTOI&, const Input&);
     bool  coverart() const;
+    void  removeart();
 
 
   private:
@@ -428,6 +431,8 @@ class MetaM4a : public Meta
 
     void  remove(const MetaTOI&);
     bool  coverart() const;
+    void  removeart();
+
     void  assign(const MetaTOI&, const Input&);
 
     Meta::Tags  tags() const;

@@ -71,6 +71,7 @@ void  _usage()
 	 << "       -i [1|2|a|f|A] add meta to tags types; defaults to ID3v2/mp3 " << endl
 	 << "       -d [1|2|a|f|A] delete tags" << endl
 	 << "       -n X:Y         clone tag from X to Y only if X exists" << endl
+	 << "       -r             remove art from main tags" << endl
 	 << "       -C             clean tags, leaving only basic info" << endl
 	 << "       -M encoding    parse current tags and convert from -M <E> -e <E'>" << endl
 	 << "               [warn] will damage tags if you get the E wrong!" << endl
@@ -194,6 +195,7 @@ int main(int argc, char *argv[])
         bool  clean;
         bool  mbconvert;
         bool  preserve;
+        bool  removeart;
 
         AudioTag::MetaTOI  remove;
         AudioTag::MetaTOI  toi;
@@ -214,6 +216,7 @@ int main(int argc, char *argv[])
     opts.clean = false;
     opts.mbconvert = false;
     opts.preserve = false;
+    opts.removeart = false;
     opts.sync = false;
     opts.mout = NULL;
     opts.locale = NULL;
@@ -226,7 +229,7 @@ int main(int argc, char *argv[])
     TagLib::String::Type  enc = TagLib::String::UTF8;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:12hla:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:r")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -274,6 +277,10 @@ int main(int argc, char *argv[])
 		mbenc = AudioTag::parseEnc(optarg, TagLib::String::Latin1);
 	    } break;
 
+            case 'r':
+                opts.removeart = true;
+                break;
+
             case 'p':
                 opts.preserve = true;
                 break;
@@ -312,7 +319,7 @@ int main(int argc, char *argv[])
         opts.sync = true;
     }
 
-    if ( (!opts.list && !opts.iflds && !opts.remove && !opts.clean && !opts.mbconvert && !opts.sync) || (opts.iflds && opts.mbconvert)) {
+    if ( (!opts.list && !opts.iflds && !opts.remove && !opts.removeart && !opts.clean && !opts.mbconvert && !opts.sync) || (opts.iflds && opts.mbconvert)) {
         opts.list = true;
     }
     opts.iflds.strip();
@@ -377,6 +384,11 @@ int main(int argc, char *argv[])
         // remove tags
         if (opts.remove) {
             ff->meta().remove(opts.remove);
+            mod = true;
+        }
+
+        if (opts.removeart) {
+            ff->meta().removeart();
             mod = true;
         }
 
