@@ -261,7 +261,7 @@ void MetaMP3::remove(const MetaTOI& toi_)
         }
         if (toi_.id3v1) {
             rmtag |= TagLib::MPEG::File::ID3v1;  
-            _svtag &= ~TagLib::MPEG::File::ID3v1;
+            //_svtag &= ~TagLib::MPEG::File::ID3v1;  // dont add this back!
             _id3v1 = NULL;
         }
         if (toi_.ape) {
@@ -274,6 +274,7 @@ void MetaMP3::remove(const MetaTOI& toi_)
     if (rmtag == TagLib::MPEG::File::NoTags) {
         return;
     }
+MP3_TAG_NOTICE("removing tags=" << rmtag);
     _tf.strip(rmtag, true);
 
     if (toi_.id3v2 || toi_.deflt) {
