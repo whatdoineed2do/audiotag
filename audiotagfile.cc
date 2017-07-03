@@ -48,8 +48,8 @@ File*  FileFactory::create(const char* f_, int& errno_, MetaOut& mo_)
         return NULL;
     }
 
-    //if ( ! (st.st_mode & (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) ) {
-    if ( ! (st.st_mode & S_IRUSR && st.st_mode & S_IWUSR) ) {
+    //if ( ! (st.st_mode & S_IRUSR && st.st_mode & S_IWUSR) ) {
+    if (access(f_, R_OK) < 0) { 
         errno_ = EPERM;
         return NULL;
     }
