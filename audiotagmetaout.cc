@@ -56,49 +56,51 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
     os_ << "\n{\n"
         << "  \"file\": {\n"
         << "    \"name\": \"" << m_.file().name() << "\",\n"
-        << "    \"tag\": \"" << tagtype_ << "\",\n"
-        << "    \"meta\": {\n";
+        << "    \"meta\": {\n"
+        << "      \"tag\": \"" << tagtype_ << "\",\n"
+        << "      \"data\": {\n";
 
-    os_ << "      \"Artist\": ";
+    os_ << "        \"Artist\": ";
     p = AudioTag::_strrep(tag_.artist());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Title\": ";
+    os_ << "        \"Title\": ";
     p = AudioTag::_strrep(tag_.title());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Album\": ";
+    os_ << "        \"Album\": ";
     p = AudioTag::_strrep(tag_.album());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Track\": ";
+    os_ << "        \"Track\": ";
     i = tag_.track();
     if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Yr\": ";
+    os_ << "        \"Yr\": ";
     i = tag_.year();
     if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Genre\": ";
+    os_ << "        \"Genre\": ";
     p = AudioTag::_strrep(tag_.genre());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Comment\": ";
+    os_ << "        \"Comment\": ";
     p = AudioTag::_strrep(tag_.comment()) ;
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "      \"Artwork\": ";
+    os_ << "        \"Artwork\": ";
     bool  b = m_.coverart();
     os_ << "\"" << (b ? "yes" : "no") << "\"";
 
-    os_ << "\n    }"
+    os_ << "\n      }"
+        << "\n    }"
         << "\n  }"
         << "\n}";
     return os_;
