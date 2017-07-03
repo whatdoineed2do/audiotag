@@ -6,6 +6,8 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+extern const char*  _argv0;
+
 
 #define MP3_TAG_ERR(m)  cerr << _argv0 << ": [error]  " << m << endl;
 #define MP3_TAG_WARN(m)  cout << _argv0 << ": [warn]  " << m << endl;
