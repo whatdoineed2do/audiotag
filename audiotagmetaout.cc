@@ -20,14 +20,17 @@ MetaOut*  MetaOut::create(const char* optarg_)
 
 std::ostream&  MetaOut::out(std::ostream& os_, const Meta& m_, const TagLib::Tag& tag_, const char* tagtype_)
 {
-    os_ 
-        << "  Artist: " << std::left << std::setw(15) << AudioTag::_strrep(tag_.artist()) 
-        << "  Title: " << std::left << std::setw(15) << AudioTag::_strrep(tag_.title()) 
-        << "  Album: " << std::left << std::setw(15) << AudioTag::_strrep(tag_.album()) 
-        << "  Yr: " << tag_.year()
-        << "  Genre: " << AudioTag::_strrep(tag_.genre())
-        << "  Comment: " << AudioTag::_strrep(tag_.comment()) 
-        << "  Artwork: " << m_.coverart();
+#define DUMP(x)  if ( (p = AudioTag::_strrep( x )) && strlen(p) > 0) os_ << std::left << std::setw(15) << p;
+
+    const char*  p;
+    os_ << "  Artist: "; DUMP( tag_.artist() );
+    os_ << "  Title: ";  DUMP( tag_.title() );
+    os_ << "  Album: ";  DUMP( tag_.album() );
+    os_ << "  Track: "; if ( tag_.track() > 0) os_ << tag_.track();
+    os_ << "  Yr: "; if ( tag_.year() > 0) os_ << tag_.year();
+    os_ << "  Genre: ";  DUMP( tag_.genre() );
+    os_ << "  Comment: ";  DUMP( tag_.comment() );
+    os_ << "  Artwork: " << m_.coverart();
     return os_;
 }
 
@@ -51,51 +54,53 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
     int  i = 0;
 
     os_ << "\n{\n"
-        << "  \"file\": \"" << m_.file().name() << "\",\n"
-        << "  \"tag\": \"" << tagtype_ << "\",\n"
-        << "  \"meta\": {\n";
+        << "  \"file\": {\n"
+        << "    \"name\": \"" << m_.file().name() << "\",\n"
+        << "    \"tag\": \"" << tagtype_ << "\",\n"
+        << "    \"meta\": {\n";
 
-    os_ << "    \"Artist\": ";
+    os_ << "      \"Artist\": ";
     p = AudioTag::_strrep(tag_.artist());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Title\": ";
+    os_ << "      \"Title\": ";
     p = AudioTag::_strrep(tag_.title());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Album\": ";
+    os_ << "      \"Album\": ";
     p = AudioTag::_strrep(tag_.album());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Track\": ";
+    os_ << "      \"Track\": ";
     i = tag_.track();
     if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Yr\": ";
+    os_ << "      \"Yr\": ";
     i = tag_.year();
     if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Genre\": ";
+    os_ << "      \"Genre\": ";
     p = AudioTag::_strrep(tag_.genre());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Comment\": ";
+    os_ << "      \"Comment\": ";
     p = AudioTag::_strrep(tag_.comment()) ;
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
 
-    os_ << "    \"Artwork\": ";
+    os_ << "      \"Artwork\": ";
     bool  b = m_.coverart();
     os_ << "\"" << (b ? "yes" : "no") << "\"";
 
-    os_ << "\n  }";
-    os_ << "\n}";
+    os_ << "\n    }"
+        << "\n  }"
+        << "\n}";
     return os_;
 }
 

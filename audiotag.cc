@@ -83,45 +83,95 @@ void  _usage()
 
 
 /* returns the name of the succesful locale
+ * if arg is NULL, attempt to use existing locale/utf'd version of it
+ * if that fails, attempt the hardcoded fallbacks
  */
 const char*  _setlocale(const char*& locale_)
 {
     const char*  attempts[] = {
-        locale_,
+        NULL, // placeholder
         "en_US.UTF-8",
         "en_GB.UTF-8",
-        "C.utf8"
+        "C.utf8",
+        "C.UTF-8"  // debian specific version
     };
+    const char*  l = NULL;
 
     static const char* const  mbdata = "香港hōtiあいうえお";
     const size_t  n = strlen(mbdata)*sizeof(wchar_t);
+    wchar_t*  w = (wchar_t*)malloc(n+1);
+
+
+    std::string  tmp;
+    if (locale_ == NULL)
+    {
+        const char*  env = getenv("LANG");
+        l = setlocale(LC_ALL, NULL);
+        const std::string  tmpl = l;
+        MP3_TAG_NOTICE_VERBOSE("user default LANG=" << (env ? env : "") << " locale=" << (l ? l : ""));
+
+        memset(w, 0, n+1);
+        size_t  res = mbstowcs(w, mbdata, n);
+        if (res != (size_t)-1) {
+            return l;
+        }
+#if 0
+        MP3_TAG_WARN("multibye conversions failed using user default LANG=" << (env ? env : "") << " locale=" << (l ? l : "") << " - attempting fallbacks");
+
+        bool  good = true;
+        if (env == NULL)
+        {
+            // no LANG set, lets see if we can make sense of the LC_ALL
+            if (l == NULL) {
+                good = false;
+            }
+        }
+        else
+        {
+            if (strlen(env) > 7 && strcmp(env+1, ".UTF-8") == 0) {
+                // hmm, LANG == "x.UTF-8" -- this failed, something wrong
+                // internally, ignore this in fallbacks
+                good = false;
+            }
+        }
+
+        if (good) {
+            tmp = (env ? env : l);
+            //MP3_TAG_NOTICE("env=" << env << "  l=" << l << " tmp=" << tmp);  // ??? tmp never gets set??
+            tmp += ".UTF-8";
+            attempts[0] = tmp.c_str();
+            MP3_TAG_NOTICE_VERBOSE("attempting to use UTF8 version of user LANG/locale=" << tmp);
+        }
+#endif
+    }
+
 
     const char*  what = NULL;
-    const char*  l = NULL;
-    for (int i=(locale_ == NULL ? 1 : 0); i<sizeof(attempts)/sizeof(const char*); ++i)
+    for (int i=0; i<sizeof(attempts)/sizeof(const char*); ++i)
     {
         what = attempts[i];
+        if (what == NULL) {
+            continue;
+        }
+
         if ( (l = setlocale(LC_ALL, what)) == NULL) {
-            if (i == 0) {
-                MP3_TAG_WARN("failed for requested locale=" << locale_ << " - attempting fallbacks");
-            }
+            MP3_TAG_WARN("failed setting locale=" << what);
         }
         else
         {
             // validate mb conversion possible with this locale
 
-            wchar_t*  w = (wchar_t*)malloc(n+1);
             memset(w, 0, n+1);
             size_t  res = mbstowcs(w, mbdata, n);
-            free(w);
             if (res != (size_t)-1) {
                 // all done, found it
                 break;
             }
-            MP3_TAG_WARN("failed for requested locale=" << locale_ << "  res=" << res);
+            MP3_TAG_WARN("failed for requested locale=" << what << "  mb conv res=" << res);
         }
         what = NULL;
     }
+    free(w);
 
     return what;
 }
