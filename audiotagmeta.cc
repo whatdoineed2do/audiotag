@@ -603,7 +603,7 @@ Meta::Tags  MetaM4a::tags() const
 {
     Meta::Tags  tag;
     if ( _tf.hasMP4Tag() && !_tag->isEmpty()) {
-        tag.push_back(Meta::Tags::value_type("M4a", _tag));
+        tag.push_back(Meta::Tags::value_type("MP4", _tag));
     }
     return tag;
 }
