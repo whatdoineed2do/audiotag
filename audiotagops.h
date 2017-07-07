@@ -175,7 +175,6 @@ struct OpUpdateTags: public _OpWR
 
     bool  _execute(File& f_, bool verbose_) const
     {
-        f_.meta().sanitize();
         if (!toi) {
             // nothing spec, use the default
             f_.meta() = input;
