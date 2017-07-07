@@ -12,7 +12,7 @@ LDFLAGS = -g -L/home/ray/tools/lib -ltag -lz
 objs:	audiotagmeta.o audiotagmetaout.o audiotagfile.o audiotag.o 
 
 data:
-	git checkout f1856a4478511d856bdceabf5e1b645faf24a898 test.mp3 test-ntags.mp3 test.flac test.m4a  test-pic.flac  test-pic.mp3
+	git checkout cfe5718 test.mp3 test-ntags.mp3 test.flac test.m4a  test-pic.flac test-pic.m4a  test-pic.mp3
 
 audiotag:	audiotag.o audiotagmeta.o audiotagfile.o audiotagmetaout.o
 	g++ $^ $(shell taglib-config --libs) $(LDFLAGS) -o $@ 
