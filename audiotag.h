@@ -7,6 +7,7 @@ using std::cerr;
 using std::endl;
 
 extern const char*  _argv0;
+extern bool  _verbose;
 
 
 #define MP3_TAG_ERR(m)  cerr << _argv0 << ": [error]  " << m << endl;
