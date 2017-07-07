@@ -40,14 +40,16 @@
 #include "audiotagfile.h"
 #include "audiotagmeta.h"
 #include "audiotagmetaout.h"
+#include "audiotagops.h"
 
 using namespace std;
 
 
+namespace AudioTag
+{
+
 const char*  _argv0 = NULL;
 bool  _verbose = false;
-
-const TagLib::String::Type  INTNL_STR_ENC = TagLib::String::UTF16BE;
 
 void  _usage()
 {
@@ -179,6 +181,7 @@ const char*  _setlocale(const char*& locale_)
 
     return what;
 }
+};
 
 
 extern int    optind;
@@ -187,7 +190,7 @@ extern char*  optarg;
 
 int main(int argc, char *argv[])
 {
-    _argv0 = basename(argv[0]);
+    AudioTag::_argv0 = basename(argv[0]);
 
     struct {
         bool  list;
@@ -268,7 +271,7 @@ int main(int argc, char *argv[])
                 opts.remove = optarg;
 	    } break;
 
-	    case 'V':  _verbose = true;  break;
+            case 'V':  AudioTag::_verbose = true;  break;
 
 	    case 'C':  opts.clean = true;  break;
 	    case 'M':
@@ -294,17 +297,17 @@ int main(int argc, char *argv[])
                 break;
 
 	    case 'h':
-	    default: _usage();
+            default: AudioTag::_usage();
 	}
     }
 
     if ( !(optind < argc) ) {
         MP3_TAG_ERR("no files specified");
-	_usage();
+        AudioTag::_usage();
     }
 
     const char*  l;
-    if ( (l = _setlocale(opts.locale)) == NULL) {
+    if ( (l = AudioTag::_setlocale(opts.locale)) == NULL) {
         MP3_TAG_ERR("failed to set valid UTF8 locale - tried all fallbacks; verify locales (locale -a)");
         return -1;
     }
