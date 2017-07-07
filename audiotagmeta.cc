@@ -579,15 +579,27 @@ void MetaFlac::assign(const MetaTOI& toi_, const Input& rhs_)
 }
 
 
+/* FLAC user error/bug?  pictureList() and removeAllPictures dont work on the 
+ * _tag object; examining the .flac file with 'metaflac --list foo.flac' we are
+ * presnted with:
+ *
+ METADATA block #x
+  type: 6 (PICTURE)
+  is last: false
+  length: 3937
+  type: 3 (Cover (front))
+  MIME type: image/jpeg
+ */
 
 bool  MetaFlac::coverart() const
 {
-    return ! _tag->pictureList().isEmpty();
+    MP3_TAG_DEBUG("flac: pic list sz, file=" <<  _tf.pictureList().size() << " tag=" << _tag->pictureList().size());
+    return _tf.pictureList().size() > 0;
 }
 
 void  MetaFlac::removeart()
 {
-    _tag->removeAllPictures();
+    _tf.removePictures();
 }
 
 MetaM4a::MetaM4a(FileM4a& f_, MetaOut& mo_)
@@ -603,7 +615,7 @@ Meta::Tags  MetaM4a::tags() const
 {
     Meta::Tags  tag;
     if ( _tf.hasMP4Tag() && !_tag->isEmpty()) {
-        tag.push_back(Meta::Tags::value_type("M4a", _tag));
+        tag.push_back(Meta::Tags::value_type("MP4", _tag));
     }
     return tag;
 }

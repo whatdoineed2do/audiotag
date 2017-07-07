@@ -40,14 +40,16 @@
 #include "audiotagfile.h"
 #include "audiotagmeta.h"
 #include "audiotagmetaout.h"
+#include "audiotagops.h"
 
 using namespace std;
 
 
+namespace AudioTag
+{
+
 const char*  _argv0 = NULL;
 bool  _verbose = false;
-
-const TagLib::String::Type  INTNL_STR_ENC = TagLib::String::UTF16BE;
 
 void  _usage()
 {
@@ -181,13 +183,23 @@ const char*  _setlocale(const char*& locale_)
 }
 
 
+void  _addupdop(AudioTag::OpUpdateTags*&  op_, const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_, AudioTag::Ops&  ops_)
+{
+    if (op_ == NULL) {
+        ops_.add( (op_ = new AudioTag::OpUpdateTags(toi_, input_)) );
+    }
+}
+
+};
+
+
 extern int    optind;
 extern char*  optarg;
 
 
 int main(int argc, char *argv[])
 {
-    _argv0 = basename(argv[0]);
+    AudioTag::_argv0 = basename(argv[0]);
 
     struct {
         bool  list;
@@ -197,15 +209,14 @@ int main(int argc, char *argv[])
         bool  preserve;
         bool  removeart;
 
-        AudioTag::MetaTOI  remove;
         AudioTag::MetaTOI  toi;
 
-        bool  sync;
         AudioTag::MetaTOI  from;
         AudioTag::MetaTOI  to;
 
 
         AudioTag::Input  iflds;
+        AudioTag::OpUpdateTags*  iop;  // not owned
 
         AudioTag::MetaOut*  mout;
 
@@ -217,9 +228,9 @@ int main(int argc, char *argv[])
     opts.mbconvert = false;
     opts.preserve = false;
     opts.removeart = false;
-    opts.sync = false;
     opts.mout = NULL;
     opts.locale = NULL;
+    opts.iop = NULL;
 
     /* what we're encoding from */
     TagLib::String::Type  mbenc = TagLib::String::UTF8;
@@ -227,6 +238,8 @@ int main(int argc, char *argv[])
 
     /* this is encoding for the frames, default it to utf8 */
     TagLib::String::Type  enc = TagLib::String::UTF8;
+
+    AudioTag::Ops  ops;
 
     int c;
     while ( (c = getopt(argc, argv, "e:hla:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:r")) != EOF)
@@ -237,16 +250,20 @@ int main(int argc, char *argv[])
 		enc = AudioTag::parseEnc(optarg, TagLib::String::UTF8);
 	    } break;
 
-	    case 'l':  opts.list = true;  break;
+	    case 'l':
+            {
+                ops.add(new AudioTag::OpListTags());
+            } break;
+
 	    case 'L':  opts.listP = true;  break;
 
-	    case 't':  opts.iflds.title = optarg;  break;
-	    case 'a':  opts.iflds.artist = optarg;  break;
-	    case 'A':  opts.iflds.album = optarg;  break;
-	    case 'y':  opts.iflds.yr = optarg;  break;
-	    case 'c':  opts.iflds.comment = optarg;  break;
-	    case 'T':  opts.iflds.trackno = optarg;  break;
-	    case 'g':  opts.iflds.genre = optarg;  break;
+            case 't':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.title = optarg;  break;
+            case 'a':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.artist = optarg;  break;
+            case 'A':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.album = optarg;  break;
+            case 'y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.yr = optarg;  break;
+            case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
+            case 'T':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackno = optarg;  break;
+            case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
 
             // clone from tag X to Y if X exists
             case 'n':
@@ -255,7 +272,17 @@ int main(int argc, char *argv[])
                 if (strlen(optarg) == 3 && optarg[1] == ':') {
                     opts.from = optarg[0];
                     opts.to   = optarg[2];
-                }
+                    if (opts.to && opts.from && opts.to.operator!=(opts.from) && 
+                        opts.to.all == false && opts.from.all == false) 
+                    {
+                        ops.add(new AudioTag::OpCloneTags(opts.to, opts.from));
+                    }
+                    else
+                    {
+                        MP3_TAG_ERR("cloning from/to must be exclusive tags");
+                        AudioTag::_usage();
+                    }
+               }
             } break;
 
             case 'i':
@@ -265,12 +292,20 @@ int main(int argc, char *argv[])
 
 	    case 'd':
 	    {
-                opts.remove = optarg;
+                ops.add(new AudioTag::OpRemoveTags(AudioTag::MetaTOI(optarg)));
 	    } break;
 
-	    case 'V':  _verbose = true;  break;
+            case 'V':
+            {
+                AudioTag::_verbose = true;
+            } break;
 
-	    case 'C':  opts.clean = true;  break;
+	    case 'C':
+            {
+                opts.clean = true;
+                ops.add(new AudioTag::OpCleanTags());
+            } break;
+
 	    case 'M':
 	    {
 		opts.mbconvert = true;
@@ -278,8 +313,10 @@ int main(int argc, char *argv[])
 	    } break;
 
             case 'r':
+            {
                 opts.removeart = true;
-                break;
+                ops.add(new AudioTag::OpRemoveArt());
+            } break;
 
             case 'p':
                 opts.preserve = true;
@@ -294,17 +331,17 @@ int main(int argc, char *argv[])
                 break;
 
 	    case 'h':
-	    default: _usage();
+            default: AudioTag::_usage();
 	}
     }
 
     if ( !(optind < argc) ) {
         MP3_TAG_ERR("no files specified");
-	_usage();
+        AudioTag::_usage();
     }
 
     const char*  l;
-    if ( (l = _setlocale(opts.locale)) == NULL) {
+    if ( (l = AudioTag::_setlocale(opts.locale)) == NULL) {
         MP3_TAG_ERR("failed to set valid UTF8 locale - tried all fallbacks; verify locales (locale -a)");
         return -1;
     }
@@ -314,14 +351,11 @@ int main(int argc, char *argv[])
     MP3_TAG_NOTICE_VERBOSE("using locale=" << l);
 
 
-    if (opts.to && opts.from && opts.to.operator!=(opts.from) && 
-        opts.to.all == false && opts.from.all == false) {
-        opts.sync = true;
+
+    if (ops.empty()) {
+        ops.add(new AudioTag::OpListTags());
     }
 
-    if ( (!opts.list && !opts.iflds && !opts.remove && !opts.removeart && !opts.clean && !opts.mbconvert && !opts.sync) || (opts.iflds && opts.mbconvert)) {
-        opts.list = true;
-    }
     opts.iflds.strip();
 
     if (opts.mout == NULL) {
@@ -356,76 +390,15 @@ int main(int argc, char *argv[])
             continue;
         }
 
-
-	/* listing takes precidence above the mod actions
-	 */
-        if (opts.list)
-        {
-            cout << *ff;
-
-#if 0
-            if (opts.listp) 
-            {
-                const Meta::Tags  tags = ff->meta().tags();
-                for (Meta::Tags::const_iterator i=tags.begin(); i!=tags.end(); ++i) {
-                    const TagLib::PropertyMap  pm = (*i)->properties();
-                }
-            }
-#endif
-        }
-
-        if ((opts.iflds || opts.clean || opts.sync || opts.remove) && access(ff->taglibfile().name(), W_OK) < 0) {
-            MP3_TAG_ERR(ff->taglibfile().name() << ": no write permissions, write ops ignored");
+        if ( !ops.readonly() && access(ff->taglibfile().name(), W_OK) < 0) {
+            MP3_TAG_ERR(ff->taglibfile().name() << ": no write permissions, all operations skipped");
         }
         else
         {
-        bool  mod = false;
+            // execute in order they appeared on command line
 
-        // remove tags
-        if (opts.remove) {
-            ff->meta().remove(opts.remove);
-            mod = true;
-        }
+            ops.execute(*ff);
 
-        if (opts.removeart) {
-            ff->meta().removeart();
-            mod = true;
-        }
-
-        // clean, only leaving basic tags
-        if (opts.clean) {
-            ff->meta().sanitize();
-            mod = true;
-        }
-
-        // multi-byte convert
-        if (opts.mbconvert) {
-            // TODO
-            mod = true;
-        }
-
-        // sync from one tag to another
-        if (opts.sync) {
-            ff->meta().clone(opts.to, opts.from);
-            mod = true;
-        }
-
-        // write new tag info
-        if (opts.iflds)
-        {
-            if (!opts.toi) {
-                // nothing spec, use the default
-                ff->meta() = opts.iflds;
-            }
-            else {
-                ff->meta().assign(opts.toi, opts.iflds);
-            }
-
-            mod = true;
-        }
-
-        if (mod)
-        {
             ff->meta().save();
 
             if (opts.preserve)
@@ -446,7 +419,6 @@ int main(int argc, char *argv[])
                     MP3_TAG_WARN_VERBOSE("'" << f << "' unable to revert to original access times - " << strerror(errno));
                 }
             }
-        }
         }
         delete ff;
     }
