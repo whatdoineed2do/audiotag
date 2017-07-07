@@ -9,7 +9,7 @@ LDFLAGS = -g -L/home/ray/tools/lib -ltag -lz
 %.o     : %.cc  ;       $(CXX) -c $(CXXFLAGS) $<
 
 
-objs:	audiotagmeta.o audiotagmetaout.o audiotagfile.o audiotag.o
+objs:	audiotagmeta.o audiotagmetaout.o audiotagfile.o audiotag.o 
 
 data:
 	git checkout f1856a4478511d856bdceabf5e1b645faf24a898 test.mp3 test-ntags.mp3 test.flac test.m4a  test-pic.flac  test-pic.mp3
@@ -19,7 +19,7 @@ audiotag:	audiotag.o audiotagmeta.o audiotagfile.o audiotagmetaout.o
 #cp -f .backup/test*{flac,m4a,mp3} .
 
 
-audiotag.o:	audiotag.cc audiotagmeta.h audiotagfile.h audiotagmetaout.h
+audiotag.o:	audiotag.cc audiotagmeta.h audiotagfile.h audiotagmetaout.h audiotagops.h
 audiotagmeta.o: audiotagmeta.cc audiotagmeta.h audiotagfile.h audiotagmetaout.h
 audiotagmetaout.o: audiotagmetaout.cc audiotagmetaout.h audiotagmeta.h
 audiotagfile.o: audiotagfile.cc audiotagmeta.h audiotagfile.h
