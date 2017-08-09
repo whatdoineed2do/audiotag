@@ -3,8 +3,9 @@ clean:
 	@rm -f *.o audiotag core a.out
 
 CXXFLAGS += -gdwarf-2 -DNDEBUG
-CXXFLAGS = -g -I/usr/include/taglib -I/home/ray/tools/include/
-LDFLAGS = -g -L/home/ray/tools/lib -ltag -lz
+
+CXXFLAGS = -g $(shell pkg-config taglib --cflags)
+LDFLAGS = -g $(shell pkg-config taglib --libs) -lz
 
 %.o     : %.cc  ;       $(CXX) -c $(CXXFLAGS) $<
 
@@ -15,7 +16,7 @@ data:
 	git checkout cfe5718 test.mp3 test-ntags.mp3 test.flac test.m4a  test-pic.flac test-pic.m4a  test-pic.mp3
 
 audiotag:	audiotag.o audiotagmeta.o audiotagfile.o audiotagmetaout.o
-	g++ $^ $(shell taglib-config --libs) $(LDFLAGS) -o $@ 
+	g++ $^ $(LDFLAGS) -o $@ 
 #cp -f .backup/test*{flac,m4a,mp3} .
 
 
