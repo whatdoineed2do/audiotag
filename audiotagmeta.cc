@@ -242,7 +242,7 @@ void  MetaMP3::save()
      * other tags have modified
      */
     MP3_TAG_DEBUG("mp3 savetag=" << _svtag);
-    _tf.save(_svtag, true);
+    _tf.save(_svtag == 0 ? TagLib::MPEG::File::ID3v2 : _svtag, true);
 }
 
 void MetaMP3::remove(const MetaTOI& toi_)
