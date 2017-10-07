@@ -282,7 +282,7 @@ void MetaMP3::remove(const MetaTOI& toi_)
      *       correct (0x0002)
      */
 
-    if (toi_.id3v2 || toi_.deflt) {
+    if (toi_.id3v2 || toi_.deflt || toi_.all) {
         _id3v2 = _tf.ID3v2Tag(true);
     }
 }
