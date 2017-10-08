@@ -275,7 +275,7 @@ void MetaMP3::remove(const MetaTOI& toi_)
         return;
     }
     MP3_TAG_DEBUG("mp3 strip=" << rmtag);
-    _tf.strip(rmtag, true);
+    _tf.strip(rmtag);
 
     /* BUG - if you ask to remove APE/ID3v1, both appear to be removed but when
      *       saved the ID3v2 tag is duplicated onto ID3v1; save tag values are 
