@@ -399,8 +399,6 @@ int main(int argc, char *argv[])
 
             ops.execute(*ff);
 
-            ff->meta().save();
-
             if (opts.preserve)
             {
                 /* try to reset the timestamps on the file

@@ -23,6 +23,9 @@ class Op {
     {
         if (verbose_)  MP3_TAG_NOTICE_VERBOSE(_descr);
         _execute(f_, verbose_);
+        if (!readonly) {
+            f_.meta().save();
+        }
     }
 
 
