@@ -64,6 +64,8 @@ class Input
     const char*  yr;       // TDRC or TYER or TORY
     const char*  trackno;  // TRCK
 
+    const char*  albumartist;
+
     void  reset()
     {
         artist = NULL;
@@ -73,6 +75,8 @@ class Input
         genre = NULL;
         yr = NULL;
         trackno = NULL;
+
+        albumartist = NULL;
     }
 
 
@@ -83,7 +87,8 @@ class Input
         comment(NULL),
         genre(NULL),
         yr(NULL),
-        trackno(NULL)
+        trackno(NULL),
+        albumartist(NULL)
     { reset(); }
 
     Input(const TagLib::Tag* tag_)
@@ -99,12 +104,12 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno; }
+    { return artist || album || title || comment || genre || yr || trackno || albumartist; }
 
 
     void  strip()
     {
-        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno , NULL };
+        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &albumartist, NULL };
 
         const char***  p = a;
         while (*p)
@@ -148,6 +153,8 @@ class Input
         album = AudioTag::_strrep(tag_->album(), &A);
         genre = AudioTag::_strrep(tag_->genre(), &g);
 
+        //albumartist = AudioTag::_strrep(tag_->???(), &r);
+
         sprintf(T, "%ld", tag_->track());
         sprintf(y, "%ld", tag_->year());
         trackno = T;
@@ -155,7 +162,7 @@ class Input
     }
 
   private:
-    TagLib::String  a,t,A,g;
+    TagLib::String  a,t,A,g,r;
     char  y[5];
     char  T[3];
 };
@@ -230,6 +237,7 @@ class Meta
 
     virtual void   artist(TagLib::Tag&, const char*);
     virtual void    album(TagLib::Tag&, const char*);
+    virtual void  albumArtist(TagLib::Tag&, const char*);
     virtual void    title(TagLib::Tag&, const char*);
     virtual void  comment(TagLib::Tag&, const char*);
     virtual void    genre(TagLib::Tag&, const char*);

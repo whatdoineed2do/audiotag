@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <taglib/tstring.h>
+#include <taglib/tpropertymap.h>
 
 #include "audiotag.h"
 #include "audiotagfile.h"
@@ -162,6 +163,26 @@ void  Meta::artist(TagLib::Tag& tag_, const char* data_)
 void  Meta::album(TagLib::Tag& tag_, const char* data_)
 {
     tag_.setAlbum( data_ ? _cnvrt(data_) : TagLib::String::null);
+}
+
+// TODO - this doesnt work .. the propetyy map must come from a child class!
+void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
+{
+    const char* N = "ALBUMARTIST";
+    TagLib::PropertyMap  m = tag_.properties();
+    if (data_ == NULL) {
+        m.erase(N);
+    }
+    else {
+        TagLib::PropertyMap::Iterator  i = m.find(N);
+        if (i == m.end()) {
+            m.insert(N, _cnvrt(data_) );
+        }
+        else {
+            m.replace(N, _cnvrt(data_));
+        }
+    }
+    tag_.setProperties(m);
 }
 
 
