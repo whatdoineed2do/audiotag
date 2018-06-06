@@ -3,6 +3,9 @@
 #include <iostream>
 #include <iomanip>
 
+#include <tpropertymap.h>
+#include <tstringlist.h>
+
 #include "audiotagmeta.h"
 
 
@@ -74,6 +77,56 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
     p = AudioTag::_strrep(tag_.album());
     if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
     os_ << ",\n";
+
+
+    // stuff from the properties not available on the 'std' i/f
+
+    /* this is a horrid hack - however, if you try to use the base class ref
+     * to call properties() you can't seem to find the properties!
+     */
+    const TagLib::ID3v1::Tag*  id3v1tag = NULL;
+    const TagLib::ID3v2::Tag*  id3v2tag = NULL;
+    const TagLib::Ogg::XiphComment* flactag = NULL;
+    const TagLib::MP4::Tag*  mp4tag = NULL;
+
+    TagLib::PropertyMap  m;
+    if ( (id3v1tag = dynamic_cast<const TagLib::ID3v1::Tag*>(&tag_)) ) m = id3v1tag->properties(); else
+    if ( (id3v2tag = dynamic_cast<const TagLib::ID3v2::Tag*>(&tag_)) ) m = id3v2tag->properties(); else
+    if ( (flactag  = dynamic_cast<const TagLib::Ogg::XiphComment*>(&tag_)) ) m = flactag->properties(); else
+    if ( (mp4tag   = dynamic_cast<const TagLib::MP4::Tag*>(&tag_)) ) m = mp4tag->properties();
+
+
+    const struct _NVP {
+        const char*  tn;  // tag name
+        const char*  on;  // output name
+    }  ptags[] = {
+        { "ALBUMARTIST",    "AlbumArtist"     },
+        { "ALBUMSORT",      "AlbumSort"       },
+        { "ARTISTSORT",     "ArtistSort"      },
+        { "TITLESORT",      "TitleSort"       },
+        { "ALBUMARTISTSORT","AlbumArtistSort" },
+
+        { "COMPOSER",       "Composer"        },
+        { "COPYRIGHT",      "Copyright"       },
+        { "ENCODEDBY",      "Encoded"         },
+
+        { NULL, NULL }
+    };
+
+    {
+        const _NVP* p = ptags;
+        while (p->tn)
+        {
+            const TagLib::StringList&  sl = m[p->tn];
+            if ( !sl.isEmpty()) {
+                os_ << "        \"" << p->on << "\": "
+                    << "\"" << AudioTag::_strrep(sl.front().toCString()) << "\""
+                    << ",\n";
+            }
+            ++p;
+        }
+    }
+
 
     os_ << "        \"Track\": ";
     i = tag_.track();
