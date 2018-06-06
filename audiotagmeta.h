@@ -26,6 +26,7 @@
 #include <taglib/commentsframe.h>
 #include <taglib/xiphcomment.h>
 #include <taglib/mp4tag.h>
+#include <taglib/tpropertymap.h>
 
 namespace TagLib
 {
@@ -64,6 +65,8 @@ class Input
     const char*  yr;       // TDRC or TYER or TORY
     const char*  trackno;  // TRCK
 
+    const char*  albumartist;
+
     void  reset()
     {
         artist = NULL;
@@ -73,6 +76,8 @@ class Input
         genre = NULL;
         yr = NULL;
         trackno = NULL;
+
+        albumartist = NULL;
     }
 
 
@@ -83,7 +88,8 @@ class Input
         comment(NULL),
         genre(NULL),
         yr(NULL),
-        trackno(NULL)
+        trackno(NULL),
+        albumartist(NULL)
     { reset(); }
 
     Input(const TagLib::Tag* tag_)
@@ -99,12 +105,12 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno; }
+    { return artist || album || title || comment || genre || yr || trackno || albumartist; }
 
 
     void  strip()
     {
-        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno , NULL };
+        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &albumartist, NULL };
 
         const char***  p = a;
         while (*p)
@@ -148,6 +154,8 @@ class Input
         album = AudioTag::_strrep(tag_->album(), &A);
         genre = AudioTag::_strrep(tag_->genre(), &g);
 
+        //albumartist = AudioTag::_strrep(tag_->???(), &r);
+
         sprintf(T, "%ld", tag_->track());
         sprintf(y, "%ld", tag_->year());
         trackno = T;
@@ -155,7 +163,7 @@ class Input
     }
 
   private:
-    TagLib::String  a,t,A,g;
+    TagLib::String  a,t,A,g,r;
     char  y[5];
     char  T[3];
 };
@@ -230,6 +238,7 @@ class Meta
 
     virtual void   artist(TagLib::Tag&, const char*);
     virtual void    album(TagLib::Tag&, const char*);
+    virtual void  albumArtist(TagLib::Tag&, const char*);
     virtual void    title(TagLib::Tag&, const char*);
     virtual void  comment(TagLib::Tag&, const char*);
     virtual void    genre(TagLib::Tag&, const char*);
@@ -272,6 +281,12 @@ class Meta
     }
 
 
+    virtual TagLib::PropertyMap  properties(const TagLib::Tag& t_) const
+    { return t_.properties(); }
+
+    virtual void                 properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+    { t_.setProperties(m_); }
+
 
   protected:
     Meta(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_) throw (std::invalid_argument) 
@@ -297,6 +312,7 @@ class Meta
 
     virtual std::ostream&  _out(std::ostream& os_, const Meta::Tags::value_type& t_) const;
     virtual void  _assign(TagLib::Tag&, const Input&);
+
 
 
   private:
@@ -344,6 +360,9 @@ class MetaMP3 : public _MetaMulti
     bool  coverart() const;
     void  removeart();
 
+    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
+
   private:
     MetaMP3(const MetaMP3&);
     void operator=(const MetaMP3&);
@@ -360,6 +379,7 @@ class MetaMP3 : public _MetaMulti
 
     const char*  _id3v2TxtEnc(const TagLib::ID3v2::Frame* f_);
     int  _svtag;
+
 };
 
 

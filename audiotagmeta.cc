@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <taglib/tstring.h>
+#include <taglib/tpropertymap.h>
 
 #include "audiotag.h"
 #include "audiotagfile.h"
@@ -164,6 +165,26 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
     tag_.setAlbum( data_ ? _cnvrt(data_) : TagLib::String::null);
 }
 
+// TODO - this doesnt work .. the propetyy map must come from a child class!
+void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
+{
+    const char* N = "ALBUMARTIST";
+    TagLib::PropertyMap  m = properties(tag_);
+    if (data_ == NULL) {
+        m.erase(N);
+    }
+    else {
+        TagLib::PropertyMap::Iterator  i = m.find(N);
+        if (i == m.end()) {
+            m.insert(N, _cnvrt(data_) );
+        }
+        else {
+            m.replace(N, _cnvrt(data_));
+        }
+    }
+    properties(tag_, m);
+}
+
 
 void  Meta::title(TagLib::Tag& tag_, const char* data_)
 {
@@ -208,6 +229,8 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
 
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
+
+    if (rhs_.albumartist)        albumArtist(tag_, rhs_.albumartist);
 }
 
 void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::String::Type mbenc_)
@@ -232,6 +255,29 @@ void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::St
     sprintf(y, "%ld", tag_.year());
     iflds_.trackno = T;
     iflds_.yr = y;
+}
+
+TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
+{
+    TagLib::PropertyMap  m;
+    const TagLib::ID3v2::Tag*  t;
+    if ( (t = dynamic_cast<const TagLib::ID3v2::Tag*>(&t_)) ) {
+        m = t->properties();
+    }
+    return m;
+}
+void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+{
+    TagLib::ID3v2::Tag*  t;
+    if ( (t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_)) ) {
+        t->setProperties(m_);
+    }
+    else {
+        /* this isnt working for me when its via the base reference ... so it 
+         *looks like its not virtualised in taglib but use as default
+         */
+        t_.setProperties(m_);
+    }
 }
 
 

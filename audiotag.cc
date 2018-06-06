@@ -62,6 +62,7 @@ void  _usage()
 	 << "  [tagging options]" << endl
 	 << "       -t  title" << endl
 	 << "       -a  artist" << endl
+	 << "       -R  album artist" << endl
 	 << "       -A  album" << endl
 	 << "       -c  comment" << endl
 	 << "       -g  genre" << endl
@@ -242,7 +243,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:r")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:r")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -259,6 +260,7 @@ int main(int argc, char *argv[])
 
             case 't':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.title = optarg;  break;
             case 'a':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.artist = optarg;  break;
+            case 'R':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.albumartist = optarg;  break;
             case 'A':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.album = optarg;  break;
             case 'y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.yr = optarg;  break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
