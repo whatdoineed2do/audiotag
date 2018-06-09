@@ -188,6 +188,20 @@ struct OpUpdateTags: public _OpWR
     }
 };
 
+struct OpPropertyTags: public _OpWR
+{
+    OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_)
+        : _OpWR("merge property tags"), impl(toi_, input_)
+    { }
+
+    OpUpdateTags  impl;
+    bool  _execute(File& f_, bool verbose_) const
+    {
+	impl._execute(f_, verbose_);
+    }
+};
+
+
 
 
 

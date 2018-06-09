@@ -67,6 +67,8 @@ class Input
 
     const char*  albumartist;
 
+    TagLib::PropertyMap  properties;
+
     void  reset()
     {
         artist = NULL;
@@ -78,6 +80,8 @@ class Input
         trackno = NULL;
 
         albumartist = NULL;
+
+        properties.clear();
     }
 
 
@@ -105,7 +109,7 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno || albumartist; }
+    { return artist || album || title || comment || genre || yr || trackno || albumartist || !properties.isEmpty(); }
 
 
     void  strip()
@@ -313,6 +317,19 @@ class Meta
     virtual std::ostream&  _out(std::ostream& os_, const Meta::Tags::value_type& t_) const;
     virtual void  _assign(TagLib::Tag&, const Input&);
 
+    virtual TagLib::PropertyMap&  _mergeproperties(TagLib::PropertyMap&, const TagLib::PropertyMap&) const;
+
+    template <typename T>
+    TagLib::PropertyMap  _properties(const T& t_) const
+    { return t_.properties(); }
+
+    template <typename T>
+    void  _properties(T& t_, const TagLib::PropertyMap& m_) const
+    {
+	// add or replace ..don't blow away
+	TagLib::PropertyMap  m = t_.properties();
+	t_.setProperties(_mergeproperties(m, m_));
+    }
 
 
   private:
@@ -399,6 +416,8 @@ class MetaOGGFlac : public Meta
     Meta::Tags  tags() const;
     void  remove(const MetaTOI&);
 
+    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
     MetaOGGFlac(const MetaOGGFlac&);
@@ -428,6 +447,8 @@ class MetaFlac : public Meta
     bool  coverart() const;
     void  removeart();
 
+    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
     MetaFlac(const MetaFlac&);
@@ -456,6 +477,9 @@ class MetaM4a : public Meta
     void  assign(const MetaTOI&, const Input&);
 
     Meta::Tags  tags() const;
+
+    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
     MetaM4a(const MetaM4a&);

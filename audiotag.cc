@@ -68,6 +68,9 @@ void  _usage()
 	 << "       -g  genre" << endl
 	 << "       -y  year" << endl
 	 << "       -T  track" << endl
+	 << "       -P  <property name>:<value>[,<property name>:<value>]" << endl
+	 << "            -P foo:  delete property call 'foo' (if exists)" << endl
+	 << "            -P foo:bar,coke:cola  add properties: foo=bar and coke=cola" 
 	 << endl
 	 << "  [maintainence options]" << endl
 	 << "       -l             list tags (exclusive maintanence option" << endl
@@ -243,7 +246,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:r")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -266,6 +269,44 @@ int main(int argc, char *argv[])
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
             case 'T':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackno = optarg;  break;
             case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
+
+            case 'P':
+            {
+		char*  pc = NULL;
+		char*  tok = NULL;
+		while ( (tok = strtok_r(pc == NULL ? optarg : NULL, ",", &pc)) )
+		{
+		    const uint8_t  tn = strlen(tok);
+		    char*  prop;
+		    if ( (prop = strtok(tok, ":")) == NULL) {
+                        MP3_TAG_ERR("invalid arg='" << tok  << "property list format: <property name>:<property value>");
+                        AudioTag::_usage();
+		    }
+
+		    const uint8_t  n = strlen(prop);
+		    if (n == tn) {
+			MP3_TAG_ERR("invalid token='" << tok << "' - no value");
+                        AudioTag::_usage();
+		    }
+		    prop[n] = NULL;
+		    const char*  value = prop + n+1;
+
+		    if (strlen(value) == 0) {
+			opts.iflds.properties[prop].clear();
+		    }
+		    else
+		    {
+			auto  where = opts.iflds.properties.find(prop);
+			if (where == opts.iflds.properties.end()) {
+			    opts.iflds.properties.insert(prop, TagLib::StringList(value) );
+			}
+			else {
+			    where->second.prepend(value);
+			}
+		    }
+		}
+		ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds) );
+            } break;
 
             // clone from tag X to Y if X exists
             case 'n':
@@ -361,7 +402,7 @@ int main(int argc, char *argv[])
     opts.iflds.strip();
 
     if (opts.mout == NULL) {
-        opts.mout = new AudioTag::MetaOut();
+        opts.mout = new AudioTag::MetaOutJson();
     }
 
 
@@ -401,6 +442,8 @@ int main(int argc, char *argv[])
 
             ops.execute(*ff);
 
+#ifndef __APPLE__
+	    // macos doesnt have st_mtim
             if (opts.preserve)
             {
                 /* try to reset the timestamps on the file
@@ -419,6 +462,7 @@ int main(int argc, char *argv[])
                     MP3_TAG_WARN_VERBOSE("'" << f << "' unable to revert to original access times - " << strerror(errno));
                 }
             }
+#endif
         }
         delete ff;
     }
