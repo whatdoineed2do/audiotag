@@ -91,6 +91,7 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
 
     const TagLib::PropertyMap  m = m_.properties(tag_);
 
+#if 0
     const struct _NVP {
         const char*  tn;  // tag name
         const char*  on;  // output name
@@ -121,7 +122,7 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
             ++p;
         }
     }
-
+#endif
 
     os_ << "        \"Track\": ";
     i = tag_.track();
@@ -145,9 +146,42 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
 
     os_ << "        \"Artwork\": ";
     bool  b = m_.coverart();
-    os_ << "\"" << (b ? "yes" : "no") << "\"";
+    os_ << "\"" << (b ? "yes" : "no") << "\",\n";
 
-    os_ << "\n      }"
+    os_ << "        \"properties\": {\n";
+    bool  fi = true;
+    for (const auto i : m)
+    {
+        if (fi) {
+            fi = false;
+        }
+        else {
+            os_ << ",\n";
+        }
+        os_ << "          \"" << i.first.toCString() << "\": ";
+        if (i.second.isEmpty()) {
+            os_ << "[ ]";
+        }
+        else 
+        {
+            bool  fj = true;
+            os_ << "[ ";
+            for (const auto& j : i.second)
+            {
+                if (fj) { 
+                    fj = false;
+                }
+                else { 
+                    os_ << ", "; 
+                }
+                os_ << "\"" << AudioTag::_strrep(j.toCString()) << "\"";
+            }
+            os_ << " ]";
+        }
+    }
+
+    os_ << "\n        }"
+        << "\n      }"
         << "\n    }"
         << "\n  }"
         << "\n}";
