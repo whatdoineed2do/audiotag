@@ -264,7 +264,6 @@ TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
     if ( (t = dynamic_cast<const TagLib::ID3v2::Tag*>(&t_)) ) {
         m = t->properties();
     }
-    //return std::move(m);
     return m;
 }
 void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
@@ -272,6 +271,12 @@ void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     TagLib::ID3v2::Tag*  t;
     if ( (t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_)) ) {
         t->setProperties(m_);
+    }
+    else {
+        /* this isnt working for me when its via the base reference ... so it 
+         *looks like its not virtualised in taglib but use as default
+         */
+        t_.setProperties(m_);
     }
 }
 
