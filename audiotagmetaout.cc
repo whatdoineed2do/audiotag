@@ -89,12 +89,7 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
     const TagLib::Ogg::XiphComment* flactag = NULL;
     const TagLib::MP4::Tag*  mp4tag = NULL;
 
-    TagLib::PropertyMap  m;
-    if ( (id3v1tag = dynamic_cast<const TagLib::ID3v1::Tag*>(&tag_)) ) m = id3v1tag->properties(); else
-    if ( (id3v2tag = dynamic_cast<const TagLib::ID3v2::Tag*>(&tag_)) ) m = id3v2tag->properties(); else
-    if ( (flactag  = dynamic_cast<const TagLib::Ogg::XiphComment*>(&tag_)) ) m = flactag->properties(); else
-    if ( (mp4tag   = dynamic_cast<const TagLib::MP4::Tag*>(&tag_)) ) m = mp4tag->properties();
-
+    const TagLib::PropertyMap  m = m_.properties(tag_);
 
     const struct _NVP {
         const char*  tn;  // tag name

@@ -169,7 +169,7 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
 void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
 {
     const char* N = "ALBUMARTIST";
-    TagLib::PropertyMap  m = tag_.properties();
+    TagLib::PropertyMap  m = properties(tag_);
     if (data_ == NULL) {
         m.erase(N);
     }
@@ -182,7 +182,7 @@ void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
             m.replace(N, _cnvrt(data_));
         }
     }
-    tag_.setProperties(m);
+    properties(tag_, m);
 }
 
 
@@ -229,6 +229,8 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
 
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
+
+    if (rhs_.albumartist)        albumArtist(tag_, rhs_.album);
 }
 
 void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::String::Type mbenc_)
@@ -253,6 +255,24 @@ void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::St
     sprintf(y, "%ld", tag_.year());
     iflds_.trackno = T;
     iflds_.yr = y;
+}
+
+TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
+{
+    TagLib::PropertyMap  m;
+    const TagLib::ID3v2::Tag*  t;
+    if ( (t = dynamic_cast<const TagLib::ID3v2::Tag*>(&t_)) ) {
+        m = t->properties();
+    }
+    //return std::move(m);
+    return m;
+}
+void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+{
+    TagLib::ID3v2::Tag*  t;
+    if ( (t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_)) ) {
+        t->setProperties(m_);
+    }
 }
 
 
