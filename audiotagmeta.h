@@ -67,6 +67,8 @@ class Input
 
     const char*  albumartist;
 
+    TagLib::PropertyMap  properties;
+
     void  reset()
     {
         artist = NULL;
@@ -78,6 +80,8 @@ class Input
         trackno = NULL;
 
         albumartist = NULL;
+
+        properties.clear();
     }
 
 
@@ -105,7 +109,7 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno || albumartist; }
+    { return artist || album || title || comment || genre || yr || trackno || albumartist || !properties.isEmpty(); }
 
 
     void  strip()
@@ -313,6 +317,7 @@ class Meta
     virtual std::ostream&  _out(std::ostream& os_, const Meta::Tags::value_type& t_) const;
     virtual void  _assign(TagLib::Tag&, const Input&);
 
+    virtual TagLib::PropertyMap&  _mergeproperties(TagLib::PropertyMap&, const TagLib::PropertyMap&) const;
 
 
   private:

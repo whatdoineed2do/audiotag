@@ -68,6 +68,7 @@ void  _usage()
 	 << "       -g  genre" << endl
 	 << "       -y  year" << endl
 	 << "       -T  track" << endl
+	 << "       -p  <property name>:<value>[,<property name>:<value>]" << endl
 	 << endl
 	 << "  [maintainence options]" << endl
 	 << "       -l             list tags (exclusive maintanence option" << endl
@@ -243,7 +244,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:r")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rp:")) != EOF)
     {
 	switch (c) {
 	    case 'e':

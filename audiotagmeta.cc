@@ -231,6 +231,9 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
 
     if (rhs_.albumartist)        albumArtist(tag_, rhs_.albumartist);
+    if (!rhs_.properties.isEmpty()) {
+        properties(tag_, rhs_.properties);
+    }
 }
 
 void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::String::Type mbenc_)
@@ -266,11 +269,29 @@ TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
     }
     return m;
 }
+
+TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLib::PropertyMap& b_) const
+{
+    for (auto i : b_) {
+        auto  j = a_.find(i.first);
+        if (j == a_.end()) {
+            a_.insert(i.first, i.second);
+        }
+        else {
+            a_.replace(i.first, i.second);
+        }
+    }
+    return a_;
+}
+
+
 void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
 {
     TagLib::ID3v2::Tag*  t;
     if ( (t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_)) ) {
-        t->setProperties(m_);
+        // add or replace ..don't blow away
+        TagLib::PropertyMap  m = properties(t_);
+        t->setProperties(_mergeproperties(m, m_));
     }
     else {
         /* this isnt working for me when its via the base reference ... so it 
