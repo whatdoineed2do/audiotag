@@ -230,7 +230,7 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
 
-    if (rhs_.albumartist)        albumArtist(tag_, rhs_.album);
+    if (rhs_.albumartist)        albumArtist(tag_, rhs_.albumartist);
 }
 
 void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::String::Type mbenc_)
