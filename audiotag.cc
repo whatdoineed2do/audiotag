@@ -289,12 +289,19 @@ int main(int argc, char *argv[])
 		    prop[n] = NULL;
 		    const char*  value = prop + n+1;
 
-		    auto  where = opts.iflds.properties.find(prop);
-		    if (where == opts.iflds.properties.end()) {
-			opts.iflds.properties.insert(prop, TagLib::StringList(value) );
+		    if (strlen(value) == 0) {
+			//opts.iflds.properties.erase(prop);
+			// this doesn't work - we need a list of properties to delete to action
 		    }
-		    else {
-			where->second.prepend(value);
+		    else
+		    {
+			auto  where = opts.iflds.properties.find(prop);
+			if (where == opts.iflds.properties.end()) {
+			    opts.iflds.properties.insert(prop, TagLib::StringList(value) );
+			}
+			else {
+			    where->second.prepend(value);
+			}
 		    }
 		}
 		ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds) );
