@@ -68,7 +68,7 @@ void  _usage()
 	 << "       -g  genre" << endl
 	 << "       -y  year" << endl
 	 << "       -T  track" << endl
-	 << "       -p  <property name>:<value>[,<property name>:<value>]" << endl
+	 << "       -P  <property name>:<value>[,<property name>:<value>]" << endl
 	 << endl
 	 << "  [maintainence options]" << endl
 	 << "       -l             list tags (exclusive maintanence option" << endl
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rp:")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -267,6 +267,11 @@ int main(int argc, char *argv[])
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
             case 'T':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackno = optarg;  break;
             case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
+
+            case 'P':
+            {
+                // TODO opts.iflds.properties.insert("foo", StringList("bar"));
+            } break;
 
             // clone from tag X to Y if X exists
             case 'n':
