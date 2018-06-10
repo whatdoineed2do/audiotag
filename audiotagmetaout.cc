@@ -174,7 +174,7 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
                 else { 
                     os_ << ", "; 
                 }
-                os_ << "\"" << AudioTag::_strrep(j.toCString()) << "\"";
+                os_ << "\"" << AudioTag::_strrep(j) << "\"";
             }
             os_ << " ]";
         }
