@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
 
             ops.execute(*ff);
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) || defined(__USE_XOPEN2K8)
 	    // macos doesnt have st_mtim
             if (opts.preserve)
             {
