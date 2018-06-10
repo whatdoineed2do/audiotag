@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <taglib/tstring.h>
+#include <taglib/tpropertymap.h>
 
 #include "audiotag.h"
 #include "audiotagfile.h"
@@ -164,6 +165,26 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
     tag_.setAlbum( data_ ? _cnvrt(data_) : TagLib::String::null);
 }
 
+// TODO - this doesnt work .. the propetyy map must come from a child class!
+void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
+{
+    const char* N = "ALBUMARTIST";
+    TagLib::PropertyMap  m = properties(tag_);
+    if (data_ == NULL) {
+        m.erase(N);
+    }
+    else {
+        TagLib::PropertyMap::Iterator  i = m.find(N);
+        if (i == m.end()) {
+            m.insert(N, _cnvrt(data_) );
+        }
+        else {
+            m.replace(N, _cnvrt(data_));
+        }
+    }
+    properties(tag_, m);
+}
+
 
 void  Meta::title(TagLib::Tag& tag_, const char* data_)
 {
@@ -208,6 +229,11 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
 
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
+
+    if (rhs_.albumartist)        albumArtist(tag_, rhs_.albumartist);
+    if (!rhs_.properties.isEmpty()) {
+        properties(tag_, rhs_.properties);
+    }
 }
 
 void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::String::Type mbenc_)
@@ -232,6 +258,35 @@ void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::St
     sprintf(y, "%ld", tag_.year());
     iflds_.trackno = T;
     iflds_.yr = y;
+}
+
+
+TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLib::PropertyMap& b_) const
+{
+    for (auto i : b_) {
+        auto  j = a_.find(i.first);
+        if (j == a_.end()) {
+            a_.insert(i.first, i.second);
+        }
+        else {
+            a_.replace(i.first, i.second);
+        }
+    }
+    return a_;
+}
+
+void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+{
+    TagLib::ID3v2::Tag*  t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_);
+    if (t)  return _properties(*t, m_);
+    else    return _properties(t_, m_);
+}
+
+TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
+{
+    const TagLib::ID3v2::Tag*  t = dynamic_cast<const TagLib::ID3v2::Tag*>(&t_);
+    if (t) return _properties(*t);
+    else   return _properties(t_);
 }
 
 
@@ -524,6 +579,21 @@ void MetaOGGFlac::remove(const MetaTOI& toi_)
 {
 }
 
+
+void  MetaOGGFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+{
+    TagLib::Ogg::XiphComment*  t = dynamic_cast<TagLib::Ogg::XiphComment*>(&t_);
+    if (t)  return _properties(*t, m_);
+    else    return _properties(t_, m_);
+}
+
+TagLib::PropertyMap  MetaOGGFlac::properties(const TagLib::Tag& t_) const
+{
+    const TagLib::Ogg::XiphComment*  t = dynamic_cast<const TagLib::Ogg::XiphComment*>(&t_);
+    if (t) return _properties(*t);
+    else   return _properties(t_);
+}
+
 MetaFlac::MetaFlac(FileFlac& f_, MetaOut& mo_) 
   : Meta(f_.taglibfile(), (TagLib::Tag**)&_tag, mo_), 
     _f(f_),
@@ -602,6 +672,22 @@ void  MetaFlac::removeart()
     _tf.removePictures();
 }
 
+
+void  MetaFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+{
+    TagLib::Ogg::XiphComment*  t = dynamic_cast<TagLib::Ogg::XiphComment*>(&t_);
+    if (t)  return _properties(*t, m_);
+    else    return _properties(t_, m_);
+}
+
+TagLib::PropertyMap  MetaFlac::properties(const TagLib::Tag& t_) const
+{
+    const TagLib::Ogg::XiphComment*  t = dynamic_cast<const TagLib::Ogg::XiphComment*>(&t_);
+    if (t) return _properties(*t);
+    else   return _properties(t_);
+}
+
+
 MetaM4a::MetaM4a(FileM4a& f_, MetaOut& mo_)
   : Meta(f_.taglibfile(), (TagLib::Tag**)&_tag, mo_), 
     _f(f_),
@@ -653,6 +739,20 @@ void MetaM4a::assign(const MetaTOI& toi_, const Input& rhs_)
         }
         _assign(*_tag, rhs_);
     }
+}
+
+void  MetaM4a::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
+{
+    TagLib::MP4::Tag*  t = dynamic_cast<TagLib::MP4::Tag*>(&t_);
+    if (t)  return _properties(*t, m_);
+    else    return _properties(t_, m_);
+}
+
+TagLib::PropertyMap  MetaM4a::properties(const TagLib::Tag& t_) const
+{
+    const TagLib::MP4::Tag*  t = dynamic_cast<const TagLib::MP4::Tag*>(&t_);
+    if (t) return _properties(*t);
+    else   return _properties(t_);
 }
 
 
