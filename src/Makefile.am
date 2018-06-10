@@ -10,13 +10,13 @@ audiotag_CXXFLAGS = $(AM_CXXFLAGS)
 audiotag_LDFLAGS = $(TAGLIB_LIBS)
 audiotag_LDADD =
 audiotag_SOURCES = \
-	audiotag.cc
-	audiotagfile.cc
-	audiotagfile.h
-	audiotag.h
-	audiotagmeta.cc
-	audiotagmeta.h
-	audiotagmetaout.cc
-	audiotagmetaout.h
+	audiotag.cc \
+	audiotagfile.cc \
+	audiotagfile.h \
+	audiotag.h \
+	audiotagmeta.cc \
+	audiotagmeta.h \
+	audiotagmetaout.cc \
+	audiotagmetaout.h \
 	audiotagops.h
 
