@@ -69,6 +69,8 @@ void  _usage()
 	 << "       -y  year" << endl
 	 << "       -T  track" << endl
 	 << "       -P  <property name>:<value>[,<property name>:<value>]" << endl
+	 << "            -P foo:  delete property call 'foo' (if exists)" << endl
+	 << "            -P foo:bar,coke:cola  add properties: foo=bar and coke=cola" 
 	 << endl
 	 << "  [maintainence options]" << endl
 	 << "       -l             list tags (exclusive maintanence option" << endl
@@ -290,8 +292,7 @@ int main(int argc, char *argv[])
 		    const char*  value = prop + n+1;
 
 		    if (strlen(value) == 0) {
-			//opts.iflds.properties.erase(prop);
-			// this doesn't work - we need a list of properties to delete to action
+			opts.iflds.properties[prop].clear();
 		    }
 		    else
 		    {
