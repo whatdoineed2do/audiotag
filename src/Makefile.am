@@ -13,6 +13,5 @@ audiotag_SOURCES = \
 	audiotag.cc \
 	audiotagfile.cc \
 	audiotagmeta.cc \
-	audiotagmeta.h \
 	audiotagmetaout.cc
 
