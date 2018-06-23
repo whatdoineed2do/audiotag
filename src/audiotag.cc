@@ -51,9 +51,23 @@ namespace AudioTag
 const char*  _argv0 = NULL;
 bool  _verbose = false;
 
+
+const char*  _version()
+{
+#ifdef AUDIOTAG_VERSION
+#define AT_STRM(x)  #x
+#define AT_STR(x)   AT_STRM(x)
+#define AUDIOTAG_VERSION_STR  AT_STR(AUDIOTAG_VERSION)
+#else
+#define AUDIOTAG_VERSION_STR  "v0.0.0-unknown"
+#endif
+    return AUDIOTAG_VERSION_STR;
+}
+
 void  _usage()
 {
-    cout << "usage: " << _argv0 << " [OPTION]... [mp3 FILES]" << endl
+    cout << _argv0 << " " << _version() << endl
+         << "usage: " << _argv0 << " [OPTION]... [mp3 FILES]" << endl
 	 << endl
 	 << "  [tag encoding options]" << endl
          << "      [-e  encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]" << endl
@@ -246,7 +260,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:v")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -372,6 +386,11 @@ int main(int argc, char *argv[])
             case 'u':
                 opts.locale = optarg;
                 break;
+
+	    case 'v':
+	        cout << AudioTag::_argv0 << " " << AudioTag::_version() << endl;
+		return 0;
+		break;
 
 	    case 'h':
             default: AudioTag::_usage();
