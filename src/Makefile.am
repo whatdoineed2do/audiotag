@@ -5,7 +5,8 @@ AM_LDFLAGS = $(TAGLIB_LDFLAGS)
 
 bin_PROGRAMS = audiotag
 
-audiotag_CPPFLAGS = -I$(top_srcdir)/lib
+# using git version instead of the am values in config.h
+audiotag_CPPFLAGS = -I$(top_srcdir)/lib -DAUDIOTAG_VERSION=$(shell git describe --long --tags --dirty --always)
 audiotag_CXXFLAGS = $(AM_CXXFLAGS)
 audiotag_LDFLAGS = $(TAGLIB_LIBS)
 audiotag_LDADD =
