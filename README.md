@@ -23,189 +23,204 @@ Multiple commands can be chained together in a single execution - however the fi
 ## Example Usage
 Add/change the `artist`, clear the `comment` and display the meta
 ```
-$ audiotag -a "foo bar" -c "" -O json -l *.mp3
-04 foo.mp3:	[ID3v1]
+$ audiotag -a "foo bar" -c "" -O json -l test.mp3
 {
   "file": {
-    "name": "04 foo.mp3",
-    "meta": {
-      "tag": "ID3v1",
-      "data": {
-        "Artist": "foo bar",
-        "Title": "",
-        "Album": "¥Ï¥ë¥«",
-        "Track": "4",
-        "Yr": null,
-        "Genre": "Rock",
-        "Comment": "",
-        "Artwork": "no"
+    "name": "test.mp3",
+    "size": 58813,
+    "mod_time": "Thu 05 Jul 2018 08:51:07 AM BST"
+  },
+  "meta": [
+    {
+      "tag_type": "ID3v1",
+      "artist": "ONEartist",
+      "title": "ONEtitle",
+      "album": null,
+      "track": 2,
+      "year": 2007,
+      "genre": "Pop",
+      "comment": "this is a comment",
+      "artwork": false,
+      "properties": {
+        "ARTIST": [ "ONEartist" ],
+        "COMMENT": [ "this is a comment" ],
+        "DATE": [ "2007" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "ONEtitle" ],
+        "TRACKNUMBER": [ "2" ]
+      }
+    },
+    {
+      "tag_type": "APE",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null,
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": null,
+      "artwork": false,
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "DATE": [ "1999" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
       }
     }
-  }
+  ]
 }
-04 foo.mp3:	[  APE]
-{
-  "file": {
-    "name": "04 foo.mp3",
-    "meta": {
-      "tag": "APE",
-      "data": {
-        "Artist": "foo bar",
-        "Title": "",
-        "Album": "",
-        "Track": "4",
-        "Yr": null,
-        "Genre": "Rock",
-        "Comment": "",
-        "Artwork": "no"
-      }
-    }
-  }
-}
-
 ```
 ## Cloning Tags
 With the example above, we can see there is an `ID3v1` and `APE` tag but no `ID3v2` tag - we can clone the `APE` tag onto the `ID3v2` whilst deleting the `ID3v1` tag (it can't hold unicode text anyway, as seen in the album tag) in one command:
 ```
-$ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l foo.mp3 
-foo.mp3:	[ID3v2]
+$ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l test.mp3 
 {
   "file": {
-    "name": "foo.mp3",
-    "meta": {
-      "tag": "ID3v2",
-      "data": {
-        "Artist": "foo bar",
-        "Title": "",
-        "Album": "ハルカ",
-        "Track": "4",
-        "Yr": null,
-        "Genre": "Rock",
-        "Comment": "",
-        "Artwork": "no"
+    "name": "test.mp3",
+    "size": 58813,
+    "mod_time": "Thu 05 Jul 2018 08:51:21 AM BST"
+  },
+  "meta": [
+    {
+      "tag_type": "ID3v2",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": "ハルカ",
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": null,
+      "artwork": false,
+      "properties": {
+        "ALBUM": [ "ハルカ" ],
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "DATE": [ "1999" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
+      }
+    },
+    {
+      "tag_type": "APE",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null,
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": null,
+      "artwork": false,
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "DATE": [ "1999" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
       }
     }
-  }
+  ]
 }
-foo.mp3:	[  APE]
-{
-  "file": {
-    "name": "foo.mp3",
-    "meta": {
-      "tag": "APE",
-      "data": {
-        "Artist": "foo bar",
-        "Title": "",
-        "Album": "ハルカ",
-        "Track": "4",
-        "Yr": null,
-        "Genre": "Rock",
-        "Comment": "",
-        "Artwork": "no"
-      }
-    }
-  }
-}
-
 ```
 ## Working with arbituary tags
 `TagLib` provides a uniform set of property names across all tag formats which are shown in json output.  The `-P` flag can add/remove property tags but the user is responsible for verifying if such a property is valid for that tag type.
 ```
 $ audiotag  -l test.mp3
-test.mp3:	[ID3v2]
 {
   "file": {
     "name": "test.mp3",
-    "meta": {
-      "tag": "ID3v2",
-      "data": {
-        "Artist": "VER2 foo 群星bar",
-        "Title": "yep星 works",
-        "Album": "",
-        "Track": "2",
-        "Yr": "2007",
-        "Genre": "Pop",
-        "Comment": "this is a comment",
-        "Artwork": "no",
-        "properties": {
-          "ARTIST": [ "VER2 foo 群星bar" ],
-          "COMMENT": [ "this is a comment" ],
-          "DATE": [ "2007" ],
-          "FOO": [ "" ],
-          "GENRE": [ "Pop" ],
-          "TITLE": [ "yep星 works" ],
-          "TRACKNUMBER": [ "2" ]
-        }
+    "size": 59721,
+    "mod_time": "Sun 10 Jun 2018 05:46:22 PM BST"
+  },
+  "meta": [
+    {
+      "tag_type": "ID3v2",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null,
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": "id3v2 comment",
+      "artwork": "false",
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "COMMENT": [ "id3v2 comment" ],
+        "DATE": [ "1999" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
       }
     }
-  }
+  ]
 }
 ```
 ### Adding Properties
 ```
 $ audiotag  -P foo:bar,coke:cola -l test.mp3
-test.mp3:	[ID3v2]
 {
   "file": {
     "name": "test.mp3",
-    "meta": {
-      "tag": "ID3v2",
-      "data": {
-        "Artist": "VER2 foo 群星bar",
-        "Title": "yep星 works",
-        "Album": "",
-        "Track": "2",
-        "Yr": "2007",
-        "Genre": "Pop",
-        "Comment": "this is a comment",
-        "Artwork": "no",
-        "properties": {
-          "ARTIST": [ "VER2 foo 群星bar" ],
-          "COKE": [ "cola" ],
-          "COMMENT": [ "this is a comment" ],
-          "DATE": [ "2007" ],
-          "FOO": [ "bar" ],
-          "GENRE": [ "Pop" ],
-          "TITLE": [ "yep星 works" ],
-          "TRACKNUMBER": [ "2" ]
-        }
+    "size": 59721,
+    "mod_time": "Sun 10 Jun 2018 05:46:22 PM BST"
+  },
+  "meta": [
+    {
+      "tag_type": "ID3v2",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null.
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": "id3v2 comment",
+      "artwork": false,
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "COKE": [ "cola" ],
+        "COMMENT": [ "id3v2 comment" ],
+        "DATE": [ "1999" ],
+        "FOO": [ "bar" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
       }
     }
-  }
+  ]
 }
 ```
 ### Removing Property value and resassign
 ```
 $ audiotag  -P coke:,COMMENT:"an updated comment" -l test.mp3
-test.mp3:	[ID3v2]
 {
   "file": {
     "name": "test.mp3",
-    "meta": {
-      "tag": "ID3v2",
-      "data": {
-        "Artist": "VER2 foo 群星bar",
-        "Title": "yep星 works",
-        "Album": "",
-        "Track": "2",
-        "Yr": "2007",
-        "Genre": "Pop",
-        "Comment": "an updated comment",
-        "Artwork": "no",
-        "properties": {
-          "ARTIST": [ "VER2 foo 群星bar" ],
-          "COMMENT": [ "an updated comment" ],
-          "DATE": [ "2007" ],
-          "FOO": [ "bar" ],
-          "GENRE": [ "Pop" ],
-          "TITLE": [ "yep星 works" ],
-          "TRACKNUMBER": [ "2" ]
-        }
+    "size": 59721,
+    "mod_time": "Wed 04 Jul 2018 06:41:53 PM BST"
+  },
+  "meta": [
+    {
+      "tag_type": "ID3v2",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null,
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": "an updated comment",
+      "artwork": "false",
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "COMMENT": [ "an updated comment" ],
+        "DATE": [ "1999" ],
+        "FOO": [ "bar" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
       }
     }
-  }
+  ]
 }
-
 ```
 
 # Further Enhancements

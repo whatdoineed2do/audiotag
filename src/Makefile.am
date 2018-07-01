@@ -1,14 +1,13 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-AM_CXXFLAGS = $(TAGLIB_CFLAGS) -Wno-conversion-null -Wno-deprecated
-AM_LDFLAGS = $(TAGLIB_LDFLAGS)
+AM_CXXFLAGS = $(TAGLIB_CFLAGS) $(JSONC_CFLAGS) -Wno-conversion-null -Wno-deprecated
 
 bin_PROGRAMS = audiotag
 
 # using git version instead of the am values in config.h
 audiotag_CPPFLAGS = -I$(top_srcdir)/lib -DAUDIOTAG_VERSION=$(shell git describe --long --tags --dirty --always)
 audiotag_CXXFLAGS = $(AM_CXXFLAGS)
-audiotag_LDFLAGS = $(TAGLIB_LIBS)
+audiotag_LDFLAGS = $(TAGLIB_LIBS) $(JSONC_LIBS)
 audiotag_LDADD =
 audiotag_SOURCES = \
 	audiotag.cc \
