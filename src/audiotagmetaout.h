@@ -42,6 +42,11 @@ struct MetaOutJson: public MetaOut
     std::ostream&  out(std::ostream&, const Meta&, const TagLib::Tag&, const char*);
 };
 
+struct MetaOutJsonOld: public MetaOut
+{
+    std::ostream&  out(std::ostream&, const Meta&, const TagLib::Tag&, const char*);
+};
+
 };
 
 #endif

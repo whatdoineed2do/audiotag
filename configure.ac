@@ -3,7 +3,7 @@
 #
 
 AC_PREREQ(2.64)
-AC_INIT([audiotag], [1.2.1], [https://github.com/whatdoineed2do/audiotag/issues], [https://github.com/whatdoineed2do/audiotag], [whatdoineed2do@nospam-github.com])
+AC_INIT([audiotag], [1.2.3], [https://github.com/whatdoineed2do/audiotag/issues], [https://github.com/whatdoineed2do/audiotag], [whatdoineed2do@nospam-github.com])
 AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AC_CONFIG_SRCDIR([src/])
@@ -15,6 +15,7 @@ AC_PROG_INSTALL
 PKG_PROG_PKG_CONFIG
 
 PKG_CHECK_MODULES(TAGLIB, [taglib >= 1.11.1])
+PKG_CHECK_MODULES(JSONC, [json-c])
 
 AC_ARG_ENABLE([debug-code],
 	[AS_HELP_STRING([--enable-debug],

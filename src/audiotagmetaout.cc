@@ -6,6 +6,8 @@
 #include <tpropertymap.h>
 #include <tstringlist.h>
 
+#include <json-c/json.h>
+
 #include "audiotagmeta.h"
 
 
@@ -16,6 +18,7 @@ MetaOut*  MetaOut::create(const char* optarg_)
     if (optarg_ == NULL)                 return new MetaOut();
     if (strcmp(optarg_, "basic") == 0)   return new MetaOutBasic();
     if (strcmp(optarg_, "json")  == 0)   return new MetaOutJson();
+    if (strcmp(optarg_, "jsonold")  == 0)   return new MetaOutJsonOld();
 
     return new MetaOut();
 }
@@ -51,7 +54,7 @@ std::ostream&  MetaOutBasic::out(std::ostream& os_, const Meta& m_, const TagLib
     return os_;
 }
 
-std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib::Tag& tag_, const char* tagtype_)
+std::ostream&  MetaOutJsonOld::out(std::ostream& os_, const Meta& m_, const TagLib::Tag& tag_, const char* tagtype_)
 {
     const char*  p = NULL;
     int  i = 0;
@@ -84,11 +87,6 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
     /* this is a horrid hack - however, if you try to use the base class ref
      * to call properties() you can't seem to find the properties!
      */
-    const TagLib::ID3v1::Tag*  id3v1tag = NULL;
-    const TagLib::ID3v2::Tag*  id3v2tag = NULL;
-    const TagLib::Ogg::XiphComment* flactag = NULL;
-    const TagLib::MP4::Tag*  mp4tag = NULL;
-
     const TagLib::PropertyMap  m = m_.properties(tag_);
 
 #if 0
@@ -185,6 +183,68 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
         << "\n    }"
         << "\n  }"
         << "\n}";
+    return os_;
+}
+
+
+std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib::Tag& tag_, const char* tagtype_)
+{
+    const char*  p = NULL;
+    int  i;
+
+    json_object*  root = json_object_new_object();
+
+    json_object*  file = json_object_new_object();
+    {
+	json_object_object_add(file, "name", json_object_new_string(m_.file().name()));
+    }
+
+    json_object*  meta = json_object_new_array();
+    {
+	json_object*           metaobj = json_object_new_object();
+	json_object_object_add(metaobj, "tag", json_object_new_string(tagtype_));
+
+	p = AudioTag::_strrep(tag_.artist());
+	json_object_object_add(metaobj, "artist", (p=AudioTag::_strrep(tag_.artist())) ? 
+		                                    json_object_new_string(p) : NULL );
+	json_object_object_add(metaobj, "title",  (p=AudioTag::_strrep(tag_.title())) ?
+						    json_object_new_string(p) : NULL);
+	json_object_object_add(metaobj, "album",  (p=AudioTag::_strrep(tag_.album())) ?
+						    json_object_new_string(p) : NULL);
+	json_object_object_add(metaobj, "track",  (i = tag_.track()) > 0 ? 
+						    json_object_new_int(i) : NULL);
+	json_object_object_add(metaobj, "year",   (i = tag_.year()) > 0 ?
+						    json_object_new_int(i) : NULL);
+	json_object_object_add(metaobj, "genre",  (p=AudioTag::_strrep(tag_.genre())) ?
+						    json_object_new_string(p) : NULL);
+	json_object_object_add(metaobj, "comment",(p=AudioTag::_strrep(tag_.comment()) ) ? 
+						    json_object_new_string(p) : NULL);
+	json_object_object_add(metaobj, "artwork",json_object_new_boolean(m_.coverart() ? 1 : 0));
+
+	/* this is a horrid hack - however, if you try to use the base class ref
+	 * to call properties() you can't seem to find the properties!
+	 */
+	const TagLib::PropertyMap  m = m_.properties(tag_);
+	json_object*           metaprop = json_object_new_object();
+	{
+	    for (const auto i : m)
+	    {
+		json_object*  mp = json_object_new_array();
+		for (const auto& j : i.second) {
+		    json_object_array_add(mp, json_object_new_string( AudioTag::_strrep(j)) );
+		}
+		json_object_object_add(metaprop, i.first.toCString(), mp);
+	    }
+	}
+	json_object_object_add(metaobj, "properties", metaprop);
+	json_object_array_add(meta, metaobj);
+    }
+
+    json_object_object_add(root, "file", file);
+    json_object_object_add(root, "meta", meta);
+
+    os_ << json_object_to_json_string_ext(root,2);
+    json_object_put(root);
     return os_;
 }
 
