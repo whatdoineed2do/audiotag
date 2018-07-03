@@ -291,6 +291,8 @@ class Meta
     virtual void                 properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     { t_.setProperties(m_); }
 
+    std::ostream&  out(std::ostream& os_, const File& f_) const;
+
 
   protected:
     Meta(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_) throw (std::invalid_argument) 
@@ -311,6 +313,7 @@ class Meta
         }
         return TagLib::String::Latin1;
     }
+
 
 
 

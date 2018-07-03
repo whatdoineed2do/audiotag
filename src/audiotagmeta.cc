@@ -755,5 +755,10 @@ TagLib::PropertyMap  MetaM4a::properties(const TagLib::Tag& t_) const
     else   return _properties(t_);
 }
 
+std::ostream&  Meta::out(std::ostream& os_, const File& f_) const
+{
+    return _mo.out(os_, f_);
+}
+
 
 };

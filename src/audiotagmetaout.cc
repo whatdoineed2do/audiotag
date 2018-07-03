@@ -9,6 +9,7 @@
 #include <json-c/json.h>
 
 #include "audiotagmeta.h"
+#include "audiotagfile.h"
 
 
 namespace AudioTag
@@ -39,6 +40,9 @@ std::ostream&  MetaOut::out(std::ostream& os_, const Meta& m_, const TagLib::Tag
     os_ << "  Artwork: " << m_.coverart();
     return os_;
 }
+
+std::ostream&  MetaOut::out(std::ostream& os_, const File& file_)
+{ return os_ << "MetaOut::out(ostream,File) TODO - " << file_.taglibfile().name(); }
 
 
 std::ostream&  MetaOutBasic::out(std::ostream& os_, const Meta& m_, const TagLib::Tag& tag_, const char* tagtype_)
@@ -245,6 +249,74 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const Meta& m_, const TagLib:
 
     os_ << json_object_to_json_string_ext(root,2);
     json_object_put(root);
+    return os_;
+}
+
+std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
+{
+    const char*  p = NULL;
+    int  i;
+
+    json_object*  jroot = json_object_new_object();
+
+    json_object*  jfile = json_object_new_object();
+    {
+	json_object_object_add(jfile, "name", json_object_new_string(f_.taglibfile().name()));
+    }
+
+    json_object*  jtags = json_object_new_array();
+    {
+	for (const auto& tag : f_.meta().tags())
+	{
+	    json_object*  jmeta = json_object_new_object();
+	    {
+		json_object*           jmetaobj = json_object_new_object();
+		json_object_object_add(jmetaobj, "tag_type", json_object_new_string(tag.first));
+
+		p = AudioTag::_strrep(tag.second->artist());
+		json_object_object_add(jmetaobj, "artist", (p=AudioTag::_strrep(tag.second->artist())) ? 
+							    json_object_new_string(p) : NULL );
+		json_object_object_add(jmetaobj, "title",  (p=AudioTag::_strrep(tag.second->title())) ?
+							    json_object_new_string(p) : NULL);
+		json_object_object_add(jmetaobj, "album",  (p=AudioTag::_strrep(tag.second->album())) ?
+							    json_object_new_string(p) : NULL);
+		json_object_object_add(jmetaobj, "track",  (i = tag.second->track()) > 0 ? 
+							    json_object_new_int(i) : NULL);
+		json_object_object_add(jmetaobj, "year",   (i = tag.second->year()) > 0 ?
+							    json_object_new_int(i) : NULL);
+		json_object_object_add(jmetaobj, "genre",  (p=AudioTag::_strrep(tag.second->genre())) ?
+							    json_object_new_string(p) : NULL);
+		json_object_object_add(jmetaobj, "comment",(p=AudioTag::_strrep(tag.second->comment()) ) ? 
+							    json_object_new_string(p) : NULL);
+		json_object_object_add(jmetaobj, "artwork",json_object_new_boolean(f_.meta().coverart() ? 1 : 0));
+
+		/* this is a horrid hack - however, if you try to use the base class ref
+		 * to call properties() you can't seem to find the properties!
+		 */
+		const TagLib::PropertyMap  m = f_.meta().properties(*tag.second);
+		json_object*           jmetaprop = json_object_new_object();
+		{
+		    for (const auto i : m)
+		    {
+			json_object*  jmp = json_object_new_array();
+			for (const auto& j : i.second) {
+			    json_object_array_add(jmp, json_object_new_string( AudioTag::_strrep(j)) );
+			}
+			json_object_object_add(jmetaprop, i.first.toCString(), jmp);
+		    }
+		}
+		json_object_object_add(jmetaobj, "properties", jmetaprop);
+		json_object_array_add(jmeta, jmetaobj);
+	    }
+	    json_object_array_add(jtags, jmeta);
+	}
+    }
+
+    json_object_object_add(jroot, "file", jfile);
+    json_object_object_add(jroot, "meta", jtags);
+
+    os_ << json_object_to_json_string_ext(jroot,2);
+    json_object_put(jroot);
     return os_;
 }
 

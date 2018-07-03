@@ -11,6 +11,7 @@ namespace TagLib
 namespace  AudioTag
 {
 class Meta;
+class File;
 
 
 /* different output formats
@@ -23,6 +24,7 @@ class MetaOut
     ~MetaOut() { }
 
     virtual std::ostream&  out(std::ostream&, const Meta&, const TagLib::Tag&, const char*);
+    virtual std::ostream&  out(std::ostream&, const File&);
 
     static MetaOut*  create(const char*);
 
@@ -40,6 +42,7 @@ struct MetaOutBasic : public MetaOut
 struct MetaOutJson: public MetaOut
 {
     std::ostream&  out(std::ostream&, const Meta&, const TagLib::Tag&, const char*);
+    std::ostream&  out(std::ostream&, const File&);
 };
 
 struct MetaOutJsonOld: public MetaOut
