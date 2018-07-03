@@ -11,22 +11,7 @@ const char*  FileM4a::sffx[]     = { ".m4a", ".aac", ".mp4", NULL };
 
 std::ostream& operator<<(std::ostream& os_, const File& f_)
 {
-#if 0
-    const Meta::Tags  tags = f_.meta().tags();
-    if (tags.empty()) {
-        os_ << f_.taglibfile().name() << ":\t[no tags]\n";
-    }
-    else
-    {
-        for (Meta::Tags::const_iterator t=tags.begin(); t!=tags.end(); ++t) {
-            os_ << f_.taglibfile().name() << ":\t";
-            f_.meta().out(os_, *t);
-            os_ << std::endl;
-        }
-    }
-#endif
-    f_.meta().out(os_, f_);
-    return os_;
+    return f_.meta().out(os_, f_);
 }
 
 
