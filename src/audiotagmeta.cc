@@ -90,16 +90,6 @@ TagLib::String::Type  parseEnc(const char* optarg, TagLib::String::Type dflt_)
 
 
  
-
-std::ostream&  Meta::_out(std::ostream& os_, const Meta::Tags::value_type& t_) const
-{
-    // delegate the outputting to the registered MetaOut subclasses
-    os_ << "[" << std::right << std::setw(5) << t_.first << "]";
-    _mo.out(os_, *this, *t_.second, t_.first);
-    return os_;
-}
-
-
 bool  MetaTOI::operator==(const MetaTOI& rhs_)
 {
     if (this == &rhs_) {
