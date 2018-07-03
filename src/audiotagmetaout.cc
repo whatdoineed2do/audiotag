@@ -268,9 +268,8 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
     {
 	for (const auto& tag : f_.meta().tags())
 	{
-	    json_object*  jmeta = json_object_new_object();
+	    json_object*           jmetaobj = json_object_new_object();
 	    {
-		json_object*           jmetaobj = json_object_new_object();
 		json_object_object_add(jmetaobj, "tag_type", json_object_new_string(tag.first));
 
 		p = AudioTag::_strrep(tag.second->artist());
@@ -306,16 +305,15 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
 		    }
 		}
 		json_object_object_add(jmetaobj, "properties", jmetaprop);
-		json_object_array_add(jmeta, jmetaobj);
 	    }
-	    json_object_array_add(jtags, jmeta);
+	    json_object_array_add(jtags, jmetaobj);
 	}
     }
 
     json_object_object_add(jroot, "file", jfile);
     json_object_object_add(jroot, "meta", jtags);
 
-    os_ << json_object_to_json_string_ext(jroot,2);
+    os_ << json_object_to_json_string_ext(jroot,3);
     json_object_put(jroot);
     return os_;
 }
