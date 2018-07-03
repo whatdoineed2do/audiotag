@@ -313,7 +313,11 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
     json_object_object_add(jroot, "file", jfile);
     json_object_object_add(jroot, "meta", jtags);
 
-    os_ << json_object_to_json_string_ext(jroot,3);
+    int  flags = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_SPACED;
+#if ( JSON_C_MAJOR_VERSION > 0 || JSON_C_MINOR_VERSION >= 13)
+    flags |= JSON_C_TO_STRING_NOSLASHESCAPE;
+#endif
+    os_ << json_object_to_json_string_ext(jroot,flags);
     json_object_put(jroot);
     return os_;
 }
