@@ -43,10 +43,12 @@ struct MetaOutJson: public MetaOut
     std::ostream&  out(std::ostream&, const File&);
 };
 
+#ifdef HAVE_JSONC
 struct MetaOutJsonC: public MetaOut
 {
     std::ostream&  out(std::ostream&, const File&);
 };
+#endif
 
 };
 

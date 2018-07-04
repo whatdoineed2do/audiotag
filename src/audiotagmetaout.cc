@@ -6,7 +6,6 @@
 #include <tpropertymap.h>
 #include <tstringlist.h>
 
-#include <json-c/json.h>
 
 #include "audiotagmeta.h"
 #include "audiotagfile.h"
@@ -19,7 +18,9 @@ MetaOut*  MetaOut::create(const char* optarg_)
     if (optarg_ == NULL)                 return new MetaOut();
     if (strcmp(optarg_, "basic") == 0)   return new MetaOutBasic();
     if (strcmp(optarg_, "json")  == 0)   return new MetaOutJson();
+#ifdef HAVE_JSONC
     if (strcmp(optarg_, "json-c")  == 0)   return new MetaOutJsonC();
+#endif
 
     return new MetaOut();
 }
@@ -166,6 +167,9 @@ os_ << "\n"
 }
 
 
+#ifdef HAVE_JSONC
+#include <json-c/json.h>
+
 std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
 {
     const char*  p = NULL;
@@ -240,6 +244,7 @@ std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
     json_object_put(jroot);
     return os_;
 }
+#endif
 
 
 };
