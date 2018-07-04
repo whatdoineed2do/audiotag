@@ -258,26 +258,6 @@ class Meta
     virtual void  save();
 
 
-    std::ostream&  out(std::ostream& os_, const Meta::Tags::value_type& t_) const
-    {
-        _out(os_, t_);
-        return os_;
-    }
-
-    virtual std::ostream&  out(std::ostream& os_) const
-    {
-        Meta::Tags  tgs = tags();
-        if (tgs.empty()) {
-            return os_ << "<EMPTY>";
-        }
-
-        for (Meta::Tags::const_iterator t=tgs.begin(); t!=tgs.end(); ++t) {
-            _out(os_, *t);
-            os_ << "\n";
-        }
-        return os_;
-    }
-
     Meta&  operator=(const Input& in_)
     {
         _assign(**_tag, in_);
@@ -290,6 +270,8 @@ class Meta
 
     virtual void                 properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     { t_.setProperties(m_); }
+
+    std::ostream&  out(std::ostream& os_, const File& f_) const;
 
 
   protected:
@@ -314,7 +296,7 @@ class Meta
 
 
 
-    virtual std::ostream&  _out(std::ostream& os_, const Meta::Tags::value_type& t_) const;
+
     virtual void  _assign(TagLib::Tag&, const Input&);
 
     virtual TagLib::PropertyMap&  _mergeproperties(TagLib::PropertyMap&, const TagLib::PropertyMap&) const;
@@ -342,9 +324,6 @@ class Meta
 
     MetaOut&  _mo;
 };
-
-inline std::ostream&  operator<<(std::ostream& os_, const Meta& m_)
-{ return m_.out(os_); }
 
 
 class _MetaMulti : public Meta

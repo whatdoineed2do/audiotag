@@ -90,16 +90,6 @@ TagLib::String::Type  parseEnc(const char* optarg, TagLib::String::Type dflt_)
 
 
  
-
-std::ostream&  Meta::_out(std::ostream& os_, const Meta::Tags::value_type& t_) const
-{
-    // delegate the outputting to the registered MetaOut subclasses
-    os_ << "[" << std::right << std::setw(5) << t_.first << "]";
-    _mo.out(os_, *this, *t_.second, t_.first);
-    return os_;
-}
-
-
 bool  MetaTOI::operator==(const MetaTOI& rhs_)
 {
     if (this == &rhs_) {
@@ -753,6 +743,11 @@ TagLib::PropertyMap  MetaM4a::properties(const TagLib::Tag& t_) const
     const TagLib::MP4::Tag*  t = dynamic_cast<const TagLib::MP4::Tag*>(&t_);
     if (t) return _properties(*t);
     else   return _properties(t_);
+}
+
+std::ostream&  Meta::out(std::ostream& os_, const File& f_) const
+{
+    return _mo.out(os_, f_);
 }
 
 
