@@ -18,7 +18,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 
 PKG_CHECK_MODULES(TAGLIB, [taglib >= 1.11.1])
-PKG_CHECK_MODULES(JSONC, [json-c])
+#PKG_CHECK_MODULES(JSONC, [json-c])
 
 AC_ARG_ENABLE([debug-code],
 	[AS_HELP_STRING([--enable-debug],
