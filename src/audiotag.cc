@@ -97,7 +97,14 @@ void  _usage()
 	 << "               [warn] will damage tags if you get the E wrong!" << endl
          << endl
 	 << "  [out options]" << endl
-	 << "      [-O {base,basic,json}]  format for tag output" << endl
+	 << "      [-O {json,basic}]  format for tag output" << endl
+	 << "           json is very useful for parsing number of files and\n"
+	 << "           processing with 'jq' to select\n"
+	 << "           ie.\n"
+	 << "             file names only that have ID3 tags\n"
+	 << "             " << _argv0 << " ... | jq 'select(.meta[] | .tag_type | . and contains(\"ID3\") ) | .file.name'\n"
+	 << "             json objects that have tags other than ID3v2\n"
+	 << "             " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
 	 << endl
 	 << "  [misc options]" << endl
 	 << "       -V             verbose" << endl;
