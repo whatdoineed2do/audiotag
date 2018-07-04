@@ -48,10 +48,25 @@ std::ostream&  MetaOutBasic::out(std::ostream& os_, const File& f_)
     return os_;
 }
 
+
+const char*  MetaOutJson::out(std::string& tmp_, const TagLib::String& s_)
+{
+    if (s_ == TagLib::String::null) {
+        return "null";
+    } 
+    else { 
+        tmp_ = "\"";
+        tmp_ += _strrep(s_);
+        tmp_ += "\"";
+        return tmp_.c_str();
+    }
+}
+
 std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
 {
     const Meta&  m_ = f_.meta();
 
+    std::string  s;
     const char*  p = NULL;
     int  i = 0;
 
@@ -77,22 +92,9 @@ os_ << ",\n";
 	}
 os_ << "    {\n"
     << "      \"tag_type\": \"" << tagtype_ << "\",\n"
-    << "      \"artist\": ";
-
-	p = AudioTag::_strrep(tag->artist());
-	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
-	os_ << ",\n";
-
-os_ << "      \"title\": ";
-	p = AudioTag::_strrep(tag->title());
-	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
-	os_ << ",\n";
-
-os_ << "      \"album\": ";
-	p = AudioTag::_strrep(tag->album());
-	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
-	os_ << ",\n";
-
+    << "      \"artist\": " << MetaOutJson::out(s, tag->artist()) << ",\n"
+    << "      \"title\": " << MetaOutJson::out(s, tag->title()) << ",\n"
+    << "      \"album\": " << MetaOutJson::out(s, tag->album()) << ",\n";
 
 	// stuff from the properties not available on the 'std' i/f
 
@@ -102,7 +104,7 @@ os_ << "      \"album\": ";
 	const TagLib::PropertyMap  m = m_.properties(*tag);
 os_ << "      \"track\": ";
 	i = tag->track();
-	if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
+	if (i > 0) { os_ << i; } else { os_ << "null"; }
 	os_ << ",\n";
 
 os_ << "      \"year\": ";
@@ -110,21 +112,10 @@ os_ << "      \"year\": ";
 	if (i > 0) { os_ << i; } else { os_ << "null"; }
 	os_ << ",\n";
 
-os_ << "      \"genre\": ";
-	p = AudioTag::_strrep(tag->genre());
-	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
-	os_ << ",\n";
-
-os_ << "      \"comment\": ";
-	p = AudioTag::_strrep(tag->comment()) ;
-	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
-	os_ << ",\n";
-
-os_ << "      \"artwork\": ";
-	bool  b = m_.coverart();
-	os_ << "\"" << (b ? "true" : "false") << "\",\n";
-
-os_ << "      \"properties\": {\n";
+os_ << "      \"genre\": " << MetaOutJson::out(s, tag->genre()) << ",\n"
+    << "      \"comment\": " << MetaOutJson::out(s, tag->comment()) << ",\n"
+    << "      \"artwork\": " << (m_.coverart() ? "true" : "false") << ",\n"
+    << "      \"properties\": {\n";
 	bool  fi = true;
 	for (const auto i : m)
 	{

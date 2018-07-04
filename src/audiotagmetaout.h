@@ -5,7 +5,10 @@
 #include <iosfwd>
 
 namespace TagLib
-{ class Tag; };
+{ 
+    class Tag; 
+    class String;
+};
 
 
 namespace  AudioTag
@@ -41,6 +44,7 @@ struct MetaOutBasic : public MetaOut
 struct MetaOutJson: public MetaOut
 {
     std::ostream&  out(std::ostream&, const File&);
+    static const char*  out(std::string& buf_, const TagLib::String& src_);
 };
 
 #ifdef HAVE_JSONC
