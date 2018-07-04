@@ -198,6 +198,11 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
     json_object*  jfile = json_object_new_object();
     {
 	json_object_object_add(jfile, "name", json_object_new_string(f_.taglibfile().name()));
+	const struct stat&  st = f_.st();
+	json_object_object_add(jfile, "size", json_object_new_int64(st.st_size));
+	char  mtime[50];
+	strftime(mtime, sizeof(mtime)-1, "%c", localtime(&st.st_mtime));
+	json_object_object_add(jfile, "mod_time", json_object_new_string(mtime));
     }
 
     json_object*  jtags = json_object_new_array();
