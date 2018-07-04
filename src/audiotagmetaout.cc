@@ -19,7 +19,7 @@ MetaOut*  MetaOut::create(const char* optarg_)
     if (optarg_ == NULL)                 return new MetaOut();
     if (strcmp(optarg_, "basic") == 0)   return new MetaOutBasic();
     if (strcmp(optarg_, "json")  == 0)   return new MetaOutJson();
-    if (strcmp(optarg_, "jsonold")  == 0)   return new MetaOutJsonOld();
+    if (strcmp(optarg_, "json-c")  == 0)   return new MetaOutJsonC();
 
     return new MetaOut();
 }
@@ -47,36 +47,47 @@ std::ostream&  MetaOutBasic::out(std::ostream& os_, const File& f_)
     return os_;
 }
 
-std::ostream&  MetaOutJsonOld::out(std::ostream& os_, const File& f_)
+std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
 {
     const Meta&  m_ = f_.meta();
 
     const char*  p = NULL;
     int  i = 0;
+
+    char  mtime[50];
+    strftime(mtime, sizeof(mtime)-1, "%c", localtime(&f_.st().st_mtime));
+
+os_ << "\n{\n"
+    << "  \"file\": {\n"
+    << "    \"name\": \"" << m_.file().name() << "\",\n"
+    << "    \"size\": " << f_.st().st_size << ",\n"
+    << "    \"mod_time\": \"" << mtime << "\"\n"
+    << "  },\n"
+    << "  \"meta\": [\n";
+
+    bool  first = true;
     const Meta::Tags&  tags = f_.meta().tags();
     for (const auto& t : tags)
     {
 	const char*  tagtype_ = t.first;
 	const auto&  tag = t.second;
+	if (!first) {
+os_ << ",\n";
+	}
+os_ << "    {\n"
+    << "      \"tag_type\": \"" << tagtype_ << "\",\n"
+    << "      \"artist\": ";
 
-	os_ << "\n{\n"
-	    << "  \"file\": {\n"
-	    << "    \"name\": \"" << m_.file().name() << "\",\n"
-	    << "    \"meta\": {\n"
-	    << "      \"tag\": \"" << tagtype_ << "\",\n"
-	    << "      \"data\": {\n";
-
-	os_ << "        \"Artist\": ";
 	p = AudioTag::_strrep(tag->artist());
 	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
 	os_ << ",\n";
 
-	os_ << "        \"Title\": ";
+os_ << "      \"title\": ";
 	p = AudioTag::_strrep(tag->title());
 	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
 	os_ << ",\n";
 
-	os_ << "        \"Album\": ";
+os_ << "      \"album\": ";
 	p = AudioTag::_strrep(tag->album());
 	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
 	os_ << ",\n";
@@ -88,65 +99,31 @@ std::ostream&  MetaOutJsonOld::out(std::ostream& os_, const File& f_)
 	 * to call properties() you can't seem to find the properties!
 	 */
 	const TagLib::PropertyMap  m = m_.properties(*tag);
-
-#if 0
-	const struct _NVP {
-	    const char*  tn;  // tag name
-	    const char*  on;  // output name
-	}  ptags[] = {
-	    { "ALBUMARTIST",    "AlbumArtist"     },
-	    { "ALBUMSORT",      "AlbumSort"       },
-	    { "ARTISTSORT",     "ArtistSort"      },
-	    { "TITLESORT",      "TitleSort"       },
-	    { "ALBUMARTISTSORT","AlbumArtistSort" },
-
-	    { "COMPOSER",       "Composer"        },
-	    { "COPYRIGHT",      "Copyright"       },
-	    { "ENCODEDBY",      "Encoded"         },
-
-	    { NULL, NULL }
-	};
-
-	{
-	    const _NVP* p = ptags;
-	    while (p->tn)
-	    {
-		const TagLib::StringList&  sl = m[p->tn];
-		if ( !sl.isEmpty()) {
-		    os_ << "        \"" << p->on << "\": "
-			<< "\"" << AudioTag::_strrep(sl.front().toCString()) << "\""
-			<< ",\n";
-		}
-		++p;
-	    }
-	}
-#endif
-
-	os_ << "        \"Track\": ";
+os_ << "      \"track\": ";
 	i = tag->track();
 	if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
 	os_ << ",\n";
 
-	os_ << "        \"Yr\": ";
+os_ << "      \"year\": ";
 	i = tag->year();
-	if (i > 0) { os_ << "\"" << i << "\""; } else { os_ << "null"; }
+	if (i > 0) { os_ << i; } else { os_ << "null"; }
 	os_ << ",\n";
 
-	os_ << "        \"Genre\": ";
+os_ << "      \"genre\": ";
 	p = AudioTag::_strrep(tag->genre());
 	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
 	os_ << ",\n";
 
-	os_ << "        \"Comment\": ";
+os_ << "      \"comment\": ";
 	p = AudioTag::_strrep(tag->comment()) ;
 	if (p) { os_ << "\"" << p << "\""; } else { os_ << "null"; }
 	os_ << ",\n";
 
-	os_ << "        \"Artwork\": ";
+os_ << "      \"artwork\": ";
 	bool  b = m_.coverart();
-	os_ << "\"" << (b ? "yes" : "no") << "\",\n";
+	os_ << "\"" << (b ? "true" : "false") << "\",\n";
 
-	os_ << "        \"properties\": {\n";
+os_ << "      \"properties\": {\n";
 	bool  fi = true;
 	for (const auto i : m)
 	{
@@ -156,7 +133,7 @@ std::ostream&  MetaOutJsonOld::out(std::ostream& os_, const File& f_)
 	    else {
 		os_ << ",\n";
 	    }
-	    os_ << "          \"" << i.first.toCString() << "\": ";
+	    os_ << "        \"" << i.first.toCString() << "\": ";
 	    if (i.second.isEmpty()) {
 		os_ << "[ ]";
 	    }
@@ -177,18 +154,19 @@ std::ostream&  MetaOutJsonOld::out(std::ostream& os_, const File& f_)
 		os_ << " ]";
 	    }
 	}
-
-	os_ << "\n        }"
-	    << "\n      }"
-	    << "\n    }"
-	    << "\n  }"
-	    << "\n}\n";
+os_ << "\n"
+    << "      }\n"
+    << "    }";
+	first = false;
     }
+os_ << "\n"
+    << "  ]\n"
+    << "}\n";
     return os_;
 }
 
 
-std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
+std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
 {
     const char*  p = NULL;
     int  i;

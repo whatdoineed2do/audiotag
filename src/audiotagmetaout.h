@@ -43,7 +43,7 @@ struct MetaOutJson: public MetaOut
     std::ostream&  out(std::ostream&, const File&);
 };
 
-struct MetaOutJsonOld: public MetaOut
+struct MetaOutJsonC: public MetaOut
 {
     std::ostream&  out(std::ostream&, const File&);
 };
