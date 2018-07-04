@@ -58,7 +58,7 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
     char  mtime[50];
     strftime(mtime, sizeof(mtime)-1, "%c", localtime(&f_.st().st_mtime));
 
-os_ << "\n{\n"
+os_ << "{\n"
     << "  \"file\": {\n"
     << "    \"name\": \"" << m_.file().name() << "\",\n"
     << "    \"size\": " << f_.st().st_size << ",\n"
