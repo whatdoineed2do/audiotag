@@ -23,48 +23,48 @@ Multiple commands can be chained together in a single execution - however the fi
 ## Example Usage
 Add/change the `artist`, clear the `comment` and display the meta
 ```
-$ audiotag -a "foo bar" -c "" -O json -l foo.mp3
+$ audiotag -a "foo bar" -c "" -O json -l test.mp3
 {
   "file": {
-    "name": "foo.mp3",
-    "size": 59721,
-    "mod_time": "Sun 10 Jun 2018 05:46:21 PM BST"
+    "name": "test.mp3",
+    "size": 58813,
+    "mod_time": "Thu 05 Jul 2018 08:51:07 AM BST"
   },
   "meta": [
-    {
-      "tag_type": "ID3v2",
-      "artist": "foo bar",
-      "title": "yep星 works",
-      "album": "",
-      "track": "2",
-      "year": 1999,
-      "genre": "Pop",
-      "comment": "",
-      "artwork": "false",
-      "properties": {
-        "ARTIST": [ "foo bar" ],
-        "DATE": [ "1999" ],
-        "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
-        "TRACKNUMBER": [ "2" ]
-      }
-    },
     {
       "tag_type": "ID3v1",
       "artist": "ONEartist",
       "title": "ONEtitle",
-      "album": "",
-      "track": "2",
+      "album": null,
+      "track": 2,
       "year": 2007,
       "genre": "Pop",
       "comment": "this is a comment",
-      "artwork": "false",
+      "artwork": false,
       "properties": {
         "ARTIST": [ "ONEartist" ],
         "COMMENT": [ "this is a comment" ],
         "DATE": [ "2007" ],
         "GENRE": [ "Pop" ],
         "TITLE": [ "ONEtitle" ],
+        "TRACKNUMBER": [ "2" ]
+      }
+    },
+    {
+      "tag_type": "APE",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null,
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": null,
+      "artwork": false,
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "DATE": [ "1999" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
         "TRACKNUMBER": [ "2" ]
       }
     }
@@ -74,27 +74,45 @@ $ audiotag -a "foo bar" -c "" -O json -l foo.mp3
 ## Cloning Tags
 With the example above, we can see there is an `ID3v1` and `APE` tag but no `ID3v2` tag - we can clone the `APE` tag onto the `ID3v2` whilst deleting the `ID3v1` tag (it can't hold unicode text anyway, as seen in the album tag) in one command:
 ```
-$ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l foo.mp3 
+$ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l test.mp3 
 {
   "file": {
-    "name": "test-alltags.mp3",
-    "size": 59593,
-    "mod_time": "Wed 04 Jul 2018 06:40:03 PM BST"
+    "name": "test.mp3",
+    "size": 58813,
+    "mod_time": "Thu 05 Jul 2018 08:51:21 AM BST"
   },
   "meta": [
     {
       "tag_type": "ID3v2",
-      "artist": "foo bar",
+      "artist": "VER2 foo 群星bar",
       "title": "yep星 works",
       "album": "ハルカ",
-      "track": "2",
+      "track": 2,
       "year": 1999,
       "genre": "Pop",
-      "comment": "",
-      "artwork": "false",
+      "comment": null,
+      "artwork": false,
       "properties": {
         "ALBUM": [ "ハルカ" ],
-        "ARTIST": [ "foo bar" ],
+        "ARTIST": [ "VER2 foo 群星bar" ],
+        "DATE": [ "1999" ],
+        "GENRE": [ "Pop" ],
+        "TITLE": [ "yep星 works" ],
+        "TRACKNUMBER": [ "2" ]
+      }
+    },
+    {
+      "tag_type": "APE",
+      "artist": "VER2 foo 群星bar",
+      "title": "yep星 works",
+      "album": null,
+      "track": 2,
+      "year": 1999,
+      "genre": "Pop",
+      "comment": null,
+      "artwork": false,
+      "properties": {
+        "ARTIST": [ "VER2 foo 群星bar" ],
         "DATE": [ "1999" ],
         "GENRE": [ "Pop" ],
         "TITLE": [ "yep星 works" ],
@@ -119,8 +137,8 @@ $ audiotag  -l test.mp3
       "tag_type": "ID3v2",
       "artist": "VER2 foo 群星bar",
       "title": "yep星 works",
-      "album": "",
-      "track": "2",
+      "album": null,
+      "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": "id3v2 comment",
@@ -151,12 +169,12 @@ $ audiotag  -P foo:bar,coke:cola -l test.mp3
       "tag_type": "ID3v2",
       "artist": "VER2 foo 群星bar",
       "title": "yep星 works",
-      "album": "",
-      "track": "2",
+      "album": null.
+      "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": "id3v2 comment",
-      "artwork": "false",
+      "artwork": false,
       "properties": {
         "ARTIST": [ "VER2 foo 群星bar" ],
         "COKE": [ "cola" ],
@@ -185,8 +203,8 @@ $ audiotag  -P coke:,COMMENT:"an updated comment" -l test.mp3
       "tag_type": "ID3v2",
       "artist": "VER2 foo 群星bar",
       "title": "yep星 works",
-      "album": "",
-      "track": "2",
+      "album": null,
+      "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": "an updated comment",
