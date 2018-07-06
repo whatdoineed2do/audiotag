@@ -35,6 +35,25 @@ else
         AC_DEFINE(DEBUG,1,[debug code])
 fi
 
+AC_CHECK_FUNCS([utimes])
+AC_MSG_CHECKING([for stat.st_mtim])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/stat.h>]],
+[[
+  struct stat st;
+  memset(&st.st_mtim, 0, sizeof(st.st_mtim));
+  return 0;
+]])],
+        [
+          AC_MSG_RESULT([yes])
+          AC_DEFINE_UNQUOTED([HAVE_ST_MTIM], 1, [Define to 1 if have struct stat.st_mtim.])
+        ],
+        [
+          AC_MSG_RESULT([no])
+          AC_DEFINE_UNQUOTED([HAVE_ST_MTIM], 0, [Define to 1 if have struct stat.st_mtim.])
+        ]
+     )
+
 
 AC_OUTPUT([
 Makefile
