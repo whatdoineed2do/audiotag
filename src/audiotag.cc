@@ -42,7 +42,13 @@
 #include "audiotagmetaout.h"
 #include "audiotagops.h"
 
-using namespace std;
+using namespace  std;
+
+#include "config.h"
+
+#if defined(HAVE_UTIMES) && defined(HAVE_ST_MTIM)
+#define AUDIOTAG_HAVE_PRESERVE
+#endif
 
 
 namespace AudioTag
@@ -67,7 +73,7 @@ const char*  _version()
 void  _usage()
 {
     cout << _argv0 << " " << _version() << endl
-         << "usage: " << _argv0 << " [OPTION]... [mp3 FILES]" << endl
+         << "usage: " << _argv0 << " [OPTION]... [FILES]" << endl
 	 << endl
 	 << "  [tag encoding options]" << endl
          << "      [-e  encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]" << endl
@@ -107,6 +113,9 @@ void  _usage()
 	 << "             " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
 	 << endl
 	 << "  [misc options]" << endl
+#ifdef AUDIOTAG_HAVE_PRESERVE
+	 << "       -p             preserve previous modification times" << '\n'
+#endif
 	 << "       -V             verbose" << endl;
 
     exit(1);
@@ -146,34 +155,6 @@ const char*  _setlocale(const char*& locale_)
         if (res != (size_t)-1) {
             return l;
         }
-#if 0
-        MP3_TAG_WARN("multibye conversions failed using user default LANG=" << (env ? env : "") << " locale=" << (l ? l : "") << " - attempting fallbacks");
-
-        bool  good = true;
-        if (env == NULL)
-        {
-            // no LANG set, lets see if we can make sense of the LC_ALL
-            if (l == NULL) {
-                good = false;
-            }
-        }
-        else
-        {
-            if (strlen(env) > 7 && strcmp(env+1, ".UTF-8") == 0) {
-                // hmm, LANG == "x.UTF-8" -- this failed, something wrong
-                // internally, ignore this in fallbacks
-                good = false;
-            }
-        }
-
-        if (good) {
-            tmp = (env ? env : l);
-            //MP3_TAG_NOTICE("env=" << env << "  l=" << l << " tmp=" << tmp);  // ??? tmp never gets set??
-            tmp += ".UTF-8";
-            attempts[0] = tmp.c_str();
-            MP3_TAG_NOTICE_VERBOSE("attempting to use UTF8 version of user LANG/locale=" << tmp);
-        }
-#endif
     }
 
 
@@ -382,9 +363,11 @@ int main(int argc, char *argv[])
                 ops.add(new AudioTag::OpRemoveArt());
             } break;
 
+#ifdef AUDIOTAG_HAVE_PRESERVE
             case 'p':
                 opts.preserve = true;
                 break;
+#endif
 
             case 'O':
                 opts.mout = AudioTag::MetaOut::create(optarg);
@@ -468,7 +451,7 @@ int main(int argc, char *argv[])
 
             ops.execute(*ff);
 
-#if !defined(__APPLE__) || defined(__USE_XOPEN2K8)
+#ifdef AUDIOTAG_HAVE_PRESERVE
 	    // macos doesnt have st_mtim
             if (opts.preserve)
             {
