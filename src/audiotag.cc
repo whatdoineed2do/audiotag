@@ -73,50 +73,55 @@ const char*  _version()
 void  _usage()
 {
     cout << _argv0 << " " << _version() << endl
-         << "usage: " << _argv0 << " [OPTION]... [FILES]" << endl
+         << "usage: " << _argv0 << " [OPTION]... [FILES]\n"
 	 << endl
-	 << "  [tag encoding options]" << endl
-         << "      [-e  encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]" << endl
-	 << "      [-u  locale]    locale to use for multibyte conversion" << endl
-	 << endl
-	 << "  [tagging options]" << endl
-	 << "       -t  title" << endl
-	 << "       -a  artist" << endl
-	 << "       -R  album artist" << endl
-	 << "       -A  album" << endl
-	 << "       -c  comment" << endl
-	 << "       -g  genre" << endl
-	 << "       -y  year" << endl
-	 << "       -T  track" << endl
-	 << "       -P  <property name>:<value>[,<property name>:<value>]" << endl
-	 << "            -P foo:  delete property call 'foo' (if exists)" << endl
-	 << "            -P foo:bar,coke:cola  add properties: foo=bar and coke=cola" 
-	 << endl
-	 << "  [maintainence options]" << endl
-	 << "       -l             list tags (exclusive maintanence option" << endl
-	 << "       -i [1|2|a|f|A] add meta to tags types; defaults to ID3v2/mp3 " << endl
-	 << "       -d [1|2|a|f|A] delete tags" << endl
-	 << "       -n X:Y         clone tag from X to Y only if X exists" << endl
-	 << "       -r             remove art from main tags" << endl
-	 << "       -C             clean tags, leaving only basic info" << endl
-	 << "       -M encoding    parse current tags and convert from -M <E> -e <E'>" << endl
-	 << "               [warn] will damage tags if you get the E wrong!" << endl
-         << endl
-	 << "  [out options]" << endl
-	 << "      [-O {json,basic}]  format for tag output" << endl
-	 << "           json is very useful for parsing number of files and\n"
-	 << "           processing with 'jq' to select\n"
-	 << "           ie.\n"
-	 << "             file names only that have ID3 tags\n"
-	 << "             " << _argv0 << " ... | jq 'select(.meta[] | .tag_type | . and contains(\"ID3\") ) | .file.name'\n"
-	 << "             json objects that have tags other than ID3v2\n"
-	 << "             " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
-	 << endl
-	 << "  [misc options]" << endl
+	 << "  [tag encoding options]\n"
+         << "    [-e  encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]\n"
+	 << "    [-u  locale]    locale to use for multibyte conversion\n"
+	 << '\n'
+	 << "  [tagging options]\n"
+	 << "    -t  title\n"
+	 << "    -a  artist\n"
+	 << "    -R  album artist\n"
+	 << "    -A  album\n"
+	 << "    -c  comment\n"
+	 << "    -g  genre\n"
+	 << "    -y  year\n"
+	 << "    -T  track\n"
+	 << "    -P  <property name>:<value>[,<property name>:<value>]\n"
+	 << "          -P foo:  delete property call 'foo' (if exists)\n"
+	 << "          -P foo:bar,coke:cola  add properties: foo=bar and coke=cola\n"
+	 << '\n'
+	 << "  [maintainence options]\n"
+	 << "    -l             list tags (exclusive maintanence option\n"
+	 << "    -i [1|2|a|f|A] add meta to tags types\n"
+         << "                     1 - ID3v1\n"
+         << "                     2 - ID3v2  (default for mp3)\n"
+         << "                     a - APE\n"
+         << "                     f - flac   (default for flac)\n"
+         << "                     A - all\n"
+	 << "    -d [1|2|a|f|A] delete tags\n"
+	 << "    -n X:Y         clone tag from X to Y only if X exists\n"
+	 << "    -r             remove art from main tags\n"
+	 << "    -C             clean tags, leaving only basic info\n"
+	 << "    -M encoding    parse current tags and convert from -M <E> -e <E'>\n"
+	 << "       [warn] will damage tags if you get the encoding wrong!\n"
+         << '\n'
+	 << "  [out options]\n"
+	 << "    [-O {json,basic}]  format for tag output\n"
+	 << "      json is very useful for parsing number of files and\n"
+	 << "      processing with 'jq' to select\n"
+	 << "      ie.\n"
+	 << "        file names only that have ID3 tags\n"
+	 << "          " << _argv0 << " ... | jq 'select(.meta[] | .tag_type | . and contains(\"ID3\") ) | .file.name'\n"
+	 << "        json objects that have tags other than ID3v2\n"
+	 << "          " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
+	 << '\n'
+	 << "  [misc options]\n"
 #ifdef AUDIOTAG_HAVE_PRESERVE
-	 << "       -p             preserve previous modification times" << '\n'
+	 << "    -p             preserve previous modification times" << '\n'
 #endif
-	 << "       -V             verbose" << endl;
+	 << "    -V             verbose" << endl;
 
     exit(1);
 }
