@@ -300,7 +300,8 @@ int main(int argc, char *argv[])
 		    prop[n] = NULL;
 		    const char*  value = prop + n+1;
 
-		    if (strlen(value) == 0) {
+                    int  vl;
+		    if ( (vl = strlen(value)) == 0 || (vl == 2 && (value[0] == '\'' && value[1] == '\'' || value[0] == '"' && value[1] == '"')) ) {
 			opts.iflds.properties[prop].clear();
 		    }
 		    else
