@@ -255,6 +255,12 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
 {
     for (auto i : b_) {
         auto  j = a_.find(i.first);
+
+        if (i.second.isEmpty() && j != a_.end()) {
+            a_.erase(i.first);
+            continue;
+        }
+
         if (j == a_.end()) {
             a_.insert(i.first, i.second);
         }
