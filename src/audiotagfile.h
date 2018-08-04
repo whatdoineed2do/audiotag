@@ -73,7 +73,7 @@ class FileMP3 : public File
     static const char*  sffx[];
 
     FileMP3(const char* f_, MetaOut& mo_) 
-	: _f(f_, false), 
+	: _f(f_), 
 	  _m(*this, mo_), 
 	  File(_m, f_, _f)
     { }
@@ -97,7 +97,7 @@ class FileOGGFlac : public File
     static const char*  sffx[];
 
     FileOGGFlac(const char* f_, MetaOut& mo_)
-        : _f(f_, false),
+        : _f(f_),
           _m(*this, mo_),
           File(_m, f_, _f)
     { }
@@ -121,7 +121,7 @@ class FileFlac : public File
     static const char*  sffx[];
 
     FileFlac(const char* f_, MetaOut& mo_)
-        : _f(f_, false),
+        : _f(f_),
           _m(*this, mo_),
           File(_m, f_, _f)
     { }
@@ -144,7 +144,7 @@ class FileM4a : public File
     static const char*  sffx[];
 
     FileM4a(const char* f_, MetaOut& mo_)
-        : _f(f_, false),
+        : _f(f_),
           _m(*this, mo_),
           File(_m, f_, _f)
     { }

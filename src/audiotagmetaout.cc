@@ -73,11 +73,20 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
     char  mtime[50];
     strftime(mtime, sizeof(mtime)-1, "%c", localtime(&f_.st().st_mtime));
 
+    const TagLib::AudioProperties*  ap = m_.file().audioProperties();
+
 os_ << "{\n"
     << "  \"file\": {\n"
     << "    \"name\": \"" << m_.file().name() << "\",\n"
     << "    \"size\": " << f_.st().st_size << ",\n"
-    << "    \"mod_time\": \"" << mtime << "\"\n"
+    << "    \"mod_time\": \"" << mtime << "\",\n"
+    << "    \"audio_properties\": {\n";
+    if (ap) {
+os_ << "      \"length\": \"" << ap->lengthInSeconds() << "\",\n"
+    << "      \"bitrate\": \"" << ap->bitrate() << "\",\n"
+    << "      \"samplerate\": \"" << ap->sampleRate() << "\",\n";
+    }
+os_ << "    }\n"
     << "  },\n"
     << "  \"meta\": [\n";
 
