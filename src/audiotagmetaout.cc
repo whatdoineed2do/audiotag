@@ -84,7 +84,7 @@ os_ << "{\n"
     if (ap) {
 os_ << "      \"length\": \"" << ap->lengthInSeconds() << "\",\n"
     << "      \"bitrate\": \"" << ap->bitrate() << "\",\n"
-    << "      \"samplerate\": \"" << ap->sampleRate() << "\",\n";
+    << "      \"samplerate\": \"" << ap->sampleRate() << "\"\n";
     }
 os_ << "    }\n"
     << "  },\n"
