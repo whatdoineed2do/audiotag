@@ -19,7 +19,7 @@ class Op {
 
     const bool  readonly;
 
-    bool  execute(File& f_, bool verbose_) const
+    void  execute(File& f_, bool verbose_) const
     {
         if (verbose_)  MP3_TAG_NOTICE_VERBOSE(_descr);
         _execute(f_, verbose_);
@@ -32,7 +32,7 @@ class Op {
   protected:
     Op(bool  b_, const char* descr_) : readonly(b_), _descr(descr_) { }
 
-    virtual bool  _execute(File&, bool verbose_) const = 0;
+    virtual void  _execute(File&, bool verbose_) const = 0;
 
   private:
     Op&  operator=(const Op&);
@@ -107,7 +107,7 @@ struct OpListTags : public _OpRO
 {
     OpListTags() : _OpRO("listing")  { }
 
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
         std::cout << f_;
     }
@@ -120,7 +120,7 @@ struct OpRemoveTags : public _OpWR
 
     const AudioTag::MetaTOI  toi;
 
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
         f_.meta().remove(toi);
     }
@@ -130,7 +130,7 @@ struct OpRemoveArt : public _OpWR
 {
     OpRemoveArt() : _OpWR("removing artwork")  { }
 
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
         f_.meta().removeart();
     }
@@ -140,7 +140,7 @@ struct OpCleanTags: public _OpWR
 {
     OpCleanTags() : _OpWR("cleaning tags")  { }
 
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
         f_.meta().sanitize();
     }
@@ -157,7 +157,7 @@ struct OpCloneTags: public _OpWR
     const AudioTag::MetaTOI&  _to;
     const AudioTag::MetaTOI&  _from;
 
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
         f_.meta().clone(_to, _from);
     }
@@ -176,7 +176,7 @@ struct OpUpdateTags: public _OpWR
     const AudioTag::Input&    input;
 
 
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
         if (!toi) {
             // nothing spec, use the default
@@ -195,7 +195,7 @@ struct OpPropertyTags: public _OpWR
     { }
 
     OpUpdateTags  impl;
-    bool  _execute(File& f_, bool verbose_) const
+    void  _execute(File& f_, bool verbose_) const
     {
 	impl._execute(f_, verbose_);
     }
