@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <list>
+#include <map>
 
 #include "audiotag.h"
 #include "audiotagmeta.h"
@@ -190,19 +191,17 @@ struct OpUpdateTags: public _OpWR
 
 struct OpPropertyTags: public _OpWR
 {
-    OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_)
-        : _OpWR("merge property tags"), impl(toi_, input_)
+    using  Map = std::multimap<const char*, const char*>;
+
+    OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_, const OpPropertyTags::Map& m_)
+        : _OpWR("merge property tags"), impl(toi_, input_), m(m_)
     { }
 
+    Map  m;
     OpUpdateTags  impl;
-    void  _execute(File& f_, bool verbose_) const
-    {
-	impl._execute(f_, verbose_);
-    }
+
+    void  _execute(File& f_, bool verbose_) const;
 };
-
-
-
 
 
 };
