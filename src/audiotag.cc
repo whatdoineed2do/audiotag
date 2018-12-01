@@ -281,6 +281,8 @@ int main(int argc, char *argv[])
 
             case 'P':
             {
+                AudioTag::OpPropertyTags::Map  m;
+
 		char*  pc = NULL;
 		char*  tok = NULL;
 		while ( (tok = strtok_r(pc == NULL ? optarg : NULL, ",", &pc)) )
@@ -300,22 +302,9 @@ int main(int argc, char *argv[])
 		    prop[n] = NULL;
 		    const char*  value = prop + n+1;
 
-                    int  vl;
-		    if ( (vl = strlen(value)) == 0 || (vl == 2 && (value[0] == '\'' && value[1] == '\'' || value[0] == '"' && value[1] == '"')) ) {
-			opts.iflds.properties[prop].clear();
-		    }
-		    else
-		    {
-			auto  where = opts.iflds.properties.find(prop);
-			if (where == opts.iflds.properties.end()) {
-			    opts.iflds.properties.insert(prop, TagLib::StringList(value) );
-			}
-			else {
-			    where->second.prepend(value);
-			}
-		    }
+                    m.insert(std::make_pair(prop, value));
 		}
-		ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds) );
+		ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
             } break;
 
             // clone from tag X to Y if X exists

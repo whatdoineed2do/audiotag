@@ -52,6 +52,7 @@ const TagLib::String::Type  INTNL_STR_ENC = TagLib::String::UTF16BE;
 
 TagLib::String::Type  parseEnc(const char* optarg_, TagLib::String::Type dflt_);
 
+TagLib::String  _cnvrt(const char* data_);
 const char*  _strrep(const TagLib::String&  str_, TagLib::String* ptr_=NULL);
 
 class Input

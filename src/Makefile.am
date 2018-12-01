@@ -13,5 +13,6 @@ audiotag_SOURCES = \
 	audiotag.cc \
 	audiotagfile.cc \
 	audiotagmeta.cc \
-	audiotagmetaout.cc
+	audiotagmetaout.cc \
+	audiotagops.cc
 
