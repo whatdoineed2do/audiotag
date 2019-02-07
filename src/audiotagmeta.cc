@@ -4,9 +4,17 @@
 #include <taglib/tstring.h>
 #include <taglib/tpropertymap.h>
 
+#include <taglib/id3v2tag.h>
+#include <taglib/attachedpictureframe.h>
+#include <taglib/mp4tag.h>
+#include <taglib/mp4coverart.h>
+#include <taglib/flacfile.h>
+#include <taglib/flacpicture.h>
+
 #include "audiotag.h"
 #include "audiotagfile.h"
 #include "audiotagmetaout.h"
+#include "audiotagartwork.h"
 
 using std::cout;
 using std::cerr;
@@ -442,6 +450,18 @@ void  MetaMP3::sanitize()
 #endif
 }
 
+void  MetaMP3::artwork(Artwork& artwork_)
+{
+    TagLib::ID3v2::Tag*  tag = _tf.ID3v2Tag(_id3v2 ? false : true);
+    TagLib::ID3v2::AttachedPictureFrame*  frame = new TagLib::ID3v2::AttachedPictureFrame();
+
+    frame->setMimeType(artwork_.mimeType());
+    frame->setPicture(artwork_.data());
+
+    removeart();
+    tag->addFrame(frame);
+}
+
 bool  MetaMP3::coverart() const
 {
     return (_id3v2 == NULL) ? false : !_id3v2->frameList("APIC").isEmpty();
@@ -450,7 +470,8 @@ bool  MetaMP3::coverart() const
 void  MetaMP3::removeart()
 {
     if (_id3v2) {
-        _id3v2->removeFrames("APIC");
+        _id3v2->removeFrames("APIC"); // v2.3
+        _id3v2->removeFrames("PIC");  // v2.2
     }
 }
 
@@ -644,6 +665,27 @@ void MetaFlac::assign(const MetaTOI& toi_, const Input& rhs_)
     }
 }
 
+void  MetaFlac::artwork(Artwork& artwork_)
+{
+    TagLib::FLAC::Picture* picture = new TagLib::FLAC::Picture();
+
+    TagLib::FLAC::Picture::Type  atype = TagLib::FLAC::Picture::FrontCover;
+
+    picture->setType(atype);
+    picture->setMimeType(artwork_.mimeType());
+    picture->setData(artwork_.data());
+    picture->setDescription("Front Cover");
+
+    TagLib::List<TagLib::FLAC::Picture*>  pics = _tf.pictureList();
+    for (auto i=pics.begin(); i!=pics.end(); ++i)
+    {
+	if ((*i)->type() == atype) {
+	    _tf.removePicture(*i);
+	}
+    }
+    _tf.addPicture(picture);
+}
+
 
 /* FLAC user error/bug?  pictureList() and removeAllPictures dont work on the 
  * _tag object; examining the .flac file with 'metaflac --list foo.flac' we are
@@ -712,6 +754,15 @@ void MetaM4a::remove(const MetaTOI& toi_)
     {
         _tag->removeItem(i->first);
     }
+}
+
+void  MetaM4a::artwork(Artwork& artwork_)
+{
+    TagLib::MP4::CoverArt coverArt(artwork_.type() == Artwork::JPEG ? TagLib::MP4::CoverArt::JPEG : TagLib::MP4::CoverArt::PNG, artwork_.data());
+
+    TagLib::MP4::CoverArtList l;
+    l.append(coverArt);
+    _tf.tag()->setItem("covr", l);
 }
 
 bool  MetaM4a::coverart() const

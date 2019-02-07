@@ -30,4 +30,9 @@ namespace AudioTag
 
 	impl._execute(f_, verbose_);
     }
+
+    void  OpAddArt::_execute(File& f_, bool verbose_) const
+    {
+	f_.meta().artwork(artwork);
+    }
 }

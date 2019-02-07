@@ -137,6 +137,16 @@ struct OpRemoveArt : public _OpWR
     }
 };
 
+class Artwork;
+struct OpAddArt : public _OpWR
+{
+    OpAddArt(AudioTag::Artwork& artwork_) : _OpWR("add artwork"), artwork(artwork_)  { }
+
+    void  _execute(File& f_, bool verbose_) const;
+
+    AudioTag::Artwork&  artwork;
+};
+
 struct OpCleanTags: public _OpWR
 {
     OpCleanTags() : _OpWR("cleaning tags")  { }

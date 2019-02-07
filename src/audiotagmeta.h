@@ -46,6 +46,7 @@ class FileOGGFlac;
 class FileM4a;
 class MetaOut;
 
+class Artwork;
 
 static const TagLib::ID3v2::Tag  _EMPTY_TAG;
 const TagLib::String::Type  INTNL_STR_ENC = TagLib::String::UTF16BE;
@@ -219,8 +220,11 @@ class Meta
   public:
     typedef std::list<std::pair<const char*, TagLib::Tag*> >  Tags;
 
-    virtual ~Meta()
-    { }
+    virtual ~Meta() = default;
+
+    Meta(const Meta&) = delete;
+    void operator=(const Meta&) = delete;
+
 
     const TagLib::File&  file() const
     { return _file; }
@@ -251,6 +255,7 @@ class Meta
     virtual void     year(TagLib::Tag&, const int);
     virtual void  trackno(TagLib::Tag&, const int);
 
+    virtual void  artwork(Artwork&) { }
     virtual bool  coverart() const { return false; }
     virtual void  removeart() { }
 
@@ -316,9 +321,6 @@ class Meta
 
 
   private:
-    Meta(const Meta&);
-    void operator=(const Meta&);
-
     TagLib::File&  _file;
     // default tag of file (for files that support multi tags); may not exist on disk
     TagLib::Tag**   _tag;
@@ -330,7 +332,7 @@ class Meta
 class _MetaMulti : public Meta
 {
   public:
-    virtual ~_MetaMulti() { }
+    virtual ~_MetaMulti() = default;
 
   protected:
     _MetaMulti(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_) : Meta(file_, tag_, mo_) { }
@@ -354,6 +356,7 @@ class MetaMP3 : public _MetaMulti
     void  clone(const MetaTOI& to_, const MetaTOI& from_);
     void  sanitize();
 
+    void  artwork(Artwork&);
     bool  coverart() const;
     void  removeart();
 
@@ -424,6 +427,7 @@ class MetaFlac : public Meta
     void  remove(const MetaTOI&);
 
     void  assign(const MetaTOI&, const Input&);
+    void  artwork(Artwork&);
     bool  coverart() const;
     void  removeart();
 
@@ -451,6 +455,7 @@ class MetaM4a : public Meta
     { }
 
     void  remove(const MetaTOI&);
+    void  artwork(Artwork&);
     bool  coverart() const;
     void  removeart();
 

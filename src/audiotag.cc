@@ -41,6 +41,7 @@
 #include "audiotagmeta.h"
 #include "audiotagmetaout.h"
 #include "audiotagops.h"
+#include "audiotagartwork.h"
 
 using namespace  std;
 
@@ -91,6 +92,7 @@ void  _usage()
 	 << "    -P  <property name>:<value>[,<property name>:<value>]\n"
 	 << "          -P foo:  delete property call 'foo' (if exists)\n"
 	 << "          -P foo:bar,coke:cola  add properties: foo=bar and coke=cola\n"
+	 << "    -w  <artwork file>[:tag{covr,...}]\n"
 	 << '\n'
 	 << "  [maintainence options]\n"
 	 << "    -l             list tags (exclusive maintanence option\n"
@@ -227,11 +229,12 @@ int main(int argc, char *argv[])
         AudioTag::MetaTOI  from;
         AudioTag::MetaTOI  to;
 
-
         AudioTag::Input  iflds;
         AudioTag::OpUpdateTags*  iop;  // not owned
 
         AudioTag::MetaOut*  mout;
+
+	AudioTag::Artwork*  artwork;
 
         const char*  locale;
     } opts;
@@ -240,6 +243,7 @@ int main(int argc, char *argv[])
     opts.clean = false;
     opts.mbconvert = false;
     opts.preserve = false;
+    opts.artwork = NULL;
     opts.removeart = false;
     opts.mout = NULL;
     opts.locale = NULL;
@@ -255,7 +259,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:v")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:w:v")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -305,6 +309,20 @@ int main(int argc, char *argv[])
                     m.insert(std::make_pair(prop, value));
 		}
 		ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
+            } break;
+
+	    case 'w':
+	    {
+		try
+		{
+		    opts.artwork = new AudioTag::Artwork(optarg);
+		}
+		catch (const std::exception& ex)
+		{
+		    MP3_TAG_ERR("invalid artwork='" << optarg<< "' - " << ex.what());
+		    AudioTag::_usage();
+		}
+		ops.add(new AudioTag::OpAddArt(*opts.artwork) );
             } break;
 
             // clone from tag X to Y if X exists
@@ -473,5 +491,6 @@ int main(int argc, char *argv[])
         delete ff;
     }
     delete opts.mout;
+    delete opts.artwork;
     return 0;
 }
