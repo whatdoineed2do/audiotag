@@ -264,8 +264,15 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
     for (auto i : b_) {
         auto  j = a_.find(i.first);
 
-        if (i.second.isEmpty() && j != a_.end()) {
-            a_.erase(i.first);
+        if (i.second.isEmpty())
+	{
+	    if (j != a_.end()) {
+		a_.erase(i.first);
+	    }
+	    // else {
+	    //   its not on the file, and its empty .. skip other we'll add empty tag
+	    // }
+
             continue;
         }
 
