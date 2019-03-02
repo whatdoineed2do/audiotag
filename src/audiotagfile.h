@@ -28,8 +28,12 @@ class MetaOut;
 class File
 {
   public:
-    virtual ~File()
-    { }
+    virtual ~File() = default;
+
+    File(const File&)  = delete;
+    File(const File&&) = delete;
+    void operator=(const File&)  = delete;
+    void operator=(const File&&) = delete;
 
     Meta&  meta()
     { return _m; }
@@ -55,9 +59,6 @@ class File
     }
 
   private:
-    File(const File&);
-    void operator=(const File&);
-
     Meta&  _m;
     TagLib::File&  _taglibfile;
 
@@ -78,14 +79,9 @@ class FileMP3 : public File
 	  File(_m, f_, _f)
     { }
 
-    ~FileMP3()
-    { }
-
+    ~FileMP3() = default;
 
   private:
-    FileMP3(const FileMP3&);
-    void operator=(const FileMP3&);
-
     FileMP3::value_type  _f;
     MetaMP3  _m;
 };
@@ -102,13 +98,9 @@ class FileOGGFlac : public File
           File(_m, f_, _f)
     { }
 
-    ~FileOGGFlac() 
-    { }
+    ~FileOGGFlac() = default;
 
   private:
-    FileOGGFlac(const FileOGGFlac&);
-    void operator=(const FileOGGFlac&);
-
     TagLib::Ogg::FLAC::File  _f;
     MetaOGGFlac  _m;
 };
@@ -126,13 +118,9 @@ class FileFlac : public File
           File(_m, f_, _f)
     { }
 
-    ~FileFlac() 
-    { }
+    ~FileFlac() = default;
 
   private:
-    FileFlac(const FileFlac&);
-    void operator=(const FileFlac&);
-
     TagLib::FLAC::File  _f;
     MetaFlac  _m;
 };
@@ -149,13 +137,9 @@ class FileM4a : public File
           File(_m, f_, _f)
     { }
 
-    ~FileM4a() 
-    { }
+    ~FileM4a() = default;
 
   private:
-    FileM4a(const FileM4a&);
-    void operator=(const FileM4a&);
-
     TagLib::MP4::File  _f;
     MetaM4a  _m;
 };
@@ -168,11 +152,13 @@ class FileFactory
     static File*  create(const char* f_, int& errno_, MetaOut&);
     static const char*  what(int);
 
-  private:
-    FileFactory();
-    FileFactory(const FileFactory&);
-    void operator=(const FileFactory&);
+    FileFactory() = delete;
+    FileFactory(const FileFactory&)  = delete;
+    FileFactory(const FileFactory&&) = delete;
+    void operator=(const FileFactory&)  = delete;
+    void operator=(const FileFactory&&) = delete;
 
+  private:
     static bool  _match(const char* sffx_, const char* t_[])
     {
         const char**  p = t_;
