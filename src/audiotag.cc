@@ -105,7 +105,8 @@ void  _usage()
          << "                     d - default (use default tag for audio type)\n"
          << "                     A - all\n"
 	 << "    -d [1|2|a|f|A] delete tags\n"
-	 << "    -n X:Y         clone tag from X to Y only if X exists\n"
+	 << "    -m <file>      clone dflt tag from file onto dflt tag type of files\n"
+	 << "    -n X:Y         clone internal tag from X to Y only if X exists\n"
 	 << "    -r             remove art from main tags\n"
 	 << "    -C             clean tags, leaving only basic info\n"
 	 << "    -M encoding    parse current tags and convert from -M <E> -e <E'>\n"
@@ -245,7 +246,7 @@ int main(int argc, char *argv[])
     opts.preserve = false;
     opts.artwork = NULL;
     opts.removeart = false;
-    opts.mout = NULL;
+    opts.mout = new AudioTag::MetaOutJson();
     opts.locale = NULL;
     opts.iop = NULL;
 
@@ -259,7 +260,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:n:VM:Ci:O:u:rP:w:v")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:g:Dd:m:n:VM:Ci:O:u:rP:w:v")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -325,7 +326,7 @@ int main(int argc, char *argv[])
 		ops.add(new AudioTag::OpAddArt(*opts.artwork) );
             } break;
 
-            // clone from tag X to Y if X exists
+            // clone internally (from the same file) from tag X to Y if X exists
             case 'n':
             {
                 // x:y
@@ -335,7 +336,7 @@ int main(int argc, char *argv[])
                     if (opts.to && opts.from && opts.to.operator!=(opts.from) && 
                         opts.to.all == false && opts.from.all == false) 
                     {
-                        ops.add(new AudioTag::OpCloneTags(opts.to, opts.from));
+                        ops.add(new AudioTag::OpCloneIntnlTags(opts.to, opts.from));
                     }
                     else
                     {
@@ -344,6 +345,19 @@ int main(int argc, char *argv[])
                     }
                }
             } break;
+
+	    // clone (dflt) tag from file to another file (using their dflt tag)
+	    case 'm':
+	    {
+		AudioTag::File*  f;
+		int  err;
+		if ( (f = AudioTag::FileFactory::create(optarg, err, *opts.mout)) == NULL) {
+		    MP3_TAG_ERR("cloning from invalid file");
+		    AudioTag::_usage();
+		}
+
+		ops.add(new AudioTag::OpCloneFileMeta(f));
+	    } break;
 
             case 'i':
             {
@@ -385,6 +399,7 @@ int main(int argc, char *argv[])
 #endif
 
             case 'O':
+		delete opts.mout;
                 opts.mout = AudioTag::MetaOut::create(optarg);
                 break;
 

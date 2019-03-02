@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <list>
 #include <map>
+#include <memory>
 
 #include "audiotag.h"
 #include "audiotagmeta.h"
@@ -158,9 +159,9 @@ struct OpCleanTags: public _OpWR
 };
 
 
-struct OpCloneTags: public _OpWR
+struct OpCloneIntnlTags: public _OpWR
 {
-    OpCloneTags(const AudioTag::MetaTOI& to_, const AudioTag::MetaTOI& from_)
+    OpCloneIntnlTags(const AudioTag::MetaTOI& to_, const AudioTag::MetaTOI& from_)
         : _OpWR("cloning tags"),
           _to(to_), _from(from_)
     { }
@@ -213,6 +214,27 @@ struct OpPropertyTags: public _OpWR
     void  _execute(File& f_, bool verbose_) const;
 };
 
+class OpCloneFileMeta: public _OpWR
+{
+  public:
+    OpCloneFileMeta(AudioTag::File* src_)
+        : _OpWR("cloning tags from file"),
+          _src(src_), _meta(_src->meta().tag())
+    { }
+
+    ~OpCloneFileMeta()
+    { delete _src; }
+
+  protected:
+    void  _execute(File& f_, bool verbose_) const
+    {
+        f_.meta() = _meta;
+    }
+
+  private:
+    AudioTag::File*  _src;
+    const AudioTag::Input  _meta;
+};
 
 };
 
