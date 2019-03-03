@@ -2,6 +2,29 @@
 
 namespace AudioTag
 {
+    Ops::~Ops()
+    {
+        for (auto i : _ops) {
+            delete i;
+        }
+    }
+
+    void  Ops::add(const Op*  op_)
+    {
+        if (op_->readonly) {
+            _readonly = false;
+        }
+       _ops.push_back(op_);
+    }
+
+    void  Ops::execute(File& f_) const
+    {
+        for (const auto i : _ops) {
+            i->execute(f_, _verbose);
+        }
+    }
+
+
     void  OpPropertyTags::_execute(File& f_, bool verbose_) const
     {
         std::for_each(m.begin(), m.end(), [this](Map::value_type e)

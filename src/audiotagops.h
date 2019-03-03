@@ -16,8 +16,10 @@ namespace AudioTag
 
 class Op {
   public:
-    virtual ~Op()  { }
+    virtual ~Op() = default;
     Op(const Op& rhs_) : readonly(rhs_.readonly) { }
+
+    Op&  operator=(const Op&) = delete;
 
     const bool  readonly;
 
@@ -37,19 +39,18 @@ class Op {
     virtual void  _execute(File&, bool verbose_) const = 0;
 
   private:
-    Op&  operator=(const Op&);
     const char*  _descr;
 };
 
 struct _OpRO : public Op
 {
-    virtual ~_OpRO() { }
+    virtual ~_OpRO() = default;
     _OpRO(const char* descr_) : Op(true, descr_) { }
 };
 
 struct _OpWR : public Op
 {
-    virtual ~_OpWR() { }
+    virtual ~_OpWR() = default;
     _OpWR(const char* descr_) : Op(false, descr_) { }
 };
 
@@ -60,12 +61,12 @@ class Ops
     typedef std::list<const Op*>  _Ops;
 
     Ops() : _readonly(true) { }
-    ~Ops()
-    {
-        for (_Ops::iterator i=_ops.begin(); i!=_ops.end(); ++i) {
-            delete *i;
-        }
-    }
+    ~Ops();
+
+    Ops(const Ops&)  = delete;
+    Ops(const Ops&&) = delete;
+    Ops&  operator=(const Ops&)  = delete;
+    Ops&  operator=(const Ops&&) = delete;
 
     bool  empty() const
     { return _ops.empty(); }
@@ -77,28 +78,12 @@ class Ops
     bool  readonly() const
     { return _readonly; }
 
-    void  add(const Op*  op_)
-    {
-        assert(op_);
-        if (!op_->readonly) {
-            _readonly = false;
-        }
-       _ops.push_back(op_);
-    }
+    void  add(const Op*  op_);
 
-    void  execute(File& f_) const
-    {
-        for (_Ops::const_iterator i=_ops.begin(); i!=_ops.end(); ++i) {
-            (*i)->execute(f_, _verbose);
-        }
-    }
+    void  execute(File& f_) const;
 
   private:
-    Ops(const Ops&);
-    Ops&  operator=(const Ops&);
-
     bool  _readonly;
-
     _Ops  _ops;
 };
 

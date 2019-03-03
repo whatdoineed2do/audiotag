@@ -233,9 +233,9 @@ int main(int argc, char *argv[])
         AudioTag::Input  iflds;
         AudioTag::OpUpdateTags*  iop;  // not owned
 
-        AudioTag::MetaOut*  mout;
+	std::unique_ptr<AudioTag::MetaOut>  mout;
 
-	AudioTag::Artwork*  artwork;
+	std::unique_ptr<AudioTag::Artwork>  artwork;
 
         const char*  locale;
     } opts;
@@ -244,9 +244,8 @@ int main(int argc, char *argv[])
     opts.clean = false;
     opts.mbconvert = false;
     opts.preserve = false;
-    opts.artwork = NULL;
     opts.removeart = false;
-    opts.mout = new AudioTag::MetaOutJson();
+    opts.mout = std::make_unique<AudioTag::MetaOutJson>();
     opts.locale = NULL;
     opts.iop = NULL;
 
@@ -316,7 +315,8 @@ int main(int argc, char *argv[])
 	    {
 		try
 		{
-		    opts.artwork = new AudioTag::Artwork(optarg);
+		    std::unique_ptr<AudioTag::Artwork>  ptr(new AudioTag::Artwork(optarg));
+		    opts.artwork = std::move(ptr);
 		}
 		catch (const std::exception& ex)
 		{
@@ -399,9 +399,10 @@ int main(int argc, char *argv[])
 #endif
 
             case 'O':
-		delete opts.mout;
-                opts.mout = AudioTag::MetaOut::create(optarg);
-                break;
+	    {
+		std::unique_ptr<AudioTag::MetaOut>  ptr(AudioTag::MetaOut::create(optarg));
+                opts.mout = std::move(ptr);
+	    } break;
 
             case 'u':
                 opts.locale = optarg;
@@ -439,10 +440,6 @@ int main(int argc, char *argv[])
     }
 
     opts.iflds.strip();
-
-    if (opts.mout == NULL) {
-        opts.mout = new AudioTag::MetaOutJson();
-    }
 
 
     const char*  f;
@@ -505,7 +502,5 @@ int main(int argc, char *argv[])
         }
         delete ff;
     }
-    delete opts.mout;
-    delete opts.artwork;
     return 0;
 }
