@@ -61,14 +61,7 @@ bool  _verbose = false;
 
 const char*  _version()
 {
-#ifdef AUDIOTAG_VERSION
-#define AT_STRM(x)  #x
-#define AT_STR(x)   AT_STRM(x)
-#define AUDIOTAG_VERSION_STR  AT_STR(AUDIOTAG_VERSION)
-#else
-#define AUDIOTAG_VERSION_STR  "v0.0.0-unknown"
-#endif
-    return AUDIOTAG_VERSION_STR;
+    return VERSION;
 }
 
 void  _usage()
