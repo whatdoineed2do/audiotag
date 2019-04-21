@@ -222,7 +222,11 @@ $ audiotag  -P coke:,COMMENT:"an updated comment" -l test.mp3
   ]
 }
 ```
-
+## Adding artwork/Disc number
+```
+$ audiotag -w foo.jpg -K 1/3 disc1track1.mp3
+```
+ 
 # Further Enhancements
 Other file formats supported by `Taglib` can be added:  this util relies on a `File` object to represent the underlying file and a corresponding `Meta` object that is directly coupled to handle the retrieval and updating of metadata.  Any new objects will have to be _registered_ with the `FileFactory`.
 

@@ -67,7 +67,10 @@ class Input
     const char*  yr;       // TDRC or TYER or TORY
     const char*  trackno;  // TRCK
 
-    const char*  albumartist;
+// this block are valid tags but no direct taglib get/set i/f
+  /*const char*  date;     // TDRC, DATE*/
+    const char*  disc;     // TPOS or DISCNUMBER or disc (as x/y)
+    const char*  albumartist;  // TPE2, ALBUMARTIST, aArt
 
     TagLib::PropertyMap  properties;
 
@@ -81,6 +84,7 @@ class Input
         yr = NULL;
         trackno = NULL;
 
+	disc = NULL;
         albumartist = NULL;
 
         properties.clear();
@@ -95,6 +99,7 @@ class Input
         genre(NULL),
         yr(NULL),
         trackno(NULL),
+        disc(NULL),
         albumartist(NULL)
     { reset(); }
 
@@ -111,12 +116,12 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno || albumartist || !properties.isEmpty(); }
+    { return artist || album || title || comment || genre || yr || trackno || disc || albumartist || !properties.isEmpty(); }
 
 
     void  strip()
     {
-        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &albumartist, NULL };
+        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &disc, &albumartist, NULL };
 
         const char***  p = a;
         while (*p)
@@ -160,7 +165,8 @@ class Input
         album = AudioTag::_strrep(tag_->album(), &A);
         genre = AudioTag::_strrep(tag_->genre(), &g);
 
-        //albumartist = AudioTag::_strrep(tag_->???(), &r);
+        //disc = ..
+        //albumartist = ..
 
         sprintf(T, "%ld", tag_->track());
         sprintf(y, "%ld", tag_->year());
@@ -169,7 +175,7 @@ class Input
     }
 
   private:
-    TagLib::String  a,t,A,g,r;
+    TagLib::String  a,t,A,g;
     char  y[5];
     char  T[3];
 };
@@ -255,6 +261,8 @@ class Meta
     virtual void     year(TagLib::Tag&, const int);
     virtual void  trackno(TagLib::Tag&, const int);
 
+    virtual void  disc(TagLib::Tag&, const char*);
+
     virtual void  artwork(Artwork&) { }
     virtual bool  coverart() const { return false; }
     virtual void  removeart() { }
@@ -301,7 +309,10 @@ class Meta
     }
 
 
-
+    /* set tags via properties where taglib doesnt provide direct i/f
+     * for valid tags (ie albumartist, disc...
+     */
+    void  _property(TagLib::Tag& tag_, const char* tagname_, const char* data_);
 
     virtual void  _assign(TagLib::Tag&, const Input&);
 

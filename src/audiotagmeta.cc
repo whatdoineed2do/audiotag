@@ -164,25 +164,33 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
 }
 
 // TODO - this doesnt work .. the propetyy map must come from a child class!
-void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
+void  Meta::_property(TagLib::Tag& tag_, const char* tagname_, const char* data_)
 {
-    const char* N = "ALBUMARTIST";
     TagLib::PropertyMap  m = properties(tag_);
     if (data_ == NULL) {
-        m.erase(N);
+        m.erase(tagname_);
     }
     else {
-        TagLib::PropertyMap::Iterator  i = m.find(N);
+        TagLib::PropertyMap::Iterator  i = m.find(tagname_);
         if (i == m.end()) {
-            m.insert(N, _cnvrt(data_) );
+            m.insert(tagname_, _cnvrt(data_) );
         }
         else {
-            m.replace(N, _cnvrt(data_));
+            m.replace(tagname_, _cnvrt(data_));
         }
     }
     properties(tag_, m);
 }
 
+void  Meta::albumArtist(TagLib::Tag& tag_, const char* data_)
+{
+    _property(tag_, "ALBUMARTIST", data_);
+}
+
+void  Meta::disc(TagLib::Tag& tag_, const char* data_)
+{
+    _property(tag_, "DISCNUMBER", data_);
+}
 
 void  Meta::title(TagLib::Tag& tag_, const char* data_)
 {
@@ -228,6 +236,7 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
 
+    if (rhs_.disc)          disc(tag_, rhs_.disc);
     if (rhs_.albumartist)        albumArtist(tag_, rhs_.albumartist);
     if (!rhs_.properties.isEmpty()) {
         properties(tag_, rhs_.properties);
