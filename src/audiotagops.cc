@@ -11,7 +11,7 @@ namespace AudioTag
 
     void  Ops::add(const Op*  op_)
     {
-        if (op_->readonly) {
+        if (!op_->readonly) {
             _readonly = false;
         }
        _ops.push_back(op_);
