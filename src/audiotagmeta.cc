@@ -214,7 +214,6 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
     tag_.setAlbum( data_ ? _cnvrt(data_) : TagLib::String::null);
 }
 
-// TODO - this doesnt work .. the propetyy map must come from a child class!
 void  Meta::_property(TagLib::Tag& tag_, const char* tagname_, const char* data_)
 {
     TagLib::PropertyMap  m = properties(tag_);
@@ -501,20 +500,6 @@ void  MetaMP3::sanitize()
         remove(toi);
         assign(toi, data);
     }
-
-#if 0 
-    _assign(**_tag, input);
-    TagLib::Tag*  tag = *_tag;
-    artist = _strrep(tag_->artist(), &a);
-    title = _strrep(tag_->title(), &t);
-    album = _strrep(tag_->album(), &A);
-    genre = _strrep(tag_->genre(), &g);
-
-    sprintf(T, "%ld", tag_->track());
-    sprintf(y, "%ld", tag_->year());
-    trackno = T;
-    yr = y;
-#endif
 }
 
 void  MetaMP3::artwork(Artwork& artwork_)
@@ -619,15 +604,9 @@ void  MetaMP3::_tag(TagLib::ID3v2::Tag*  tag_, const Input&  flds_, TagLib::Stri
     }
     if (flds_.yr)       tag_->setYear    ((unsigned)atol(flds_.yr));
 
-#if 0
-    if (flds_.artist)   _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TPE1", enc_), flds_.artist);
-    if (flds_.album)    _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TALB", enc_), flds_.album);
-    if (flds_.title)    _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TIT2", enc_), flds_.title);
-#else
     if (flds_.artist)   _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TPE1", _overrideEncLatin(flds_.artist, enc_)), flds_.artist);
     if (flds_.album)    _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TALB", _overrideEncLatin(flds_.album, enc_)), flds_.album);
     if (flds_.title)    _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TIT2", _overrideEncLatin(flds_.title, enc_)), flds_.title);
-#endif
 
     if (flds_.trackno)  _tagFrme(tag_, new TagLib::ID3v2::TextIdentificationFrame("TRCK", TagLib::String::Latin1), flds_.trackno);
 
