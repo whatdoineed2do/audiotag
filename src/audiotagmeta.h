@@ -126,37 +126,37 @@ class Input
         const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &disc, &albumartist, NULL };
 
         const char***  p = a;
-        while (*p)
-        {
-             if (**p) {
-                 char*  x = (char*)**p;
-                 char*  y = x;
+	while (*p)
+	{
+	    if (**p) {
+		char*  x = (char*)**p;
+		char*  y = x;
 
-                 while (*x) {
-                     ++x;
-                 }
+		while (*x) {
+		    ++x;
+		}
 
-                 /* y = start, x = end */
-                 if (y == x) {
-                 }
-                 else
-                 {
-                     --x;
-                     /* get rid of trailing... */
-                     while (x > y && isspace(*x)) {
-                         --x;
-                     }
-                     *++x = (char)NULL;
+		/* y = start, x = end */
+		if (y == x) {
+		}
+		else
+		{
+		    --x;
+		    /* get rid of trailing... */
+		    while (x > y && isspace(*x)) {
+			--x;
+		    }
+		    *++x = (char)NULL;
 
-                     /* ...and leading */
-                     while (y < x && isspace(*y)) {
-                         ++y;
-                     }
+		    /* ...and leading */
+		    while (y < x && isspace(*y)) {
+			++y;
+		    }
 
-                     **p = (y == x) ? NULL : y;
-                 }
-             }
-             ++p;
+		    **p = (y == x) ? NULL : y;
+		}
+	    }
+            ++p;
         }
     }
 
