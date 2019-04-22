@@ -86,6 +86,10 @@ void  _usage()
 	 << "    -P  <property name>:<value>[,<property name>:<value>]\n"
 	 << "          -P foo:  delete property call 'foo' (if exists)\n"
 	 << "          -P foo:bar,coke:cola  add properties: foo=bar and coke=cola\n"
+	 << "        common properties:\n"
+	 << "          TITLESORT ALBUMSORT ARTISTSORT ALBUMARTISTSORT\n"
+	 << "          COMPOSER PERFORMER\n"
+	 << "          ISRC COPYRIGHT CATALOGNUMBER BARCODE\n"
 	 << "    -w  <artwork file>[:tag{covr,...}]\n"
 	 << '\n'
 	 << "  [maintainence options]\n"
