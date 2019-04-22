@@ -158,21 +158,8 @@ class Input
         }
     }
 
-    void  populate(const TagLib::Tag* tag_)
-    {
-        artist = AudioTag::_strrep(tag_->artist(), &a);
-        title = AudioTag::_strrep(tag_->title(), &t);
-        album = AudioTag::_strrep(tag_->album(), &A);
-        genre = AudioTag::_strrep(tag_->genre(), &g);
-
-        //disc = ..
-        //albumartist = ..
-
-        sprintf(T, "%ld", tag_->track());
-        sprintf(y, "%ld", tag_->year());
-        trackno = T;
-        yr = y;
-    }
+    void  populate(const TagLib::Tag* tag_);
+    bool  validate() const;
 
   private:
     TagLib::String  a,t,A,g;
@@ -356,8 +343,9 @@ class MetaMP3 : public _MetaMulti
   public:
     MetaMP3(FileMP3&, MetaOut&);
 
-    ~MetaMP3()
-    { }
+    ~MetaMP3() = default;
+    MetaMP3(const MetaMP3&) = delete;
+    void operator=(const MetaMP3&) = delete;
 
     Meta::Tags  tags() const;
 
@@ -375,9 +363,6 @@ class MetaMP3 : public _MetaMulti
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    MetaMP3(const MetaMP3&);
-    void operator=(const MetaMP3&);
-
     FileMP3&  _f;
     TagLib::MPEG::File&  _tf;
 
@@ -400,9 +385,9 @@ class MetaOGGFlac : public Meta
   public:
     MetaOGGFlac(FileOGGFlac&, MetaOut&);
     
-    ~MetaOGGFlac()
-    { }
-
+    ~MetaOGGFlac() = default;
+    MetaOGGFlac(const MetaOGGFlac&) = delete;
+    void operator=(const MetaOGGFlac&) = delete;
 
     const bool  empty() const;
     //{ return _f.hasXiphComment(); }
@@ -414,9 +399,6 @@ class MetaOGGFlac : public Meta
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    MetaOGGFlac(const MetaOGGFlac&);
-    void operator=(const MetaOGGFlac&);
-
     FileOGGFlac&  _f;
     TagLib::Ogg::FLAC::File&  _tf;
 
@@ -430,9 +412,9 @@ class MetaFlac : public Meta
   public:
     MetaFlac(FileFlac&, MetaOut&);
     
-    ~MetaFlac()
-    { }
-
+    ~MetaFlac() = default;
+    MetaFlac(const MetaFlac&) = delete;
+    void operator=(const MetaFlac&) = delete;
 
     Meta::Tags  tags() const;
     void  remove(const MetaTOI&);
@@ -446,9 +428,6 @@ class MetaFlac : public Meta
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    MetaFlac(const MetaFlac&);
-    void operator=(const MetaFlac&);
-
     FileFlac&  _f;
     TagLib::FLAC::File&  _tf;
 
@@ -462,8 +441,9 @@ class MetaM4a : public Meta
   public:
     MetaM4a(FileM4a&, MetaOut&);
     
-    ~MetaM4a()
-    { }
+    ~MetaM4a() = default;
+    MetaM4a(const MetaM4a&) = delete;
+    void operator=(const MetaM4a&) = delete;
 
     void  remove(const MetaTOI&);
     void  artwork(Artwork&);
@@ -478,9 +458,6 @@ class MetaM4a : public Meta
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    MetaM4a(const MetaM4a&);
-    void operator=(const MetaM4a&);
-
     FileM4a&  _f;
     TagLib::MP4::File&  _tf;
 

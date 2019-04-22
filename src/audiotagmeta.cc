@@ -24,6 +24,28 @@ using std::endl;
 namespace AudioTag
 {
 
+void  Input::populate(const TagLib::Tag* tag_)
+{
+    artist = AudioTag::_strrep(tag_->artist(), &a);
+    title = AudioTag::_strrep(tag_->title(), &t);
+    album = AudioTag::_strrep(tag_->album(), &A);
+    genre = AudioTag::_strrep(tag_->genre(), &g);
+
+    //disc = ..
+    //albumartist = ..
+
+    sprintf(T, "%ld", tag_->track());
+    sprintf(y, "%ld", tag_->year());
+    trackno = T;
+    yr = y;
+}
+
+bool  Input::validate() const
+{
+    return true;
+}
+
+
 TagLib::String  _cnvrt(const char* data_)
 {
     const size_t  n = strlen(data_)*sizeof(wchar_t);
