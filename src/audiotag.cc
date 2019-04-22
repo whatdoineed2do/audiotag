@@ -421,6 +421,10 @@ int main(int argc, char *argv[])
         MP3_TAG_ERR("no files specified");
         AudioTag::_usage();
     }
+    if ( !opts.iflds.validate()) {
+        MP3_TAG_ERR("invalid options");
+        AudioTag::_usage();
+    }
 
     const char*  l;
     if ( (l = AudioTag::_setlocale(opts.locale)) == NULL) {

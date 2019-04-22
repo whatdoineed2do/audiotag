@@ -1,5 +1,10 @@
 #include "audiotagmeta.h"
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#endif
+#include <time.h>
+#include <stdio.h>
 #include <string.h>
 #include <taglib/tstring.h>
 #include <taglib/tpropertymap.h>
@@ -42,7 +47,31 @@ void  Input::populate(const TagLib::Tag* tag_)
 
 bool  Input::validate() const
 {
-    return true;
+    bool  good = true;
+    if (good && trackno)
+    {
+	unsigned x = 0;
+	good = sscanf(trackno, "%ld", &x) == 1;
+    }
+    if (good && yr)
+    {
+	unsigned x = 0;
+	good = sscanf(yr, "%ld", &x) == 1;
+    }
+    if (good && disc)
+    {
+	// expect x/y
+	int x = -1, y = -1;
+	good = sscanf(disc, "%d/%d", &x, &y) == 2;
+    }
+    if (good && date)
+    {
+	struct tm  tm;
+	char*  ret = strptime(date, "%Y-%m-%d", &tm);
+	good = (ret && *ret == '\0');
+    }
+
+    return good;
 }
 
 

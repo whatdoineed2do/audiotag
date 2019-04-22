@@ -68,7 +68,7 @@ class Input
     const char*  trackno;  // TRCK
 
 // this block are valid tags but no direct taglib get/set i/f
-  /*const char*  date;     // TDRC, DATE*/
+    const char*  date;     // TDRC, DATE
     const char*  disc;     // TPOS or DISCNUMBER or disc (as x/y)
     const char*  albumartist;  // TPE2, ALBUMARTIST, aArt
 
@@ -84,6 +84,7 @@ class Input
         yr = NULL;
         trackno = NULL;
 
+	date = NULL;
 	disc = NULL;
         albumartist = NULL;
 
@@ -99,6 +100,7 @@ class Input
         genre(NULL),
         yr(NULL),
         trackno(NULL),
+	date(NULL),
         disc(NULL),
         albumartist(NULL)
     { reset(); }
@@ -116,7 +118,7 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno || disc || albumartist || !properties.isEmpty(); }
+    { return artist || album || title || comment || genre || yr || trackno || date || disc || albumartist || !properties.isEmpty(); }
 
 
     void  strip()
