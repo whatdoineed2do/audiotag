@@ -259,15 +259,15 @@ void  Meta::genre(TagLib::Tag& tag_, const char* data_)
     tag_.setGenre( data_ ? _cnvrt(data_) : TagLib::String::null);
 }
 
-void  Meta::year(TagLib::Tag& tag_, const int data_)
+void  Meta::year(TagLib::Tag& tag_, const unsigned data_)
 {
-    tag_.setYear( data_ > 0 ? data_ : 0);
+    tag_.setYear(data_);
 }
 
 
-void  Meta::trackno(TagLib::Tag& tag_, const int data_)
+void  Meta::trackno(TagLib::Tag& tag_, const unsigned data_)
 {
-    tag_.setTrack( data_ > 0 ? data_ : 0);
+    tag_.setTrack(data_);
 }
 
 
@@ -790,16 +790,35 @@ Meta::Tags  MetaM4a::tags() const
     return tag;
 }
 
+void  MetaM4a::year(TagLib::Tag& tag_, const unsigned data_)
+{
+    // for some reason taglib 1.11.1 seems to have a couple of problems:
+    // .. set{Year,Date}(0) does NOT clear these values for m4a
+    // .. can't use symbolic DATE/TRACKNUMBER to remove
+ 
+    if (data_ > 0) _tag->setYear ( data_);
+    else if (data_ == 0 && _tag == &tag_) _tag->removeItem("\251day");
+}
+
+void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned data_)
+{
+    if (data_ > 0) tag_.setTrack(data_);
+    else if (data_ == 0 && _tag == &tag_) _tag->removeItem("trkn");
+}
+
 void MetaM4a::remove(const MetaTOI& toi_)
 {
     if (!_tag && !toi_.mp4 && !toi_.deflt) {
         return;
     }
 
+#if 0
     for (TagLib::MP4::ItemListMap::Iterator i=_tag->itemListMap().begin(); i!=_tag->itemListMap().end(); ++i)
     {
         _tag->removeItem(i->first);
     }
+#endif
+    _tag->itemListMap().clear();
 }
 
 void  MetaM4a::artwork(Artwork& artwork_)

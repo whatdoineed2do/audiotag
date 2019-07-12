@@ -247,8 +247,8 @@ class Meta
     virtual void  comment(TagLib::Tag&, const char*);
     virtual void    genre(TagLib::Tag&, const char*);
 
-    virtual void     year(TagLib::Tag&, const int);
-    virtual void  trackno(TagLib::Tag&, const int);
+    virtual void     year(TagLib::Tag&, const unsigned);
+    virtual void  trackno(TagLib::Tag&, const unsigned);
 
     virtual void  disc(TagLib::Tag&, const char*);
 
@@ -451,6 +451,9 @@ class MetaM4a : public Meta
     void  artwork(Artwork&);
     bool  coverart() const;
     void  removeart();
+
+    void     year(TagLib::Tag&, const unsigned)  override;
+    void  trackno(TagLib::Tag&, const unsigned)  override;
 
     void  assign(const MetaTOI&, const Input&);
 
