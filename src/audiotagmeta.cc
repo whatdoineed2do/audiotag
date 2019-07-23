@@ -812,12 +812,6 @@ void MetaM4a::remove(const MetaTOI& toi_)
         return;
     }
 
-#if 0
-    for (TagLib::MP4::ItemListMap::Iterator i=_tag->itemListMap().begin(); i!=_tag->itemListMap().end(); ++i)
-    {
-        _tag->removeItem(i->first);
-    }
-#endif
     _tag->itemListMap().clear();
 }
 
@@ -832,9 +826,7 @@ void  MetaM4a::artwork(Artwork& artwork_)
 
 bool  MetaM4a::coverart() const
 {
-    TagLib::MP4::Item  coverItem = _tag->itemListMap()["covr"];
-    TagLib::MP4::CoverArtList coverArtList = coverItem.toCoverArtList();
-    return !coverArtList.isEmpty();
+    return _tag->contains("covr");
 }
 
 void  MetaM4a::removeart()
