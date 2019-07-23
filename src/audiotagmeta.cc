@@ -21,10 +21,6 @@
 #include "audiotagmetaout.h"
 #include "audiotagartwork.h"
 
-using std::cout;
-using std::cerr;
-using std::endl;
-
 
 namespace AudioTag
 {
@@ -812,7 +808,16 @@ void MetaM4a::remove(const MetaTOI& toi_)
         return;
     }
 
-    _tag->itemListMap().clear();
+    // non const method deprecated, workaround
+    // _tag->itemListMap().clear();
+    const auto&  items = _tag->itemListMap();
+    TagLib::MP4::ItemMap::ConstIterator i = items.begin();
+    while (i != items.end()) {
+        const auto&  key = i->first;
+        ++i;
+
+        _tag->removeItem(key);
+    }
 }
 
 void  MetaM4a::artwork(Artwork& artwork_)
