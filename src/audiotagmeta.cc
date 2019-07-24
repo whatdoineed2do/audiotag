@@ -267,6 +267,13 @@ void  Meta::trackno(TagLib::Tag& tag_, const unsigned data_)
 }
 
 
+void  Meta::trackno(TagLib::Tag& tag_, const unsigned x_, const unsigned y_)
+{
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%lu/%lu", x_, y_);
+    _property(tag_, "TRACKNUMBER", buf);
+}
+
 void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
 {
     if (!rhs_) {
@@ -280,6 +287,10 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
     if (rhs_.genre)        genre(tag_, rhs_.genre);
 
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
+
+    if (rhs_.trackno && rhs_.trackN)
+                         trackno(tag_, atol(rhs_.trackno), atol(rhs_.trackN));
+    else
     if (rhs_.trackno)    trackno(tag_, atol(rhs_.trackno));
 
     if (rhs_.disc)          disc(tag_, rhs_.disc);
@@ -801,6 +812,13 @@ void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned data_)
     if (data_ > 0) tag_.setTrack(data_);
     else if (data_ == 0 && _tag == &tag_) _tag->removeItem("trkn");
 }
+
+void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned x_, const unsigned y_)
+{
+    if (x_ && y_) Meta::trackno(tag_, x_, y_);
+    else  _tag->removeItem("trkn");
+}
+
 
 void MetaM4a::remove(const MetaTOI& toi_)
 {

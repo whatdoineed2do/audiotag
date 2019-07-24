@@ -65,7 +65,8 @@ class Input
     const char*  comment;  // COMM
     const char*  genre;    // TCON
     const char*  yr;       // TDRC or TYER or TORY
-    const char*  trackno;  // TRCK
+    const char*  trackno;  // TRCK as 'x'
+    const char*  trackN;   // last track
 
 // this block are valid tags but no direct taglib get/set i/f
     const char*  date;     // TDRC, DATE
@@ -83,6 +84,7 @@ class Input
         genre = NULL;
         yr = NULL;
         trackno = NULL;
+        trackN = NULL;
 
 	date = NULL;
 	disc = NULL;
@@ -100,6 +102,7 @@ class Input
         genre(NULL),
         yr(NULL),
         trackno(NULL),
+        trackN(NULL),
 	date(NULL),
         disc(NULL),
         albumartist(NULL)
@@ -123,7 +126,7 @@ class Input
 
     void  strip()
     {
-        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &disc, &albumartist, NULL };
+        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &trackN, &disc, &albumartist, NULL };
 
         const char***  p = a;
 	while (*p)
@@ -249,6 +252,7 @@ class Meta
 
     virtual void     year(TagLib::Tag&, const unsigned);
     virtual void  trackno(TagLib::Tag&, const unsigned);
+    virtual void  trackno(TagLib::Tag&, const unsigned, const unsigned);
 
     virtual void  disc(TagLib::Tag&, const char*);
 
@@ -454,6 +458,7 @@ class MetaM4a : public Meta
 
     void     year(TagLib::Tag&, const unsigned)  override;
     void  trackno(TagLib::Tag&, const unsigned)  override;
+    void  trackno(TagLib::Tag&, const unsigned, const unsigned)  override;
 
     void  assign(const MetaTOI&, const Input&);
 

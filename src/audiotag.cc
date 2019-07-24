@@ -82,7 +82,8 @@ void  _usage()
 	 << "    -g  genre\n"
 	 << "    -y  year\n"
 	 << "    -T  track\n"
-	 << "    -K  disc/disc total\n"
+	 << "    -K  last track\n"
+	 << "    -D  disc/disc total\n"
 	 << "    -P  <property name>:<value>[,<property name>:<value>]\n"
 	 << "          -P foo:  delete property call 'foo' (if exists)\n"
 	 << "          -P foo:bar,coke:cola  add properties: foo=bar and coke=cola\n"
@@ -257,7 +258,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:K:g:Dd:m:n:VM:Ci:O:u:rP:w:v")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:K:D:g:Dd:m:n:VM:Ci:O:u:rP:w:v")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -279,7 +280,8 @@ int main(int argc, char *argv[])
             case 'y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.yr = optarg;  break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
             case 'T':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackno = optarg;  break;
-            case 'K':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.disc = optarg;  break;
+            case 'K':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackN = optarg;  break;
+            case 'D':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.disc = optarg;  break;
             case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
 
             case 'P':
