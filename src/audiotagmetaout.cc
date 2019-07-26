@@ -3,8 +3,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include <tpropertymap.h>
-#include <tstringlist.h>
+#include <taglib/tpropertymap.h>
+#include <taglib/tstringlist.h>
 
 
 #include "audiotagmeta.h"
