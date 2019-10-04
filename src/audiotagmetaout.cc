@@ -51,7 +51,8 @@ std::ostream&  MetaOutBasic::out(std::ostream& os_, const File& f_)
 
 const char*  MetaOutJson::out(std::string& tmp_, const TagLib::String& s_)
 {
-    if (s_ == TagLib::String::null) {
+    static TagLib::String  taglib_string_null;
+    if (s_ == taglib_string_null) {
         return "null";
     } 
     else { 

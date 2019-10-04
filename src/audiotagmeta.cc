@@ -24,6 +24,7 @@
 
 namespace AudioTag
 {
+const TagLib::String  taglib_string_null;
 
 void  Input::populate(const TagLib::Tag* tag_)
 {
@@ -75,7 +76,7 @@ TagLib::String  _cnvrt(const char* data_)
 {
     const size_t  n = strlen(data_)*sizeof(wchar_t);
     if (n == 0) {
-        return TagLib::String::null;
+        return taglib_string_null;
     }
 
     if (INTNL_STR_ENC == TagLib::String::Latin1) {
@@ -114,7 +115,7 @@ const char*  _strrep(const TagLib::String&  str_, TagLib::String* ptr_)
 {
     /* so fucking stupid..
      */
-    if (str_ == TagLib::String::null) {
+    if (str_ == taglib_string_null) {
         static const char*  tmp = "";
         return tmp;
     }
@@ -201,13 +202,13 @@ void  Meta::save()
 
 void  Meta::artist(TagLib::Tag& tag_, const char* data_)
 {
-    tag_.setArtist( data_ ? _cnvrt(data_) : TagLib::String::null);
+    tag_.setArtist( data_ ? _cnvrt(data_) : taglib_string_null);
 }
 
 
 void  Meta::album(TagLib::Tag& tag_, const char* data_)
 {
-    tag_.setAlbum( data_ ? _cnvrt(data_) : TagLib::String::null);
+    tag_.setAlbum( data_ ? _cnvrt(data_) : taglib_string_null);
 }
 
 void  Meta::_property(TagLib::Tag& tag_, const char* tagname_, const char* data_)
@@ -240,19 +241,19 @@ void  Meta::disc(TagLib::Tag& tag_, const char* data_)
 
 void  Meta::title(TagLib::Tag& tag_, const char* data_)
 {
-    tag_.setTitle( data_ ? _cnvrt(data_) : TagLib::String::null);
+    tag_.setTitle( data_ ? _cnvrt(data_) : taglib_string_null);
 }
 
 
 void  Meta::comment(TagLib::Tag& tag_, const char* data_)
 {
-    tag_.setComment( data_ ? _cnvrt(data_) : TagLib::String::null);
+    tag_.setComment( data_ ? _cnvrt(data_) : taglib_string_null);
 }
 
 
 void  Meta::genre(TagLib::Tag& tag_, const char* data_)
 {
-    tag_.setGenre( data_ ? _cnvrt(data_) : TagLib::String::null);
+    tag_.setGenre( data_ ? _cnvrt(data_) : taglib_string_null);
 }
 
 void  Meta::year(TagLib::Tag& tag_, const unsigned data_)
@@ -313,10 +314,10 @@ void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::St
     A = tag_.album();
     g = tag_.genre();
 
-    iflds_.artist = (a == TagLib::String::null) ? NULL : (va = a.data(mbenc_)).data();
-    iflds_.title  = (t == TagLib::String::null) ? NULL : (vt = t.data(mbenc_)).data();
-    iflds_.album  = (A == TagLib::String::null) ? NULL : (vA = A.data(mbenc_)).data();
-    iflds_.genre  = (g == TagLib::String::null) ? NULL : (vg = g.data(mbenc_)).data();
+    iflds_.artist = (a == taglib_string_null) ? NULL : (va = a.data(mbenc_)).data();
+    iflds_.title  = (t == taglib_string_null) ? NULL : (vt = t.data(mbenc_)).data();
+    iflds_.album  = (A == taglib_string_null) ? NULL : (vA = A.data(mbenc_)).data();
+    iflds_.genre  = (g == taglib_string_null) ? NULL : (vg = g.data(mbenc_)).data();
 
     sprintf(T, "%ld", tag_.track());
     sprintf(y, "%ld", tag_.year());
@@ -374,7 +375,7 @@ void  MetaMP3::save()
      * other tags have modified
      */
     MP3_TAG_DEBUG("mp3 savetag=" << _svtag);
-    _tf.save(_svtag == 0 ? TagLib::MPEG::File::ID3v2 : _svtag, true, 4, false);
+    _tf.save(_svtag == 0 ? TagLib::MPEG::File::ID3v2 : _svtag, TagLib::File::StripOthers, TagLib::ID3v2::v4, TagLib::File::DoNotDuplicate);
 }
 
 void MetaMP3::remove(const MetaTOI& toi_)
@@ -828,7 +829,7 @@ void MetaM4a::remove(const MetaTOI& toi_)
 
     // non const method deprecated, workaround
     // _tag->itemListMap().clear();
-    const auto&  items = _tag->itemListMap();
+    const auto&  items = _tag->itemMap();
     TagLib::MP4::ItemMap::ConstIterator i = items.begin();
     while (i != items.end()) {
         const auto&  key = i->first;
