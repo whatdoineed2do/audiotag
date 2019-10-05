@@ -94,10 +94,7 @@ struct OpListTags : public _OpRO
 {
     OpListTags() : _OpRO("listing")  { }
 
-    void  _execute(File& f_, bool verbose_) const
-    {
-        std::cout << f_;
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 
@@ -107,20 +104,14 @@ struct OpRemoveTags : public _OpWR
 
     const AudioTag::MetaTOI  toi;
 
-    void  _execute(File& f_, bool verbose_) const
-    {
-        f_.meta().remove(toi);
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 struct OpRemoveArt : public _OpWR
 {
     OpRemoveArt() : _OpWR("removing artwork")  { }
 
-    void  _execute(File& f_, bool verbose_) const
-    {
-        f_.meta().removeart();
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 class Artwork;
@@ -137,10 +128,7 @@ struct OpCleanTags: public _OpWR
 {
     OpCleanTags() : _OpWR("cleaning tags")  { }
 
-    void  _execute(File& f_, bool verbose_) const
-    {
-        f_.meta().sanitize();
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 
@@ -154,10 +142,7 @@ struct OpCloneIntnlTags: public _OpWR
     const AudioTag::MetaTOI&  _to;
     const AudioTag::MetaTOI&  _from;
 
-    void  _execute(File& f_, bool verbose_) const
-    {
-        f_.meta().clone(_to, _from);
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 
@@ -173,16 +158,7 @@ struct OpUpdateTags: public _OpWR
     const AudioTag::Input&    input;
 
 
-    void  _execute(File& f_, bool verbose_) const
-    {
-        if (!toi) {
-            // nothing spec, use the default
-            f_.meta() = input;
-        }
-        else {
-            f_.meta().assign(toi, input);
-        }
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 struct OpPropertyTags: public _OpWR
@@ -196,7 +172,7 @@ struct OpPropertyTags: public _OpWR
     Map  m;
     OpUpdateTags  impl;
 
-    void  _execute(File& f_, bool verbose_) const;
+    void  _execute(File& f_, bool verbose_) const override;
 };
 
 class OpCloneFileMeta: public _OpWR
@@ -211,10 +187,7 @@ class OpCloneFileMeta: public _OpWR
     { delete _src; }
 
   protected:
-    void  _execute(File& f_, bool verbose_) const
-    {
-        f_.meta() = _meta;
-    }
+    void  _execute(File& f_, bool verbose_) const override;
 
   private:
     AudioTag::File*  _src;

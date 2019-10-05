@@ -24,6 +24,41 @@ namespace AudioTag
         }
     }
 
+    void  OpListTags::_execute(File& f_, bool verbose_) const
+    {
+        std::cout << f_;
+    }
+
+    void  OpRemoveTags::_execute(File& f_, bool verbose_) const
+    {
+        f_.meta().remove(toi);
+    }
+
+    void  OpRemoveArt::_execute(File& f_, bool verbose_) const
+    {
+        f_.meta().removeart();
+    }
+
+    void  OpCleanTags::_execute(File& f_, bool verbose_) const
+    {
+        f_.meta().sanitize();
+    }
+
+    void  OpCloneIntnlTags::_execute(File& f_, bool verbose_) const
+    {
+        f_.meta().clone(_to, _from);
+    }
+
+    void  OpUpdateTags::_execute(File& f_, bool verbose_) const
+    {
+        if (!toi) {
+            // nothing spec, use the default
+            f_.meta() = input;
+        }
+        else {
+            f_.meta().assign(toi, input);
+        }
+    }
 
     void  OpPropertyTags::_execute(File& f_, bool verbose_) const
     {
@@ -52,6 +87,11 @@ namespace AudioTag
         });
 
 	impl._execute(f_, verbose_);
+    }
+
+    void  OpCloneFileMeta::_execute(File& f_, bool verbose_) const
+    {
+        f_.meta() = _meta;
     }
 
     void  OpAddArt::_execute(File& f_, bool verbose_) const
