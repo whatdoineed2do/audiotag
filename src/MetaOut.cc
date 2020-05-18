@@ -122,8 +122,12 @@ os_ << "      \"year\": ";
 	if (i > 0) { os_ << i; } else { os_ << "null"; }
 	os_ << ",\n";
 
-os_ << "      \"genre\": " << MetaOutJson::out(s, tag->genre()) << ",\n"
-    << "      \"comment\": " << MetaOutJson::out(s, tag->comment()) << ",\n"
+os_ << "      \"genre\": " << MetaOutJson::out(s, tag->genre()) << ",\n";
+
+        if (m_.rating() > 0) {
+os_ << "      \"rating\": " << m_.rating() << ",\n";
+        }
+os_ << "      \"comment\": " << MetaOutJson::out(s, tag->comment()) << ",\n"
     << "      \"artwork\": " << (m_.coverart() ? "true" : "false") << ",\n"
     << "      \"properties\": {\n";
 	bool  fi = true;
