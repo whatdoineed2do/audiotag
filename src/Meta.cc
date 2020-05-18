@@ -11,8 +11,11 @@
 
 #include <taglib/id3v2tag.h>
 #include <taglib/attachedpictureframe.h>
+#include <taglib/popularimeterframe.h>
+
 #include <taglib/mp4tag.h>
 #include <taglib/mp4coverart.h>
+
 #include <taglib/flacfile.h>
 #include <taglib/flacpicture.h>
 
@@ -66,6 +69,11 @@ bool  Input::validate() const
 	struct tm  tm;
 	char*  ret = strptime(date, "%Y-%m-%d", &tm);
 	good = (ret && *ret == '\0');
+    }
+    if (good && rating)
+    {
+	int  x = 0;
+	good = (sscanf(rating, "%d", &x) == 1 && x >= 0 && x <=5);
     }
 
     return good;
@@ -299,6 +307,7 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
     if (!rhs_.properties.isEmpty()) {
         properties(tag_, rhs_.properties);
     }
+    if (rhs_.rating)     rating(atoi(rhs_.rating));
 }
 
 void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::String::Type mbenc_)
@@ -334,6 +343,7 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
         if (i.second.isEmpty())
 	{
 	    if (j != a_.end()) {
+std::cout << "erasing '" << i.first.toCString() << "'\n";         
 		a_.erase(i.first);
 	    }
 	    // else {
@@ -356,8 +366,8 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
 void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
 {
     TagLib::ID3v2::Tag*  t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_);
-    if (t)  return _properties(*t, m_);
-    else    return _properties(t_, m_);
+    if (t)  _properties(*t, m_);
+    else    _properties(t_, m_);
 }
 
 TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
@@ -367,6 +377,60 @@ TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
     else   return _properties(t_);
 }
 
+int  MetaMP3::rating() const
+{
+    if (_id3v2) {
+	const TagLib::ID3v2::FrameList&  fl = _id3v2->frameList("POPM");
+	if (fl.isEmpty()) {
+	    return Meta::rating();
+	}
+
+	const auto  frame = dynamic_cast<TagLib::ID3v2::PopularimeterFrame*>(fl.front());
+	if (frame) {
+	    const int  r = frame->rating();
+            if (r >   0 && r <=  31)  return 1;
+            if (r >  31 && r <=  95)  return 2;
+            if (r >  95 && r <= 159)  return 3;
+            if (r > 159 && r <= 224)  return 4;
+            if (r > 224 && r <= 255)  return 5;
+	}
+    }
+    return Meta::rating();
+}
+
+void  MetaMP3::rating(uint8_t r_)
+{
+    TagLib::ID3v2::Tag*  tag = _tf.ID3v2Tag(_id3v2 ? false : true);
+    short  r = 0;
+    switch (r_)
+    {
+	case 1: r =   1; break;
+	case 2: r =  64; break;
+	case 3: r = 128; break;
+	case 4: r = 196; break;
+	case 5: r = 255; break;
+
+	case 0:
+	default:
+	    r = 0;
+    }
+
+    removerating();
+    if (r > 0)
+    {
+        TagLib::ID3v2::PopularimeterFrame*  frame = new TagLib::ID3v2::PopularimeterFrame();
+        frame->setEmail("whatdoineed2do");
+        frame->setRating(r);
+        tag->addFrame(frame);
+    }
+}
+
+void  MetaMP3::removerating()
+{
+    if (_id3v2) {
+        _id3v2->removeFrames("POPM");
+    }
+}
 
 void  MetaMP3::save()
 {
@@ -650,12 +714,20 @@ void MetaOGGFlac::remove(const MetaTOI& toi_)
 {
 }
 
+int  MetaOGGFlac::rating() const
+{
+    return Meta::rating();
+}
+
+void MetaOGGFlac::rating(uint8_t r_)
+{
+}
 
 void  MetaOGGFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
 {
     TagLib::Ogg::XiphComment*  t = dynamic_cast<TagLib::Ogg::XiphComment*>(&t_);
-    if (t)  return _properties(*t, m_);
-    else    return _properties(t_, m_);
+    if (t)  _properties(*t, m_);
+    else    _properties(t_, m_);
 }
 
 TagLib::PropertyMap  MetaOGGFlac::properties(const TagLib::Tag& t_) const
@@ -764,12 +836,63 @@ void  MetaFlac::removeart()
     _tf.removePictures();
 }
 
+int  MetaFlac::rating() const
+{
+    const TagLib::PropertyMap  props = properties(*_tag);
+    const auto  prop = props.find("RATING");
+
+    if (prop == props.end()) {
+	return Meta::rating();
+    }
+
+    const auto  l = *prop;
+    if (l.second.isEmpty()) {
+	return Meta::rating();
+    }
+
+    const int  r = atoi(l.second.front().toCString());
+    if (r >  0 && r <=  20)  return 1;
+    if (r > 20 && r <=  40)  return 2;
+    if (r > 40 && r <=  60)  return 3;
+    if (r > 60 && r <=  80)  return 4;
+    if (r > 80 && r <= 100)  return 5;
+
+    return Meta::rating();
+}
+
+void  MetaFlac::rating(uint8_t r_)
+{
+    // map 0..5 to 0..100
+    const char*  r;
+    switch (r_)
+    {
+	case 1: r = "20"; break;
+	case 2: r = "40"; break;
+	case 3: r = "60"; break;
+	case 4: r = "80"; break;
+	case 5: r = "100"; break;
+
+	case 0:
+	default:
+	    r = NULL;
+    }
+
+    if (r == NULL) {
+        // TODO the _property() merges but not deletes tags - prob need to handle that
+        TagLib::PropertyMap  m = properties(*_tag);
+        m.erase("RATING");
+	_tag->setProperties(m);
+    }
+    else {
+        _property(*_tag, "RATING", r);
+    }
+}
 
 void  MetaFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
 {
     TagLib::Ogg::XiphComment*  t = dynamic_cast<TagLib::Ogg::XiphComment*>(&t_);
-    if (t)  return _properties(*t, m_);
-    else    return _properties(t_, m_);
+    if (t)  _properties(*t, m_);
+    else    _properties(t_, m_);
 }
 
 TagLib::PropertyMap  MetaFlac::properties(const TagLib::Tag& t_) const
@@ -869,11 +992,51 @@ void MetaM4a::assign(const MetaTOI& toi_, const Input& rhs_)
     }
 }
 
+int  MetaM4a::rating() const
+{
+    const TagLib::String  key = "rate";
+    if (_tag->contains(key)) {
+        const int  r = _tag->item(key).toInt();
+        if (r >  0 && r <=  20)  return 1;
+        if (r > 20 && r <=  40)  return 2;
+        if (r > 40 && r <=  60)  return 3;
+        if (r > 60 && r <=  80)  return 4;
+        if (r > 80 && r <= 100)  return 5;
+    }
+    return Meta::rating();
+}
+
+void  MetaM4a::rating(uint8_t r_)
+{
+    const TagLib::String  key = "rate";
+
+    // map 0..5 to 0..100
+    int  r = 0;
+    switch (r_)
+    {
+	case 1: r =  20; break;
+	case 2: r =  40; break;
+	case 3: r =  60; break;
+	case 4: r =  80; break;
+	case 5: r = 100; break;
+
+	case 0:
+	default:
+	    r = 0;
+    }
+    if (r == 0) {
+        _tf.tag()->removeItem(key);
+    }
+    else {
+        _tf.tag()->setItem(key, r);
+    }
+}
+
 void  MetaM4a::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
 {
     TagLib::MP4::Tag*  t = dynamic_cast<TagLib::MP4::Tag*>(&t_);
-    if (t)  return _properties(*t, m_);
-    else    return _properties(t_, m_);
+    if (t)  _properties(*t, m_);
+    else    _properties(t_, m_);
 }
 
 TagLib::PropertyMap  MetaM4a::properties(const TagLib::Tag& t_) const

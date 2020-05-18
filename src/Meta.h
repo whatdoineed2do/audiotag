@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cstdint>
 #include <stdexcept>
 #include <exception>
 #include <iostream>
@@ -75,6 +76,8 @@ class Input
 
     TagLib::PropertyMap  properties;
 
+    const char*  rating;  // POPM or RATING
+
     void  reset()
     {
         artist = NULL;
@@ -91,6 +94,8 @@ class Input
         albumartist = NULL;
 
         properties.clear();
+
+	rating = NULL;
     }
 
 
@@ -105,7 +110,8 @@ class Input
         trackN(NULL),
 	date(NULL),
         disc(NULL),
-        albumartist(NULL)
+        albumartist(NULL),
+	rating(NULL)
     { reset(); }
 
     Input(const TagLib::Tag* tag_)
@@ -121,7 +127,7 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno || date || disc || albumartist || !properties.isEmpty(); }
+    { return artist || album || title || comment || genre || yr || trackno || date || disc || albumartist || !properties.isEmpty() || rating; }
 
 
     void  strip()
@@ -170,6 +176,7 @@ class Input
     TagLib::String  a,t,A,g;
     char  y[5];
     char  T[3];
+    char  r[4];  // 0 .. 255
 };
 
 
@@ -259,6 +266,10 @@ class Meta
     virtual void  artwork(Artwork&) { }
     virtual bool  coverart() const { return false; }
     virtual void  removeart() { }
+
+    virtual int   rating() const { return -1; }  // -1 no rating
+    virtual void  rating(uint8_t) = 0;  // 0 resets, take 0..5
+    virtual void  removerating() { }
 
 
     // force any changes to underlying file
@@ -365,6 +376,10 @@ class MetaMP3 : public _MetaMulti
     bool  coverart() const;
     void  removeart();
 
+    int   rating() const;
+    void  rating(uint8_t);  // takes 0..255
+    void  removerating();
+
     TagLib::PropertyMap  properties(const TagLib::Tag&) const;
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
@@ -401,6 +416,9 @@ class MetaOGGFlac : public Meta
     Meta::Tags  tags() const;
     void  remove(const MetaTOI&);
 
+    int   rating() const;
+    void  rating(uint8_t);
+
     TagLib::PropertyMap  properties(const TagLib::Tag&) const;
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
@@ -429,6 +447,9 @@ class MetaFlac : public Meta
     void  artwork(Artwork&);
     bool  coverart() const;
     void  removeart();
+
+    int   rating() const;
+    void  rating(uint8_t);
 
     TagLib::PropertyMap  properties(const TagLib::Tag&) const;
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
@@ -463,6 +484,9 @@ class MetaM4a : public Meta
     void  assign(const MetaTOI&, const Input&);
 
     Meta::Tags  tags() const;
+
+    int   rating() const;
+    void  rating(uint8_t);
 
     TagLib::PropertyMap  properties(const TagLib::Tag&) const;
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
