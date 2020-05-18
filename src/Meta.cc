@@ -1,4 +1,4 @@
-#include "audiotagmeta.h"
+#include "Meta.h"
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
@@ -17,9 +17,9 @@
 #include <taglib/flacpicture.h>
 
 #include "audiotag.h"
-#include "audiotagfile.h"
-#include "audiotagmetaout.h"
-#include "audiotagartwork.h"
+#include "File.h"
+#include "MetaOut.h"
+#include "Artwork.h"
 
 
 namespace AudioTag

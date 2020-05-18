@@ -7,8 +7,8 @@
 #include <memory>
 
 #include "audiotag.h"
-#include "audiotagmeta.h"
-#include "audiotagfile.h"
+#include "Meta.h"
+#include "File.h"
 
 
 namespace AudioTag

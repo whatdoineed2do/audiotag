@@ -18,7 +18,7 @@
 #include <taglib/oggflacfile.h>
 #include <taglib/mp4file.h>
 
-#include "audiotagmeta.h"
+#include "Meta.h"
 
 namespace AudioTag
 {

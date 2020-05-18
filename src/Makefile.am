@@ -11,8 +11,8 @@ audiotag_LDFLAGS =  $(JSONC_LIBS) -lz
 audiotag_LDADD = $(TAGLIB_LIBS)
 audiotag_SOURCES = \
 	audiotag.cc \
-	audiotagfile.cc \
-	audiotagmeta.cc \
-	audiotagmetaout.cc \
-	audiotagops.cc
+	File.cc \
+	Meta.cc \
+	MetaOut.cc \
+	Ops.cc
 

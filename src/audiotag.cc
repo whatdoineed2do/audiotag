@@ -37,11 +37,11 @@
 #include <taglib/xiphcomment.h>
 
 #include "audiotag.h"
-#include "audiotagfile.h"
-#include "audiotagmeta.h"
-#include "audiotagmetaout.h"
-#include "audiotagops.h"
-#include "audiotagartwork.h"
+#include "File.h"
+#include "Meta.h"
+#include "MetaOut.h"
+#include "Ops.h"
+#include "Artwork.h"
 
 using namespace  std;
 

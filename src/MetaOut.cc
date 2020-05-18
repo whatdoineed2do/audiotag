@@ -1,4 +1,4 @@
-#include "audiotagmetaout.h"
+#include "MetaOut.h"
 
 #include <iostream>
 #include <iomanip>
@@ -7,8 +7,8 @@
 #include <taglib/tstringlist.h>
 
 
-#include "audiotagmeta.h"
-#include "audiotagfile.h"
+#include "Meta.h"
+#include "File.h"
 
 
 namespace AudioTag
