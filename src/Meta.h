@@ -127,12 +127,47 @@ class Input
     }
 
     operator bool() const
-    { return artist || album || title || comment || genre || yr || trackno || date || disc || albumartist || !properties.isEmpty() || rating; }
+    {
+	return
+	    artist ||
+	    album ||
+	    title ||
+	    comment ||
+	    genre ||
+	    yr ||
+	    trackno ||
+	    trackN ||
+
+	    date ||
+	    disc ||
+	    albumartist ||
+
+	    !properties.isEmpty() ||
+	    rating;
+    }
 
 
     void  strip()
     {
-        const char**  a[] = { &artist, &album, &title, &comment, &genre, &yr, &trackno, &trackN, &disc, &albumartist, NULL };
+        const char**  a[] = {
+	    // keep in sync with Input object string members
+	    &artist,
+	    &album,
+	    &title,
+	    &comment,
+	    &genre,
+	    &yr,
+	    &trackno,
+	    &trackN,
+
+	    &date,
+	    &disc,
+	    &albumartist,
+
+	    &rating,
+
+	    NULL
+	};
 
         const char***  p = a;
 	while (*p)
@@ -208,7 +243,7 @@ struct MetaTOI  // tags of interest
     }
 
     bool  operator!=(const MetaTOI& rhs_)
-    { return ! (*this == rhs_); } 
+    { return ! (*this == rhs_); }
 
     bool  operator==(const MetaTOI& rhs_);
 
@@ -405,7 +440,7 @@ class MetaOGGFlac : public Meta
 {
   public:
     MetaOGGFlac(FileOGGFlac&, MetaOut&);
-    
+
     ~MetaOGGFlac() = default;
     MetaOGGFlac(const MetaOGGFlac&) = delete;
     void operator=(const MetaOGGFlac&) = delete;
@@ -435,7 +470,7 @@ class MetaFlac : public Meta
 {
   public:
     MetaFlac(FileFlac&, MetaOut&);
-    
+
     ~MetaFlac() = default;
     MetaFlac(const MetaFlac&) = delete;
     void operator=(const MetaFlac&) = delete;
@@ -467,7 +502,7 @@ class MetaM4a : public Meta
 {
   public:
     MetaM4a(FileM4a&, MetaOut&);
-    
+
     ~MetaM4a() = default;
     MetaM4a(const MetaM4a&) = delete;
     void operator=(const MetaM4a&) = delete;
