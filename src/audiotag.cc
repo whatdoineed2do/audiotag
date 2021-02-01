@@ -81,6 +81,7 @@ void  _usage()
 	 << "    -c  comment\n"
 	 << "    -g  genre\n"
 	 << "    -y  year\n"
+	 << "    -Y  date (in YYYY-MM-DD format - 0000-00-00 unsets)\n"
 	 << "    -T  track\n"
 	 << "    -K  last track\n"
 	 << "    -D  disc/disc total\n"
@@ -259,7 +260,7 @@ int main(int argc, char *argv[])
     AudioTag::Ops  ops;
 
     int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:c:T:K:D:g:Dd:m:n:VM:Ci:O:u:rP:w:vs:")) != EOF)
+    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:Y:c:T:K:D:g:Dd:m:n:VM:Ci:O:u:rP:w:vs:")) != EOF)
     {
 	switch (c) {
 	    case 'e':
@@ -279,6 +280,7 @@ int main(int argc, char *argv[])
             case 'R':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.albumartist = optarg;  break;
             case 'A':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.album = optarg;  break;
             case 'y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.yr = optarg;  break;
+            case 'Y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.date = optarg;  break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
             case 'T':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackno = optarg;  break;
             case 'K':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackN = optarg;  break;
