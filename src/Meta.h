@@ -293,6 +293,7 @@ class Meta
     virtual void    genre(TagLib::Tag&, const char*);
 
     virtual void     year(TagLib::Tag&, const unsigned);
+    virtual void     date(TagLib::Tag&, const char*);
     virtual void  trackno(TagLib::Tag&, const unsigned);
     virtual void  trackno(TagLib::Tag&, const unsigned, const unsigned);
 
@@ -401,6 +402,9 @@ class MetaMP3 : public _MetaMulti
 
     Meta::Tags  tags() const;
 
+    void  year(TagLib::Tag&, const unsigned)  override;
+    void  date(TagLib::Tag&, const char*)  override;
+
     void  save();
     void  remove(const MetaTOI&);
     void  assign(const MetaTOI&, const Input&);
@@ -477,6 +481,8 @@ class MetaFlac : public Meta
 
     Meta::Tags  tags() const;
     void  remove(const MetaTOI&);
+
+    void  date(TagLib::Tag&, const char*)  override;
 
     void  assign(const MetaTOI&, const Input&);
     void  artwork(Artwork&);

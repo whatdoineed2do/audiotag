@@ -66,9 +66,14 @@ bool  Input::validate() const
     }
     if (good && date)
     {
-	struct tm  tm;
-	char*  ret = strptime(date, "%Y-%m-%d", &tm);
-	good = (ret && *ret == '\0');
+	if (strcmp(date, "0000-00-00") == 0) {
+	    // special 'remove it' date
+	}
+	else {
+	    struct tm  tm;
+	    char*  ret = strptime(date, "%Y-%m-%d", &tm);
+	    good = (ret && *ret == '\0');
+	}
     }
     if (good && rating)
     {
@@ -270,6 +275,15 @@ void  Meta::year(TagLib::Tag& tag_, const unsigned data_)
 }
 
 
+void  Meta::date(TagLib::Tag& tag_, const char* data_)
+{
+    // default use year() if children dont provide it
+    unsigned  yr = 0;
+    sscanf(data_, "%u", &yr);
+    tag_.setYear(yr);
+}
+
+
 void  Meta::trackno(TagLib::Tag& tag_, const unsigned data_)
 {
     tag_.setTrack(data_);
@@ -296,6 +310,7 @@ void  Meta::_assign(TagLib::Tag& tag_, const Input& rhs_)
     if (rhs_.genre)        genre(tag_, rhs_.genre);
 
     if (rhs_.yr)            year(tag_, atol(rhs_.yr));
+    if (rhs_.date)          date(tag_, rhs_.date);
 
     if (rhs_.trackno && rhs_.trackN)
                          trackno(tag_, atol(rhs_.trackno), atol(rhs_.trackN));
@@ -360,6 +375,41 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
         }
     }
     return a_;
+}
+
+void  MetaMP3::year(TagLib::Tag& t_, const unsigned year_)
+{
+    Meta::year(t_, year_);
+
+    // urgh, this gets messy... only add if we already have one
+    if (_id3v2)
+    {
+	const TagLib::ID3v2::FrameList&  fl = _id3v2->frameList("TDRL");
+	if (!fl.isEmpty()) {
+	    char  fakedate[11];  // 4+1+2+1+2+1
+	    snprintf(fakedate, 11, "%u-01-01", year_);
+	    date(t_, fakedate);
+	}
+    }
+}
+
+void  MetaMP3::date(TagLib::Tag& t_, const char* date_)
+{
+    // delete
+    if (strcmp(date_, "0000-00-00") == 0) {
+        if (_id3v2) {
+	    _id3v2->removeFrames("TDRL");
+	}
+    }
+    else
+    {
+	// this is only available for 2.4 tag
+	TagLib::ID3v2::Tag*  tag = _tf.ID3v2Tag(_id3v2 ? false : true);
+	_tagFrme(tag, new TagLib::ID3v2::TextIdentificationFrame("TDRL", TagLib::String::Latin1), date_);
+
+	// use default impl to set yr
+	Meta::date(t_, date_);
+    }
 }
 
 void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
@@ -778,6 +828,28 @@ void MetaFlac::remove(const MetaTOI& toi_)
 
     // get back a valid ptr
     _tag = _tf.xiphComment();
+}
+
+void MetaFlac::date(TagLib::Tag& t_, const char* date_)
+{
+    static const char* const  FLAC_TAG_DATE = "DATE";
+
+    TagLib::PropertyMap  props = properties(*_tag);
+
+    if (strcmp(date_, "0000-00-00") == 0) {
+	props.erase(FLAC_TAG_DATE);
+	_tag->setProperties(props);
+        return;
+    }
+
+    const auto  prop = props.find(FLAC_TAG_DATE);
+
+    if (prop != props.end()) {
+	props.erase(FLAC_TAG_DATE);
+    }
+
+    _property(*_tag, FLAC_TAG_DATE, date_);
+    // taglib sets the year for us
 }
 
 void MetaFlac::assign(const MetaTOI& toi_, const Input& rhs_)
