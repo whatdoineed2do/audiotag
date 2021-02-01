@@ -293,7 +293,7 @@ class Meta
 
 
   protected:
-    Meta(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_) throw (std::invalid_argument) 
+    Meta(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_)
         : _file(file_), _tag(tag_), _mo(mo_)
     {
         if (false && *_tag == NULL) {
