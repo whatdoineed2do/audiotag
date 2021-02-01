@@ -165,11 +165,9 @@ struct OpPropertyTags: public _OpWR
 {
     using  Map = std::multimap<const char*, const char*>;
 
-    OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_, const OpPropertyTags::Map& m_)
-        : _OpWR("merge property tags"), impl(toi_, input_), m(m_)
-    { }
+    OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_, const OpPropertyTags::Map& m_);
 
-    Map  m;
+    const Map  m;
     OpUpdateTags  impl;
 
     void  _execute(File& f_, bool verbose_) const override;
