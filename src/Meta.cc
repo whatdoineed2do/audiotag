@@ -377,6 +377,14 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
     return a_;
 }
 
+
+// MP3 /////////////////////////////////////////////////////////////////////////
+const char*  MetaMP3::TAG_DATE     = "TDRL";
+const char*  MetaMP3::TAG_RATING   = "POPM";
+const char*  MetaMP3::TAG_COVERART = "APIC";
+const char*  MetaMP3::TAG_COVERART_OLD = "PIC";
+
+
 void  MetaMP3::year(TagLib::Tag& t_, const unsigned year_)
 {
     Meta::year(t_, year_);
@@ -384,7 +392,7 @@ void  MetaMP3::year(TagLib::Tag& t_, const unsigned year_)
     // urgh, this gets messy... only add if we already have one
     if (_id3v2)
     {
-	const TagLib::ID3v2::FrameList&  fl = _id3v2->frameList("TDRL");
+	const TagLib::ID3v2::FrameList&  fl = _id3v2->frameList(MetaMP3::TAG_DATE);
 	if (!fl.isEmpty()) {
 	    char  fakedate[11];  // 4+1+2+1+2+1
 	    snprintf(fakedate, 11, "%u-01-01", year_);
@@ -398,14 +406,14 @@ void  MetaMP3::date(TagLib::Tag& t_, const char* date_)
     // delete
     if (strcmp(date_, "0000-00-00") == 0) {
         if (_id3v2) {
-	    _id3v2->removeFrames("TDRL");
+	    _id3v2->removeFrames(MetaMP3::TAG_DATE);
 	}
     }
     else
     {
 	// this is only available for 2.4 tag
 	TagLib::ID3v2::Tag*  tag = _tf.ID3v2Tag(_id3v2 ? false : true);
-	_tagFrme(tag, new TagLib::ID3v2::TextIdentificationFrame("TDRL", TagLib::String::Latin1), date_);
+	_tagFrme(tag, new TagLib::ID3v2::TextIdentificationFrame(MetaMP3::TAG_DATE, TagLib::String::Latin1), date_);
 
 	// use default impl to set yr
 	Meta::date(t_, date_);
@@ -429,7 +437,7 @@ TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
 int  MetaMP3::rating() const
 {
     if (_id3v2) {
-	const TagLib::ID3v2::FrameList&  fl = _id3v2->frameList("POPM");
+	const TagLib::ID3v2::FrameList&  fl = _id3v2->frameList(MetaMP3::TAG_RATING);
 	if (fl.isEmpty()) {
 	    return Meta::rating();
 	}
@@ -477,7 +485,7 @@ void  MetaMP3::rating(uint8_t r_)
 void  MetaMP3::removerating()
 {
     if (_id3v2) {
-        _id3v2->removeFrames("POPM");
+        _id3v2->removeFrames(MetaMP3::TAG_RATING);
     }
 }
 
@@ -637,14 +645,14 @@ void  MetaMP3::artwork(Artwork& artwork_)
 
 bool  MetaMP3::coverart() const
 {
-    return (_id3v2 == NULL) ? false : !_id3v2->frameList("APIC").isEmpty();
+    return (_id3v2 == NULL) ? false : !_id3v2->frameList(MetaMP3::TAG_COVERART).isEmpty();
 }
 
 void  MetaMP3::removeart()
 {
     if (_id3v2) {
-        _id3v2->removeFrames("APIC"); // v2.3
-        _id3v2->removeFrames("PIC");  // v2.2
+        _id3v2->removeFrames(MetaMP3::TAG_COVERART); // v2.3
+        _id3v2->removeFrames(MetaMP3::TAG_COVERART_OLD);  // v2.2
     }
 }
 
@@ -786,6 +794,13 @@ TagLib::PropertyMap  MetaOGGFlac::properties(const TagLib::Tag& t_) const
     else   return _properties(t_);
 }
 
+
+
+// flac ////////////////////////////////////////////////////////////////////////
+const char*  MetaFlac::TAG_RATING = "RATING";
+const char*  MetaFlac::TAG_DATE = "DATE";
+
+
 MetaFlac::MetaFlac(FileFlac& f_, MetaOut& mo_) 
   : Meta(f_.taglibfile(), (TagLib::Tag**)&_tag, mo_), 
     _f(f_),
@@ -832,23 +847,21 @@ void MetaFlac::remove(const MetaTOI& toi_)
 
 void MetaFlac::date(TagLib::Tag& t_, const char* date_)
 {
-    static const char* const  FLAC_TAG_DATE = "DATE";
-
     TagLib::PropertyMap  props = properties(*_tag);
 
     if (strcmp(date_, "0000-00-00") == 0) {
-	props.erase(FLAC_TAG_DATE);
+	props.erase(MetaFlac::TAG_DATE);
 	_tag->setProperties(props);
         return;
     }
 
-    const auto  prop = props.find(FLAC_TAG_DATE);
+    const auto  prop = props.find(MetaFlac::TAG_DATE);
 
     if (prop != props.end()) {
-	props.erase(FLAC_TAG_DATE);
+	props.erase(MetaFlac::TAG_DATE);
     }
 
-    _property(*_tag, FLAC_TAG_DATE, date_);
+    _property(*_tag, MetaFlac::TAG_DATE, date_);
     // taglib sets the year for us
 }
 
@@ -910,7 +923,7 @@ void  MetaFlac::removeart()
 int  MetaFlac::rating() const
 {
     const TagLib::PropertyMap  props = properties(*_tag);
-    const auto  prop = props.find("RATING");
+    const auto  prop = props.find(MetaFlac::TAG_RATING);
 
     if (prop == props.end()) {
 	return Meta::rating();
@@ -951,11 +964,11 @@ void  MetaFlac::rating(uint8_t r_)
     if (r == NULL) {
         // TODO the _property() merges but not deletes tags - prob need to handle that
         TagLib::PropertyMap  m = properties(*_tag);
-        m.erase("RATING");
+        m.erase(MetaFlac::TAG_RATING);
 	_tag->setProperties(m);
     }
     else {
-        _property(*_tag, "RATING", r);
+        _property(*_tag, MetaFlac::TAG_RATING, r);
     }
 }
 
@@ -972,6 +985,12 @@ TagLib::PropertyMap  MetaFlac::properties(const TagLib::Tag& t_) const
     if (t) return _properties(*t);
     else   return _properties(t_);
 }
+
+
+// m4a /////////////////////////////////////////////////////////////////////////
+const char*  MetaM4a::TAG_TRACK_NO = "trkn";
+const char*  MetaM4a::TAG_COVERART = "covr";
+const char*  MetaM4a::TAG_RATE = "rate";
 
 
 MetaM4a::MetaM4a(FileM4a& f_, MetaOut& mo_)
@@ -1005,13 +1024,13 @@ void  MetaM4a::year(TagLib::Tag& tag_, const unsigned data_)
 void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned data_)
 {
     if (data_ > 0) tag_.setTrack(data_);
-    else if (data_ == 0 && _tag == &tag_) _tag->removeItem("trkn");
+    else if (data_ == 0 && _tag == &tag_) _tag->removeItem(MetaM4a::TAG_TRACK_NO);
 }
 
 void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned x_, const unsigned y_)
 {
     if (x_ && y_) Meta::trackno(tag_, x_, y_);
-    else  _tag->removeItem("trkn");
+    else  _tag->removeItem(MetaM4a::TAG_TRACK_NO);
 }
 
 
@@ -1039,18 +1058,18 @@ void  MetaM4a::artwork(Artwork& artwork_)
 
     TagLib::MP4::CoverArtList l;
     l.append(coverArt);
-    _tf.tag()->setItem("covr", l);
+    _tf.tag()->setItem(MetaM4a::TAG_COVERART, l);
 }
 
 bool  MetaM4a::coverart() const
 {
-    return _tag->contains("covr");
+    return _tag->contains(MetaM4a::TAG_COVERART);
 }
 
 void  MetaM4a::removeart()
 {
     // what about the other art... ???
-    _tag->removeItem("covr");
+    _tag->removeItem(MetaM4a::TAG_COVERART);
 }
 
 void MetaM4a::assign(const MetaTOI& toi_, const Input& rhs_)
@@ -1065,7 +1084,7 @@ void MetaM4a::assign(const MetaTOI& toi_, const Input& rhs_)
 
 int  MetaM4a::rating() const
 {
-    const TagLib::String  key = "rate";
+    const TagLib::String  key = MetaM4a::TAG_RATE;
     if (_tag->contains(key)) {
         const int  r = _tag->item(key).toInt();
         if (r >  0 && r <=  20)  return 1;
@@ -1079,7 +1098,7 @@ int  MetaM4a::rating() const
 
 void  MetaM4a::rating(uint8_t r_)
 {
-    const TagLib::String  key = "rate";
+    const TagLib::String  key = MetaM4a::TAG_RATE;
 
     // map 0..5 to 0..100
     int  r = 0;

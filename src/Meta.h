@@ -436,6 +436,10 @@ class MetaMP3 : public _MetaMulti
     const char*  _id3v2TxtEnc(const TagLib::ID3v2::Frame* f_);
     int  _svtag;
 
+    static const char*  TAG_DATE;
+    static const char*  TAG_RATING;
+    static const char*  TAG_COVERART;
+    static const char*  TAG_COVERART_OLD;
 };
 
 
@@ -502,6 +506,9 @@ class MetaFlac : public Meta
     TagLib::Ogg::XiphComment*  _tag;
 
     // this can have id3v2/v1 but ignoring
+
+    static const char*  TAG_RATING;
+    static const char*  TAG_DATE;
 };
 
 class MetaM4a : public Meta
@@ -537,6 +544,10 @@ class MetaM4a : public Meta
     TagLib::MP4::File&  _tf;
 
     TagLib::MP4::Tag*  _tag;
+
+    static const char*  TAG_TRACK_NO;
+    static const char*  TAG_COVERART;
+    static const char*  TAG_RATE;
 };
 
 
