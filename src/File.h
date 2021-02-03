@@ -163,7 +163,7 @@ class FileFactory
     {
         const char**  p = t_;
         while (*p) {
-            if (strcmp(sffx_, *p++) == 0) {
+            if (strcasecmp(sffx_, *p++) == 0) {
                 return true;
             }
         }
