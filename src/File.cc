@@ -7,7 +7,10 @@ namespace AudioTag
 const char*  FileMP3::sffx[]     = { ".mp3", NULL };
 const char*  FileOGGFlac::sffx[] = { ".ogg", NULL };
 const char*  FileFlac::sffx[]    = { ".flac", NULL };
-const char*  FileM4a::sffx[]     = { ".m4a", ".aac", ".mp4", ".alac", NULL };  // ffmpeg likes to force alac into a .m4a
+/* drop .aac - for some reason ffmpeg writing to an .aac container causes this 
+ * crash; same opts to .m4a is fine
+ */
+const char*  FileM4a::sffx[]     = { ".m4a", ".mp4", ".alac", NULL };  // ffmpeg likes to force alac into a .m4a
 
 std::ostream& operator<<(std::ostream& os_, const File& f_)
 {
