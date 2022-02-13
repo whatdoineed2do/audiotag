@@ -259,6 +259,9 @@ int main(int argc, char *argv[])
 
     AudioTag::Ops  ops;
 
+    // we do this as we dont want to do anything wihtin taglib that deals with mbs
+    std::list<char*>  propargs;
+
     int c;
     while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:Y:c:T:K:D:g:Dd:m:n:VM:Ci:O:u:rP:w:vs:")) != EOF)
     {
@@ -288,33 +291,7 @@ int main(int argc, char *argv[])
             case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
             case 's':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.rating = optarg;  break;
 
-            case 'P':
-            {
-                AudioTag::OpPropertyTags::Map  m;
-
-		char*  pc = NULL;
-		char*  tok = NULL;
-		while ( (tok = strtok_r(pc == NULL ? optarg : NULL, ",", &pc)) )
-		{
-		    const uint8_t  tn = strlen(tok);
-		    char*  prop;
-		    if ( (prop = strtok(tok, ":")) == NULL) {
-                        MP3_TAG_ERR("invalid arg='" << tok  << "property list format: <property name>:<property value>");
-                        AudioTag::_usage();
-		    }
-
-		    const uint8_t  n = strlen(prop);
-		    if (n == tn) {
-			MP3_TAG_ERR("invalid token='" << tok << "' - no value");
-                        AudioTag::_usage();
-		    }
-		    prop[n] = NULL;
-		    const char*  value = prop + n+1;
-
-                    m.insert(std::make_pair(prop, value));
-		}
-		ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
-            } break;
+            case 'P':  propargs.push_back(optarg);  break;
 
 	    case 'w':
 	    {
@@ -442,6 +419,32 @@ int main(int argc, char *argv[])
     }
     MP3_TAG_NOTICE_VERBOSE("using locale=" << l);
 
+    std::for_each(propargs.cbegin(), propargs.cend(), [&ops, &opts](char* optarg) {
+	AudioTag::OpPropertyTags::Map  m;
+
+	char*  pc = NULL;
+	char*  tok = NULL;
+	while ( (tok = strtok_r(pc == NULL ? optarg : NULL, ",", &pc)) )
+	{
+	    const uint8_t  tn = strlen(tok);
+	    char*  prop;
+	    if ( (prop = strtok(tok, ":")) == NULL) {
+		MP3_TAG_ERR("invalid arg='" << tok  << "property list format: <property name>:<property value>");
+		AudioTag::_usage();
+	    }
+
+	    const uint8_t  n = strlen(prop);
+	    if (n == tn) {
+		MP3_TAG_ERR("invalid token='" << tok << "' - no value");
+		AudioTag::_usage();
+	    }
+	    prop[n] = NULL;
+	    const char*  value = prop + n+1;
+
+	    m.insert(std::make_pair(prop, value));
+	}
+	ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
+    });
 
 
     if (ops.empty()) {
