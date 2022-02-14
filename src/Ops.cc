@@ -61,15 +61,15 @@ namespace AudioTag
     }
 
 
-    OpPropertyTags::OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_, const OpPropertyTags::Map& m_)
+    OpPropertyTags::OpPropertyTags(const AudioTag::MetaTOI& toi_, AudioTag::Input& input_, const OpPropertyTags::Map& m_)
         : _OpWR("merge property tags"), impl(toi_, input_), m(m_)
     {
-        std::for_each(m.begin(), m.end(), [this](Map::value_type e)
+        std::for_each(m.begin(), m.end(), [this, &input_](Map::value_type e)
         {
             const char*  prop  = e.first;
             const char*  value = e.second;
 
-            TagLib::PropertyMap&  urgh = const_cast<TagLib::PropertyMap&>(impl.input.properties);
+            TagLib::PropertyMap&  urgh = input_.properties;
 
             int  vl;
             if ( (vl = strlen(value)) == 0 || (vl == 2 && (value[0] == '\'' && value[1] == '\'' || value[0] == '"' && value[1] == '"')) ) {

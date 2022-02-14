@@ -165,7 +165,7 @@ struct OpPropertyTags: public _OpWR
 {
     using  Map = std::multimap<const char*, const char*>;
 
-    OpPropertyTags(const AudioTag::MetaTOI& toi_, const AudioTag::Input& input_, const OpPropertyTags::Map& m_);
+    OpPropertyTags(const AudioTag::MetaTOI& toi_, AudioTag::Input& input_, const OpPropertyTags::Map& m_);
 
     const Map  m;
     OpUpdateTags  impl;
