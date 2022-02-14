@@ -214,7 +214,6 @@ class Input
     char  r[4];  // 0 .. 255
 };
 
-
 void  multibyteConvert(Input&, TagLib::Tag&  tag_, const TagLib::String::Type);
 
 struct MetaTOI  // tags of interest

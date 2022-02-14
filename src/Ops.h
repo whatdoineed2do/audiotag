@@ -18,8 +18,11 @@ class Op {
   public:
     virtual ~Op() = default;
     Op(const Op& rhs_) : readonly(rhs_.readonly) { }
+    Op(const Op&& rhs_) : readonly(rhs_.readonly), _descr(rhs_._descr)
+    { }
 
     Op&  operator=(const Op&) = delete;
+    Op&  operator=(const Op&&) = delete;
 
     const bool  readonly;
 
@@ -46,12 +49,14 @@ struct _OpRO : public Op
 {
     virtual ~_OpRO() = default;
     _OpRO(const char* descr_) : Op(true, descr_) { }
+    _OpRO(_OpRO&& rhs_) = default;
 };
 
 struct _OpWR : public Op
 {
     virtual ~_OpWR() = default;
     _OpWR(const char* descr_) : Op(false, descr_) { }
+    _OpWR(_OpWR&& rhs_) = default;
 };
 
 
@@ -93,6 +98,7 @@ class Ops
 struct OpListTags : public _OpRO
 {
     OpListTags() : _OpRO("listing")  { }
+    OpListTags(OpListTags&&) = default;
 
     void  _execute(File& f_, bool verbose_) const override;
 };
@@ -101,6 +107,7 @@ struct OpListTags : public _OpRO
 struct OpRemoveTags : public _OpWR
 {
     OpRemoveTags(const AudioTag::MetaTOI& toi_) : _OpWR("removing tags"), toi(toi_)  { }
+    OpRemoveTags(OpRemoveTags&& rhs_) : _OpWR(std::move(rhs_)), toi(std::move(rhs_.toi)) { }
 
     const AudioTag::MetaTOI  toi;
 
@@ -118,6 +125,7 @@ class Artwork;
 struct OpAddArt : public _OpWR
 {
     OpAddArt(AudioTag::Artwork& artwork_) : _OpWR("add artwork"), artwork(artwork_)  { }
+    OpAddArt(OpAddArt&& rhs_) : _OpWR(std::move(rhs_)), artwork(rhs_.artwork) { }
 
     void  _execute(File& f_, bool verbose_) const;
 
@@ -127,6 +135,7 @@ struct OpAddArt : public _OpWR
 struct OpCleanTags: public _OpWR
 {
     OpCleanTags() : _OpWR("cleaning tags")  { }
+    OpCleanTags(OpCleanTags&& rhs_) = default;
 
     void  _execute(File& f_, bool verbose_) const override;
 };
@@ -138,6 +147,7 @@ struct OpCloneIntnlTags: public _OpWR
         : _OpWR("cloning tags"),
           _to(to_), _from(from_)
     { }
+    OpCloneIntnlTags(OpCloneIntnlTags&& rhs_) : _OpWR(std::move(rhs_)), _to(rhs_._to), _from(rhs_._from) { }
 
     const AudioTag::MetaTOI&  _to;
     const AudioTag::MetaTOI&  _from;
@@ -152,6 +162,7 @@ struct OpUpdateTags: public _OpWR
         : _OpWR("updating tags"),
           toi(toi_), input(input_)
     { }
+    OpUpdateTags(OpUpdateTags&& rhs_) : _OpWR(std::move(rhs_)), toi(rhs_.toi), input(rhs_.input) { }
 
     // both these have to be a ref since the inputs are created in stages
     const AudioTag::MetaTOI&  toi;
@@ -166,6 +177,7 @@ struct OpPropertyTags: public _OpWR
     using  Map = std::multimap<const char*, const char*>;
 
     OpPropertyTags(const AudioTag::MetaTOI& toi_, AudioTag::Input& input_, const OpPropertyTags::Map& m_);
+    OpPropertyTags(OpPropertyTags&& rhs_) : _OpWR(std::move(rhs_)), m(std::move(rhs_.m)), impl(std::move(rhs_.impl)) { }
 
     const Map  m;
     OpUpdateTags  impl;
@@ -180,6 +192,10 @@ class OpCloneFileMeta: public _OpWR
         : _OpWR("cloning tags from file"),
           _src(src_), _meta(_src->meta().tag())
     { }
+    OpCloneFileMeta(OpCloneFileMeta&& rhs_) : _OpWR(std::move(rhs_)), _src(rhs_._src), _meta(std::move(rhs_._meta))
+    {
+        rhs_._src = nullptr;
+    }
 
     ~OpCloneFileMeta()
     { delete _src; }
