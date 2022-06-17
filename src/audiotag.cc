@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <libgen.h>
+#include <getopt.h>
 
 #include <iostream>
 #include <iomanip>
@@ -70,64 +71,65 @@ void  _usage()
          << "usage: " << _argv0 << " [OPTION]... [FILES]\n"
 	 << endl
 	 << "  [tag encoding options]\n"
-         << "    [-e  encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]\n"
-	 << "    [-u  locale]    locale to use for multibyte conversion\n"
+	 << "    -e  --encoding-in   <encoding>            encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]\n"
+	 << "    -u  --locale        <locale>]             locale to use for multibyte conversion\n"
 	 << '\n'
 	 << "  [tagging options]\n"
-	 << "    -t  title\n"
-	 << "    -a  artist\n"
-	 << "    -R  album artist\n"
-	 << "    -A  album\n"
-	 << "    -c  comment\n"
-	 << "    -g  genre\n"
-	 << "    -y  year\n"
-	 << "    -Y  date (in YYYY-MM-DD format - 0000-00-00 unsets)\n"
-	 << "    -T  track\n"
-	 << "    -K  last track\n"
-	 << "    -D  disc/disc total\n"
-	 << "    -s  rating 0..5 - 0 unsets\n"
-	 << "    -P  <property name>:<value>[,<property name>:<value>]\n"
-	 << "          -P foo:  delete property call 'foo' (if exists)\n"
-	 << "          -P foo:bar,coke:cola  add properties: foo=bar and coke=cola\n"
-	 << "        common properties:\n"
-	 << "          TITLESORT ALBUMSORT ARTISTSORT ALBUMARTISTSORT\n"
-	 << "          COMPOSER PERFORMER\n"
-	 << "          ISRC COPYRIGHT CATALOGNUMBER BARCODE\n"
-	 << "    -w  <artwork file>[:tag{covr,...}]\n"
+	 << "    -t  --title         <title>\n"
+	 << "    -a  --artist        <artist>\n"
+	 << "    -R  --album-artist  <albume artist>\n"
+	 << "    -A  --album         <album<\n"
+	 << "    -c  --comment       <comment>\n"
+	 << "    -g  --genre         <genre>\n"
+	 << "    -y  --release-year  <year>\n"
+	 << "    -Y  --release-date  <date>                YYYY-MM-DD format - 0000-00-00 unsets\n"
+	 << "    -T  --track         <track number>\n"
+	 << "    -K  --last-track    <trakc number>\n"
+	 << "    -D  --disc          <disc/disc total>\n"
+	 << "    -s  --rating        <Rating>              0..5 - 0 unsets\n"
+	 << "    -P  --properties    <name>:<value>[,<name>:<value>]\n"
+	 << "                                              set/remove properties\n"
+	 << "                                                -P foo:  delete property call 'foo' (if exists)\n"
+	 << "                                                -P foo:bar,coke:cola  add properties: foo=bar and coke=cola\n"
+	 << "                                              common properties:\n"
+	 << "                                                TITLESORT ALBUMSORT ARTISTSORT ALBUMARTISTSORT\n"
+	 << "                                                COMPOSER PERFORMER\n"
+	 << "                                                ISRC COPYRIGHT CATALOGNUMBER BARCODE\n"
+	 << "    -w  --artwork       <artwork file>[:tag{covr,...}]\n"
 	 << '\n'
 	 << "  [maintainence options]\n"
-	 << "    -l             list tags (exclusive maintanence option\n"
-	 << "    -i [1|2|a|f|A] add meta to tags types\n"
-         << "                     1 - ID3v1\n"
-         << "                     2 - ID3v2   (default for mp3)\n"
-         << "                     a - APE\n"
-         << "                     f - flac    (default for flac)\n"
-         << "                     4 - m4a     (default for mp4 audio)\n"
-         << "                     d - default (use default tag for audio type)\n"
-         << "                     A - all\n"
-	 << "    -d [1|2|a|f|A] delete tags\n"
-	 << "    -m <file>      clone dflt tag from file onto dflt tag type of files\n"
-	 << "    -n X:Y         clone internal tag from X to Y only if X exists\n"
-	 << "    -r             remove art from main tags\n"
-	 << "    -C             clean tags, leaving only basic info\n"
-	 << "    -M encoding    parse current tags and convert from -M <E> -e <E'>\n"
-	 << "       [warn] will damage tags if you get the encoding wrong!\n"
+	 << "    -l  --list                                list tags (exclusive maintanence option\n"
+	 << "    -i  --tag           <[1|2|a|f|A]>         add meta to tags types\n"
+	 << "                                                1 - ID3v1\n"
+	 << "                                                2 - ID3v2   (default for mp3)\n"
+	 << "                                                a - APE\n"
+	 << "                                                f - flac    (default for flac)\n"
+	 << "                                                4 - m4a     (default for mp4 audio)\n"
+	 << "                                                d - default (use default tag for audio type)\n"
+	 << "                                                A - all\n"
+	 << "    -d  --delete        <[1|2|a|f|A]>         delete tags\n"
+	 << "    -m  --clone-from    <file>                clone dflt tag from file onto dflt tag type of files\n"
+	 << "    -n  --clone-tag     <X:Y>                 clone internal tag from X to Y only if X exists\n"
+	 << "    -r  --remove-art                          remove album art\n"
+	 << "    -C                                        clean tags, leaving only basic info\n"
+	 << "    -M  --encoding-in   <encoding>            parse current tags and convert from -M <E> -e <E'>\n"
+	 << "                                                [warn] will damage tags if you get the encoding wrong!\n"
          << '\n'
 	 << "  [out options]\n"
-	 << "    [-O {json,basic}]  format for tag output\n"
-	 << "      json is very useful for parsing number of files and\n"
-	 << "      processing with 'jq' to select\n"
-	 << "      ie.\n"
-	 << "        file names only that have ID3 tags\n"
-	 << "          " << _argv0 << " ... | jq 'select(.meta[] | .tag_type | . and contains(\"ID3\") ) | .file.name'\n"
-	 << "        json objects that have tags other than ID3v2\n"
-	 << "          " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
+	 << "    -O  --format        <[json,basic}>        output format\n"
+	 << "                                              json is very useful for parsing number of files and\n"
+	 << "                                              processing with 'jq' to select\n"
+	 << "                                                ie.\n"
+	 << "                                                  file names only that have ID3 tags\n"
+	 << "                                                    " << _argv0 << " ... | jq 'select(.meta[] | .tag_type | . and contains(\"ID3\") ) | .file.name'\n"
+	 << "                                                  json objects that have tags other than ID3v2\n"
+	 << "                                                    " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
 	 << '\n'
 	 << "  [misc options]\n"
 #ifdef AUDIOTAG_HAVE_PRESERVE
-	 << "    -p             preserve previous modification times" << '\n'
+	 << "    -p  --preserve-date                       preserve previous modification times" << '\n'
 #endif
-	 << "    -V             verbose" << endl;
+	 << "    -V  --verbase" << endl;
 
     exit(1);
 }
@@ -262,8 +264,59 @@ int main(int argc, char *argv[])
     // we do this as we dont want to do anything wihtin taglib that deals with mbs
     std::list<char*>  propargs;
 
-    int c;
-    while ( (c = getopt(argc, argv, "e:hla:R:pt:A:y:Y:c:T:K:D:g:Dd:m:n:VM:Ci:O:u:rP:w:vs:")) != EOF)
+    const struct option  long_opts[] = {
+	{ "title",		1, 0, 't' },
+	{ "artist",		1, 0, 'a' },
+	{ "artist",		1, 0, 'a' },
+	{ "comment",		1, 0, 'c' },
+	{ "genre",		1, 0, 'g' },
+	{ "release-year",	1, 0, 'y' },
+	{ "release-date",	1, 0, 'Y' },
+	{ "track",		1, 0, 'T' },
+	{ "last-track",		1, 0, 'K' },
+	{ "disc",		1, 0, 'D' },
+	{ "rating",		1, 0, 's' },
+	{ "artwork",		1, 0, 'w' },
+
+	{ "properties",		1, 0, 'P' },
+
+	{ "list",		0, 0, 'l' },
+	{ "tag",		1, 0, 'i' },
+	{ "detele",		1, 0, 'd' },
+	{ "clone-from",		1, 0, 'm' },
+	{ "clone-tag",		1, 0, 'n' },
+	{ "remove-art",		0, 0, 'r' },
+	{ "clean",		0, 0, 'C' },
+
+	{ "locale",		1, 0, 'u' },
+	{ "encoding-in",	1, 0, 'M' },
+	{ "encoding-out", 	1, 0, 'e' },
+
+	{ "format",		1, 0, 'O' },
+#ifdef AUDIOTAG_HAVE_PRESERVE
+	{ "preserve-date",	0, 0, 'p' },
+#endif
+	{ "verbose",		0, 0, 'V' },
+
+	{ "help", 		0, 0, 'h' },
+
+	{ 0, 0, 0,  0 }
+    };
+    char  opt_args[sizeof(long_opts)*2] = { 0 };
+    {
+	char*  og = opt_args;
+	const struct option* op = long_opts;
+	while (op->name) {
+	    *og++ = op->val;
+	    if (op->has_arg != no_argument) {
+		*og++ = ':';
+	    }
+	    ++op;
+	}
+    }
+
+    int  c;
+    while ( (c=getopt_long(argc, argv, opt_args, long_opts, NULL)) != -1)
     {
 	switch (c) {
 	    case 'e':
