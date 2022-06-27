@@ -267,7 +267,8 @@ int main(int argc, char *argv[])
     const struct option  long_opts[] = {
 	{ "title",		1, 0, 't' },
 	{ "artist",		1, 0, 'a' },
-	{ "artist",		1, 0, 'a' },
+	{ "album",	        1, 0, 'A' },
+	{ "album-artist",	1, 0, 'R' },
 	{ "comment",		1, 0, 'c' },
 	{ "genre",		1, 0, 'g' },
 	{ "release-year",	1, 0, 'y' },
