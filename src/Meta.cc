@@ -6,6 +6,8 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
+#include <functional>
 #include <taglib/tstring.h>
 #include <taglib/tpropertymap.h>
 
@@ -227,7 +229,7 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
 void  Meta::_property(TagLib::Tag& tag_, const char* tagname_, const char* data_)
 {
     TagLib::PropertyMap  m = properties(tag_);
-    if (data_ == NULL) {
+    if (data_ == NULL || *data_ == '\0') {
         m.erase(tagname_);
     }
     else {
@@ -352,6 +354,30 @@ void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::St
 
 TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLib::PropertyMap& b_) const
 {
+    std::function<void (const char*, const TagLib::PropertyMap&)>  dump = [](const char* id_, const TagLib::PropertyMap& m_) -> void {
+#ifdef DEBUG_MERGE_PROP_MAP
+	std::cout << id_ << ": { ";
+	for_each(m_.begin(), m_.end(), [&](auto i) {
+	       std::cout << i.first.toCString() << " [ ";
+	       for_each(i.second.begin(), i.second.end(), [&](auto j) {
+		           std::cout << j.toCString() << " ";
+		       });
+	       std::cout << "] ";
+	    });
+	std::cout << "}\n";
+#else
+#endif
+    };
+    dump("target (before)", a_);
+    dump("merging with", b_);
+
+    // drop any empty lists from target
+    TagLib::PropertyMap::Iterator  empties;
+    while ( (empties = std::find_if(a_.begin(), a_.end(), [&](auto i) { return i.second.isEmpty(); }) ) != a_.end() ) {
+	a_.erase(empties->first);
+    }
+    dump("target (cleaned)", a_);
+
     for (auto i : b_) {
         auto  j = a_.find(i.first);
 
@@ -374,6 +400,7 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
             a_.replace(i.first, i.second);
         }
     }
+    dump("target (after)", a_);
     return a_;
 }
 
