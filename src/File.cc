@@ -87,6 +87,10 @@ File*  _ffmpeg_create(const char* file_, MetaOut& mo_)
 	// container not supported
 	_ffmpeg_err = AVERROR_DECODER_NOT_FOUND;
     }
+    else if (ctx->video_codec_id == AV_CODEC_ID_NONE && ctx-> audio_codec_id == AV_CODEC_ID_NONE && ctx->nb_streams == 0) {
+	// file is junk
+	_ffmpeg_err = AVERROR_INVALIDDATA;
+    }
     else
     {
 	for (int i=0; i<ctx->nb_streams; ++i)
