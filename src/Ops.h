@@ -190,7 +190,7 @@ class OpCloneFileMeta: public _OpWR
   public:
     OpCloneFileMeta(AudioTag::File* src_)
         : _OpWR("cloning tags from file"),
-          _src(src_), _meta(_src->meta().tag())
+          _src(src_), _meta(_src->meta())
     { }
     OpCloneFileMeta(OpCloneFileMeta&& rhs_) : _OpWR(std::move(rhs_)), _src(rhs_._src), _meta(std::move(rhs_._meta))
     {

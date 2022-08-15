@@ -46,6 +46,7 @@ class FileFlac;
 class FileOGGFlac;
 class FileM4a;
 class MetaOut;
+class Meta;
 
 class Artwork;
 
@@ -119,6 +120,8 @@ class Input
         reset();
         populate(tag_);
     }
+
+    Input(const Meta& meta_);
 
     Input&  operator=(const TagLib::Tag* tag_)
     {

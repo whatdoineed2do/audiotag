@@ -192,6 +192,18 @@ MetaTOI&  MetaTOI::operator=(const char* optarg_)
 }
 
 
+Input::Input(const Meta& meta_)
+{
+    reset();
+    populate(meta_.tag());
+
+    // this is to deal with an apparent bug that we can't use the base class to
+    // get the full propertiesMap so we overwrite it using our own method to
+    // pull all properties
+    properties = meta_.properties(*meta_.tag());
+}
+
+
 void  Meta::sanitize()
 {
     /* need to strip the tag, no API call to clear down - the 
