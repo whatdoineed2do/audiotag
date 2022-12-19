@@ -31,7 +31,7 @@ AC_SUBST(FFMPEG_LIBS)
 AM_CONDITIONAL(HAVE_FFMPEG, test x"$have_ffmpeg" = xyes)
 
 
-AC_ARG_ENABLE([debug-code],
+AC_ARG_ENABLE([debug],
 	[AS_HELP_STRING([--enable-debug],
 	[enable debug (default is no)])],
 	[no_debug=false],
