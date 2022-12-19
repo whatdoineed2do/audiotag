@@ -2,6 +2,7 @@
 #define AUDIOTAG_H
 
 #include <iostream>
+#include "../config.h"
 
 namespace AudioTag
 {
