@@ -63,7 +63,7 @@ struct _OpWR : public Op
 class Ops
 {
   public:
-    typedef std::list<const Op*>  _Ops;
+    using _Ops = std::list<const Op*>;
 
     Ops() : _readonly(true) { }
     ~Ops();

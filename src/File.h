@@ -70,7 +70,7 @@ std::ostream& operator<<(std::ostream& os_, const File& f_);
 class FileMP3 : public File
 {
   public:
-    typedef TagLib::MPEG::File  value_type;
+    using value_type = TagLib::MPEG::File;
     static const char*  sffx[];
 
     FileMP3(const char* f_, MetaOut& mo_) 

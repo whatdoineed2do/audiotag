@@ -260,7 +260,7 @@ struct MetaTOI  // tags of interest
 class Meta
 {
   public:
-    typedef std::list<std::pair<const char*, TagLib::Tag*> >  Tags;
+    using Tags = std::list<std::pair<const char*, TagLib::Tag*> >;
 
     virtual ~Meta() = default;
 
