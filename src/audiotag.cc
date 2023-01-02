@@ -95,6 +95,7 @@ void  _usage()
 	 << "                                                TITLESORT ALBUMSORT ARTISTSORT ALBUMARTISTSORT\n"
 	 << "                                                COMPOSER PERFORMER\n"
 	 << "                                                ISRC COPYRIGHT CATALOGNUMBER BARCODE\n"
+	 << "        --properties-seperator=:  token to seperate property name/value, default ':'\n"
 	 << "    -w  --artwork       <artwork file>[:tag{covr,...}]\n"
 	 << '\n'
 	 << "  [maintainence options]\n"
@@ -240,6 +241,8 @@ int main(int argc, char *argv[])
 
 	std::unique_ptr<AudioTag::Artwork>  artwork;
 
+	const char* propertiesTok;
+
         const char*  locale;
     } opts;
     opts.list = false;
@@ -251,6 +254,7 @@ int main(int argc, char *argv[])
     opts.mout = std::make_unique<AudioTag::MetaOutJson>();
     opts.locale = NULL;
     opts.iop = NULL;
+    opts.propertiesTok = ":";
 
     /* what we're encoding from */
     TagLib::String::Type  mbenc = TagLib::String::UTF8;
@@ -280,6 +284,7 @@ int main(int argc, char *argv[])
 	{ "artwork",		1, 0, 'w' },
 
 	{ "properties",		1, 0, 'P' },
+	{ "properties-seperator",1, 0, 255 },
 
 	{ "list",		0, 0, 'l' },
 	{ "tag",		1, 0, 'i' },
@@ -346,6 +351,7 @@ int main(int argc, char *argv[])
             case 's':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.rating = optarg;  break;
 
             case 'P':  propargs.push_back(optarg);  break;
+	    case 255:  opts.propertiesTok = optarg;  break;
 
 	    case 'w':
 	    {
@@ -482,8 +488,8 @@ int main(int argc, char *argv[])
 	{
 	    const uint8_t  tn = strlen(tok);
 	    char*  prop;
-	    if ( (prop = strtok(tok, ":")) == NULL) {
-		MP3_TAG_ERR("invalid arg='" << tok  << "property list format: <property name>:<property value>");
+	    if ( (prop = strtok(tok, opts.propertiesTok)) == NULL) {
+		MP3_TAG_ERR("invalid arg='" << tok  << "property list format: <property name><seperator (" << opts.propertiesTok<< ")><property value>");
 		AudioTag::_usage();
 	    }
 
