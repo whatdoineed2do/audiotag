@@ -535,7 +535,14 @@ void  MetaMP3::save()
      * other tags have modified
      */
     MP3_TAG_DEBUG("mp3 savetag=" << _svtag);
-    _tf.save(_svtag == 0 ? TagLib::MPEG::File::ID3v2 : _svtag, TagLib::File::StripOthers, TagLib::ID3v2::v4, TagLib::File::DoNotDuplicate);
+    _tf.save(_svtag == 0 ? TagLib::MPEG::File::ID3v2 : _svtag,
+#if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION == 11
+	     // ubuntu does not have anything > 1.11.1
+	     true, 4, false
+#else
+	     TagLib::File::StripOthers, TagLib::ID3v2::v4, TagLib::File::DoNotDuplicate
+#endif
+            );
 }
 
 void MetaMP3::remove(const MetaTOI& toi_)
