@@ -1,0 +1,28 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -yq \
+        build-essential autotools-dev autoconf libtool \
+        libtag1-dev \
+        libavformat-dev libavutil-dev \
+        libjson-c-dev
+    - name: configure
+      run: |
+        autoreconf --install
+        autoconf
+        ./configure
+    - name: make
+      run: make
