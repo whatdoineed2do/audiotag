@@ -83,8 +83,7 @@ void  _usage()
 	 << "    -g  --genre         <genre>\n"
 	 << "    -y  --release-year  <year>\n"
 	 << "    -Y  --release-date  <date>                YYYY-MM-DD format - 0000-00-00 unsets\n"
-	 << "    -T  --track         <track number>\n"
-	 << "    -K  --last-track    <trakc number>\n"
+	 << "    -T  --track         <track number [/total tracks]>\n"
 	 << "    -D  --disc          <disc/disc total>\n"
 	 << "    -s  --rating        <Rating>              0..5 - 0 unsets\n"
 	 << "    -P  --properties    <name>:<value>[,<name>:<value>]\n"
@@ -278,7 +277,6 @@ int main(int argc, char *argv[])
 	{ "release-year",	1, 0, 'y' },
 	{ "release-date",	1, 0, 'Y' },
 	{ "track",		1, 0, 'T' },
-	{ "last-track",		1, 0, 'K' },
 	{ "disc",		1, 0, 'D' },
 	{ "rating",		1, 0, 's' },
 	{ "artwork",		1, 0, 'w' },
@@ -344,8 +342,15 @@ int main(int argc, char *argv[])
             case 'y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.yr = optarg;  break;
             case 'Y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.date = optarg;  break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
-            case 'T':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackno = optarg;  break;
-            case 'K':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.trackN = optarg;  break;
+            case 'T':
+	    {
+	        AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);
+		opts.iflds.trackno = optarg;
+		const char*  p = strchr(optarg, '/');
+		if (p && *(p+1) != '\0') {
+		    opts.iflds.trackN = p+1;
+		}
+	    } break;
             case 'D':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.disc = optarg;  break;
             case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
             case 's':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.rating = optarg;  break;
