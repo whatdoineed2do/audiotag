@@ -260,6 +260,7 @@ struct MetaTOI  // tags of interest
 class Meta
 {
   public:
+    static constexpr const char*  DATE_REMOVE = "0000-00-00";
     using Tags = std::list<std::pair<const char*, TagLib::Tag*> >;
 
     virtual ~Meta() = default;

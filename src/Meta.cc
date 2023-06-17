@@ -68,7 +68,7 @@ bool  Input::validate() const
     }
     if (good && date)
     {
-	if (strcmp(date, "0000-00-00") == 0) {
+	if (strcmp(date, Meta::DATE_REMOVE) == 0) {
 	    // special 'remove it' date
 	}
 	else {
@@ -443,7 +443,7 @@ void  MetaMP3::year(TagLib::Tag& t_, const unsigned year_)
 void  MetaMP3::date(TagLib::Tag& t_, const char* date_)
 {
     // delete
-    if (strcmp(date_, "0000-00-00") == 0) {
+    if (strcmp(date_, Meta::DATE_REMOVE) == 0) {
         if (_id3v2) {
 	    _id3v2->removeFrames(MetaMP3::TAG_DATE);
 	}
@@ -895,7 +895,7 @@ void MetaFlac::date(TagLib::Tag& t_, const char* date_)
 {
     TagLib::PropertyMap  props = properties(*_tag);
 
-    if (strcmp(date_, "0000-00-00") == 0) {
+    if (strcmp(date_, Meta::DATE_REMOVE) == 0) {
 	props.erase(MetaFlac::TAG_DATE);
 	_tag->setProperties(props);
         return;
