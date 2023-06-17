@@ -107,7 +107,7 @@ void  _usage()
 	 << "                                                4 - m4a     (default for mp4 audio)\n"
 	 << "                                                d - default (use default tag for audio type)\n"
 	 << "                                                A - all\n"
-	 << "    -d  --delete        <[1|2|a|f|A]>         delete tags\n"
+	 << "    -d  --delete        <[1|2|a|f|A]>         delete tags (ID3v1, ID3v2, ape, flac, all)\n"
 	 << "    -m  --clone-from    <file>                clone dflt tag from file onto dflt tag type of files\n"
 	 << "    -n  --clone-tag     <X:Y>                 clone internal tag from X to Y only if X exists\n"
 	 << "    -r  --remove-art                          remove album art\n"
