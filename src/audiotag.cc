@@ -161,7 +161,7 @@ const char*  _setlocale(const char*& locale_)
         const char*  env = getenv("LANG");
         l = setlocale(LC_ALL, NULL);
         const std::string  tmpl = l;
-        MP3_TAG_NOTICE_VERBOSE("user default LANG=" << (env ? env : "") << " locale=" << (l ? l : ""));
+        AUDIOTAG_NOTICE_VERBOSE("user default LANG=" << (env ? env : "") << " locale=" << (l ? l : ""));
 
         memset(w, 0, n+1);
         size_t  res = mbstowcs(w, mbdata, n);
@@ -180,7 +180,7 @@ const char*  _setlocale(const char*& locale_)
         }
 
         if ( (l = setlocale(LC_ALL, what)) == NULL) {
-            MP3_TAG_WARN("failed setting locale=" << what);
+            AUDIOTAG_WARN("failed setting locale=" << what);
         }
         else
         {
@@ -192,7 +192,7 @@ const char*  _setlocale(const char*& locale_)
                 // all done, found it
                 break;
             }
-            MP3_TAG_WARN("failed for requested locale=" << what << "  mb conv res=" << res);
+            AUDIOTAG_WARN("failed for requested locale=" << what << "  mb conv res=" << res);
         }
         what = NULL;
     }
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 		}
 		catch (const std::exception& ex)
 		{
-		    MP3_TAG_ERR("invalid artwork='" << optarg<< "' - " << ex.what());
+		    AUDIOTAG_ERR("invalid artwork='" << optarg<< "' - " << ex.what());
 		    AudioTag::_usage();
 		}
 		ops.add(new AudioTag::OpAddArt(*opts.artwork) );
@@ -387,7 +387,7 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        MP3_TAG_ERR("cloning from/to must be exclusive tags");
+                        AUDIOTAG_ERR("cloning from/to must be exclusive tags");
                         AudioTag::_usage();
                     }
                }
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
 		AudioTag::File*  f;
 		int  err;
 		if ( (f = AudioTag::FileFactory::create(optarg, err, *opts.mout)) == NULL) {
-		    MP3_TAG_ERR("cloning from invalid file");
+		    AUDIOTAG_ERR("cloning from invalid file");
 		    AudioTag::_usage();
 		}
 
@@ -466,23 +466,23 @@ int main(int argc, char *argv[])
     }
 
     if ( !(optind < argc) ) {
-        MP3_TAG_ERR("no files specified");
+        AUDIOTAG_ERR("no files specified");
         AudioTag::_usage();
     }
     if ( !opts.iflds.validate()) {
-        MP3_TAG_ERR("invalid options");
+        AUDIOTAG_ERR("invalid options");
         AudioTag::_usage();
     }
 
     const char*  l;
     if ( (l = AudioTag::_setlocale(opts.locale)) == NULL) {
-        MP3_TAG_ERR("failed to set valid UTF8 locale - tried all fallbacks; verify locales (locale -a)");
+        AUDIOTAG_ERR("failed to set valid UTF8 locale - tried all fallbacks; verify locales (locale -a)");
         return -1;
     }
     if (opts.locale && l != opts.locale) {
-        MP3_TAG_WARN("requested locale=" << opts.locale << " not suitable for mbyte conversions, using local=" << l);
+        AUDIOTAG_WARN("requested locale=" << opts.locale << " not suitable for mbyte conversions, using local=" << l);
     }
-    MP3_TAG_NOTICE_VERBOSE("using locale=" << l);
+    AUDIOTAG_NOTICE_VERBOSE("using locale=" << l);
 
     std::for_each(propargs.cbegin(), propargs.cend(), [&ops, &opts](char* optarg) {
 	AudioTag::OpPropertyTags::Map  m;
@@ -494,13 +494,13 @@ int main(int argc, char *argv[])
 	    const uint8_t  tn = strlen(tok);
 	    char*  prop;
 	    if ( (prop = strtok(tok, opts.propertiesTok)) == NULL) {
-		MP3_TAG_ERR("invalid arg='" << tok  << "property list format: <property name><seperator (" << opts.propertiesTok<< ")><property value>");
+		AUDIOTAG_ERR("invalid arg='" << tok  << "property list format: <property name><seperator (" << opts.propertiesTok<< ")><property value>");
 		AudioTag::_usage();
 	    }
 
 	    const uint8_t  n = strlen(prop);
 	    if (n == tn) {
-		MP3_TAG_ERR("invalid token='" << tok << "' - no value");
+		AUDIOTAG_ERR("invalid token='" << tok << "' - no value");
 		AudioTag::_usage();
 	    }
 	    prop[n] = NULL;
@@ -533,12 +533,12 @@ int main(int argc, char *argv[])
         try
         {
             if ( !(ff = AudioTag::FileFactory::create(f, err, *opts.mout))) {
-                MP3_TAG_WARN("failed to open - " << f << " - " << AudioTag::FileFactory::what(err) << " - ignored");
+                AUDIOTAG_WARN("failed to open - " << f << " - " << AudioTag::FileFactory::what(err) << " - ignored");
             }
         }
         catch (const std::exception& ex)
         {
-            MP3_TAG_WARN("failed to open - " << f << " - " << ex.what() << " - ignored");
+            AUDIOTAG_WARN("failed to open - " << f << " - " << ex.what() << " - ignored");
         }
 
 
@@ -547,7 +547,7 @@ int main(int argc, char *argv[])
         }
 
         if ( !ops.readonly() && access(ff->taglibfile().name(), W_OK) < 0) {
-            MP3_TAG_ERR(ff->taglibfile().name() << ": no write permissions, all operations skipped");
+            AUDIOTAG_ERR(ff->taglibfile().name() << ": no write permissions, all operations skipped");
         }
         else
         {
@@ -572,7 +572,7 @@ int main(int argc, char *argv[])
 
                 //if ( utime(f, &ub) < 0) {
                 if ( utimes(f, tv) < 0) {
-                    MP3_TAG_WARN_VERBOSE("'" << f << "' unable to revert to original access times - " << strerror(errno));
+                    AUDIOTAG_WARN_VERBOSE("'" << f << "' unable to revert to original access times - " << strerror(errno));
                 }
             }
 #endif

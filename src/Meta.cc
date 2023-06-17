@@ -96,7 +96,7 @@ TagLib::String  _cnvrt(const char* data_)
 
     if (INTNL_STR_ENC == TagLib::String::Latin1) {
         // nice and simple
-	MP3_TAG_DEBUG("encoded as [" << INTNL_STR_ENC << "]  '" << data_ << "'");
+	AUDIOTAG_DEBUG("encoded as [" << INTNL_STR_ENC << "]  '" << data_ << "'");
 	return TagLib::String(data_);
     }
 
@@ -115,12 +115,12 @@ TagLib::String  _cnvrt(const char* data_)
 	 * Thus "%s" is used instead of "%c".
 	 */
 	if (x>0) p[x]=0;
-	MP3_TAG_DEBUG("multibyte char[" << c << "] = '" << p << "'  (" << x << " bytes)");
+	AUDIOTAG_DEBUG("multibyte char[" << c << "] = '" << p << "'  (" << x << " bytes)");
     }
 #endif
 
     const TagLib::String  s(w, INTNL_STR_ENC);
-    MP3_TAG_DEBUG("encoded as [" << INTNL_STR_ENC << "]  '" << data_ << "', unicode='" << s.toCString(true) << "', latin1='" << s.toCString() << "'");
+    AUDIOTAG_DEBUG("encoded as [" << INTNL_STR_ENC << "]  '" << data_ << "', unicode='" << s.toCString(true) << "', latin1='" << s.toCString() << "'");
     delete []  w;
     return s;
 }
@@ -534,7 +534,7 @@ void  MetaMP3::save()
      * only save that (otherwise it copies id3v2 onto id3v1) but consider if 
      * other tags have modified
      */
-    MP3_TAG_DEBUG("mp3 savetag=" << _svtag);
+    AUDIOTAG_DEBUG("mp3 savetag=" << _svtag);
     _tf.save(_svtag == 0 ? TagLib::MPEG::File::ID3v2 : _svtag,
 #if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION == 11
 	     // ubuntu does not have anything > 1.11.1
@@ -574,7 +574,7 @@ void MetaMP3::remove(const MetaTOI& toi_)
     if (rmtag == TagLib::MPEG::File::NoTags) {
         return;
     }
-    MP3_TAG_DEBUG("mp3 strip=" << rmtag);
+    AUDIOTAG_DEBUG("mp3 strip=" << rmtag);
     _tf.strip(rmtag);
 
     /* BUG - if you ask to remove APE/ID3v1, both appear to be removed but when
@@ -730,7 +730,7 @@ MetaMP3::MetaMP3(FileMP3& f_, MetaOut& mo_)
     if (_id3v2 && !_id3v2->isEmpty())  _svtag |= TagLib::MPEG::File::ID3v2;
     if (_ape   && !_ape->isEmpty())    _svtag |= TagLib::MPEG::File::APE;
 
-    MP3_TAG_DEBUG("mp3 ctor: " << _svtag << "  1:" << std::hex << _id3v1 << " 2: "<< _id3v2 << " a: " << _ape);
+    AUDIOTAG_DEBUG("mp3 ctor: " << _svtag << "  1:" << std::hex << _id3v1 << " 2: "<< _id3v2 << " a: " << _ape);
 }
 
 const char*  MetaMP3::_id3v2TxtEnc(const TagLib::ID3v2::Frame* f_)
@@ -957,7 +957,7 @@ void  MetaFlac::artwork(Artwork& artwork_)
 
 bool  MetaFlac::coverart() const
 {
-    MP3_TAG_DEBUG("flac: pic list sz, file=" <<  _tf.pictureList().size() << " tag=" << _tag->pictureList().size());
+    AUDIOTAG_DEBUG("flac: pic list sz, file=" <<  _tf.pictureList().size() << " tag=" << _tag->pictureList().size());
     return _tf.pictureList().size() > 0;
 }
 
