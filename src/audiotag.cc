@@ -81,8 +81,7 @@ void  _usage()
 	 << "    -A  --album         <album<\n"
 	 << "    -c  --comment       <comment>\n"
 	 << "    -g  --genre         <genre>\n"
-	 << "    -y  --release-year  <year>\n"
-	 << "    -Y  --release-date  <date>                YYYY-MM-DD format - 0000-00-00 unsets\n"
+	 << "    -y  --date          <year/date>           YYYY [-MM-DD] format - 0000-00-00 unsets\n"
 	 << "    -T  --track         <track number [/total tracks]>\n"
 	 << "    -D  --disc          <disc/disc total>\n"
 	 << "    -s  --rating        <Rating>              0..5 - 0 unsets\n"
@@ -274,8 +273,7 @@ int main(int argc, char *argv[])
 	{ "album-artist",	1, 0, 'R' },
 	{ "comment",		1, 0, 'c' },
 	{ "genre",		1, 0, 'g' },
-	{ "release-year",	1, 0, 'y' },
-	{ "release-date",	1, 0, 'Y' },
+	{ "date",	        1, 0, 'y' },
 	{ "track",		1, 0, 'T' },
 	{ "disc",		1, 0, 'D' },
 	{ "rating",		1, 0, 's' },
@@ -339,8 +337,17 @@ int main(int argc, char *argv[])
             case 'a':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.artist = optarg;  break;
             case 'R':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.albumartist = optarg;  break;
             case 'A':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.album = optarg;  break;
-            case 'y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.yr = optarg;  break;
-            case 'Y':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.date = optarg;  break;
+            case 'y':
+	    {
+		AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);
+		opts.iflds.yr = optarg;
+
+		struct tm  tm;
+		char*  ret = strptime(optarg, "%Y-%m-%d", &tm);
+		if (ret && *ret == '\0') {
+		    opts.iflds.date = optarg;
+		}
+	    } break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
             case 'T':
 	    {
@@ -581,3 +588,4 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
+
