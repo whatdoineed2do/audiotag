@@ -342,10 +342,17 @@ int main(int argc, char *argv[])
 		AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);
 		opts.iflds.yr = optarg;
 
-		struct tm  tm;
-		char*  ret = strptime(optarg, "%Y-%m-%d", &tm);
-		if (ret && *ret == '\0') {
-		    opts.iflds.date = optarg;
+		if (strchr(optarg, '-')) {
+		    struct tm  tm;
+		    char*  ret = strptime(optarg, "%Y-%m-%d", &tm);
+		    if (ret && *ret == '\0') {
+			opts.iflds.date = optarg;
+		    }
+		}
+		else {
+		    static char  date[16];
+		    strcpy(date, AudioTag::Meta::DATE_REMOVE);
+		    opts.iflds.date = date;
 		}
 	    } break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
