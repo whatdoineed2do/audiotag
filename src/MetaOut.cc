@@ -91,12 +91,18 @@ os_ << "      \"length\": " << ap->lengthInMilliseconds()/1000.0 << ",\n"
     }
 os_ << "    }\n"
     << "  },\n"
-    << "  \"meta\": [\n";
+    << "  \"meta\": [";
 
+    bool  any = false;
     bool  first = true;
     const Meta::Tags&  tags = f_.meta().tags();
     for (const auto& t : tags)
     {
+	if (!any) {
+	    os_ << "\n";
+	}
+
+	any = true;
 	const char*  tagtype_ = t.first;
 	const auto&  tag = t.second;
 	if (!first) {
@@ -167,7 +173,7 @@ os_ << "\n"
     << "    }";
 	first = false;
     }
-os_ << "\n"
+os_ << (any ? "\n" : "")
     << "  ]\n"
     << "}\n";
     return os_;
