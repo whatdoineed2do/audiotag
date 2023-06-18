@@ -49,11 +49,14 @@ class File
     { return _st; }
 
     bool  writable() const
-    { return !_taglibfile.readOnly(); } 
+    { return !_taglibfile.readOnly(); }
+
+    const std::string&  hash() const
+    { return _hash; }
 
 
   protected:
-    File(Meta& m_, const char* fn_, TagLib::File& f_) : _m(m_), _taglibfile(f_)
+    File(Meta& m_, const std::string&  hash_, const char* fn_, TagLib::File& f_) : _m(m_), _taglibfile(f_), _hash(hash_)
     {
         stat(fn_, &_st);
     }
@@ -63,6 +66,7 @@ class File
     TagLib::File&  _taglibfile;
 
     struct stat  _st;  // original file values;
+    const std::string  _hash;  // audio hash
 };
 std::ostream& operator<<(std::ostream& os_, const File& f_);
 
@@ -73,10 +77,10 @@ class FileMP3 : public File
     using value_type = TagLib::MPEG::File;
     static const char*  sffx[];
 
-    FileMP3(const char* f_, MetaOut& mo_) 
-	: _f(f_), 
-	  _m(*this, mo_), 
-	  File(_m, f_, _f)
+    FileMP3(const char* f_, MetaOut& mo_, const std::string& hash_)
+	: _f(f_),
+	  _m(*this, mo_),
+	  File(_m, hash_, f_, _f)
     { }
 
     ~FileMP3() = default;
@@ -92,10 +96,10 @@ class FileOGGFlac : public File
   public:
     static const char*  sffx[];
 
-    FileOGGFlac(const char* f_, MetaOut& mo_)
+    FileOGGFlac(const char* f_, MetaOut& mo_, const std::string& hash_)
         : _f(f_),
           _m(*this, mo_),
-          File(_m, f_, _f)
+          File(_m, hash_, f_, _f)
     { }
 
     ~FileOGGFlac() = default;
@@ -112,10 +116,10 @@ class FileFlac : public File
   public:
     static const char*  sffx[];
 
-    FileFlac(const char* f_, MetaOut& mo_)
+    FileFlac(const char* f_, MetaOut& mo_, const std::string& hash_)
         : _f(f_),
           _m(*this, mo_),
-          File(_m, f_, _f)
+          File(_m, hash_, f_, _f)
     { }
 
     ~FileFlac() = default;
@@ -131,10 +135,10 @@ class FileM4a : public File
   public:
     static const char*  sffx[];
 
-    FileM4a(const char* f_, MetaOut& mo_)
+    FileM4a(const char* f_, MetaOut& mo_, const std::string& hash_)
         : _f(f_),
           _m(*this, mo_),
-          File(_m, f_, _f)
+          File(_m, hash_, f_, _f)
     { }
 
     ~FileM4a() = default;

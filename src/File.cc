@@ -8,6 +8,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/hash.h>
 #include <libavutil/opt.h>
 #include <libavutil/log.h>
 
@@ -36,6 +37,56 @@ std::ostream& operator<<(std::ostream& os_, const File& f_)
 }
 
 #ifdef HAVE_FFMPEG
+std::string  _ffmpeg_audio_hash(AVFormatContext*  ctx_, const int audioIdx_)
+{
+    AVPacket *pkt = NULL;
+    struct AVHashContext *hash = NULL;
+    std::string  audiohash;
+
+    try
+    {
+	int ret;
+
+	pkt = av_packet_alloc();
+	if (!pkt) {
+	    _ffmpeg_err = ENOMEM;
+	    throw _ffmpeg_err;
+	}
+
+	ret = av_hash_alloc(&hash, "sha256");
+	if (ret < 0) {
+	    if (ret != EINVAL)  {
+		_ffmpeg_err = ENOMEM;
+	    }
+	    throw _ffmpeg_err;
+	}
+	av_hash_init(hash);
+
+	while ((ret = av_read_frame(ctx_, pkt)) >= 0)
+	{
+	    if (pkt->stream_index != audioIdx_) {
+		av_packet_unref(pkt);
+		continue;
+	    }
+
+	    av_hash_update(hash, pkt->data, pkt->size);
+	    av_packet_unref(pkt);
+	}
+
+	char  res[2 * AV_HASH_MAX_SIZE + 4] = { 0 };
+	av_hash_final_hex(hash, (uint8_t*)res, sizeof(res));
+
+	audiohash = res;
+    }
+    catch (...)
+    { }
+
+    if (pkt)   av_packet_free(&pkt);
+    if (hash)  av_hash_freep(&hash);
+
+    return audiohash;
+}
+
 File*  _ffmpeg_create(const char* file_, MetaOut& mo_)
 {
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
@@ -117,19 +168,20 @@ File*  _ffmpeg_create(const char* file_, MetaOut& mo_)
 		 */
 		case AVMEDIA_TYPE_AUDIO:
 		{
+		    const std::string  hash = _ffmpeg_audio_hash(ctx, i);
 		    switch (ctx->streams[i]->codecpar->codec_id)
 		    {
 			case AV_CODEC_ID_MP3:
-			    f = new FileMP3(file_, mo_);
+			    f = new FileMP3(file_, mo_, hash);
 			    break;
 
 			case AV_CODEC_ID_AAC:
 			case AV_CODEC_ID_ALAC:
-			    f = new FileM4a(file_, mo_);
+			    f = new FileM4a(file_, mo_, hash);
 			    break;
 
 			case AV_CODEC_ID_FLAC:
-			    f = new FileFlac(file_, mo_);
+			    f = new FileFlac(file_, mo_, hash);
 
 			default:
 			    break;
