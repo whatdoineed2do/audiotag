@@ -124,8 +124,6 @@ File*  _ffmpeg_create(const char* file_, MetaOut& mo_)
         return NULL;
     }
 
-    bool  hasvideo = true;
-
     File*  f = NULL;
  
     // find the container is supported and then worry about the codec
@@ -144,57 +142,25 @@ File*  _ffmpeg_create(const char* file_, MetaOut& mo_)
     }
     else
     {
-	for (int i=0; i<ctx->nb_streams; ++i)
+	AVCodec*  audio_codec = nullptr;
+	const std::string  hash = _ffmpeg_audio_hash(ctx, av_find_best_stream(ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &audio_codec, 0));
+	switch (audio_codec->id)
 	{
-	    switch (ctx->streams[i]->codecpar->codec_type)
-	    {
-		case AVMEDIA_TYPE_VIDEO:
-		{
-		    switch (ctx->streams[i]->codecpar->codec_id) {
-			case AV_CODEC_ID_MJPEG:
-			case AV_CODEC_ID_MJPEGB:
-			    // embedded artwork, not video
-			    hasvideo = false;
-			    break;
-
-			default:
-			    hasvideo = true;
-			    break;
-		    }
-		} break;
-
-		/* WARN -- only consider the file's FIRST audio stream - if normal 
-		 * siutations this is fine
-		 */
-		case AVMEDIA_TYPE_AUDIO:
-		{
-		    const std::string  hash = _ffmpeg_audio_hash(ctx, i);
-		    switch (ctx->streams[i]->codecpar->codec_id)
-		    {
-			case AV_CODEC_ID_MP3:
-			    f = new FileMP3(file_, mo_, hash);
-			    break;
-
-			case AV_CODEC_ID_AAC:
-			case AV_CODEC_ID_ALAC:
-			    f = new FileM4a(file_, mo_, hash);
-			    break;
-
-			case AV_CODEC_ID_FLAC:
-			    f = new FileFlac(file_, mo_, hash);
-
-			default:
-			    break;
-		    }
-		} break;
-
-		default:
-		    break;
-	    }
-
-	    if (f) {
+	    case AV_CODEC_ID_MP3:
+		f = new FileMP3(file_, mo_, hash);
 		break;
-	    }
+
+	    case AV_CODEC_ID_AAC:
+	    case AV_CODEC_ID_ALAC:
+		f = new FileM4a(file_, mo_, hash);
+		break;
+
+	    case AV_CODEC_ID_FLAC:
+		f = new FileFlac(file_, mo_, hash);
+		break;
+
+	    default:
+		break;
 	}
     }
     avformat_close_input(&ctx);
