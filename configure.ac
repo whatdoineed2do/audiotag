@@ -21,7 +21,7 @@ AX_CXX_COMPILE_STDCXX([14], [noext], [mandatory])
 
 PKG_CHECK_MODULES(TAGLIB, [taglib >= 1.11.1])
 #PKG_CHECK_MODULES(JSONC, [json-c])
-PKG_CHECK_MODULES(FFMPEG, libavformat libavutil, have_ffmpeg=yes, have_ffmpeg=no)
+PKG_CHECK_MODULES(FFMPEG, libavformat libavcodec libavutil, have_ffmpeg=yes, have_ffmpeg=no)
 if test x"$have_ffmpeg" = xyes; then
     AH_TEMPLATE([HAVE_FFMPEG], [Whether ffmpeg is installed, used for more accurate input file assessment])
     AC_DEFINE_UNQUOTED(HAVE_FFMPEG, 1)
