@@ -83,9 +83,10 @@ os_ << "{\n"
     << "    \"mod_time\": \"" << mtime << "\",\n"
     << "    \"audio_properties\": {\n";
     if (ap) {
-os_ << "      \"length\": \"" << ap->lengthInSeconds() << "\",\n"
-    << "      \"bitrate\": \"" << ap->bitrate() << "\",\n"
-    << "      \"samplerate\": \"" << ap->sampleRate() << "\"\n"
+os_ << "      \"length\": " << ap->lengthInMilliseconds()/1000.0 << ",\n"
+    << "      \"bitrate\": " << ap->bitrate() << ",\n"
+    << "      \"samplerate\": " << ap->sampleRate() << ",\n"
+    << "      \"channels\": " << ap->channels() << ",\n"
     << "      \"hash\": \"" << f_.hash() << "\"\n";
     }
 os_ << "    }\n"
