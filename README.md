@@ -2,16 +2,16 @@
 Command line multi audio format meta tagging util
 
 Command line utility based on `TagLib (v1.11.1)` to read/write basic meta information to the follow file formats:
-- MP3
-- flac
-- M4a (.m4a MP4 audio)
+- `MP3`
+- `flac`
+- `M4a` (.m4a MP4 audio)
 
 Basic functionality to:
-- unified interface across all supported formats: goodbye to different tag names im metaflac vs id3tag etc fir simple tagging
+- unified interface across all supported formats: goodbye to different tag names in [`metaflac`](https://xiph.org/flac/documentation_tools_metaflac.html) vs [`id3tag`](https://man.archlinux.org/man/extra/id3lib/id3tag.1.en) etc for simple tagging
 - clean - strip all tags except for very basic artist/title/genre etc
 - sync - copy existing tag (ie ID3v2) to another tag (ie APE) for MP3
 - delete - delete tags from file
-- UTF8 tag data supported in tags which support it (NOT id3v1)
+- UTF8 tag data supported in tags which support it (NOT in ID3v1)
 
 `ffmpeg/libavfilter` will allow for more accurate file determination based on actual file container type, rather than file extension.
 
@@ -19,8 +19,8 @@ Based heavily on the `tagwritter` util from `TabLib` and previous mp3tag
 
 
 Multiple commands can be chained together in a single execution - however the file is only written to disk once.  The output can be of two useful forms:
-- mock JSON
-- old id3tag output
+- mock `JSON`
+- old `id3tag` output
 
 ## Example Usage
 Add/change the `artist`, clear the `comment` and display the meta
@@ -125,7 +125,7 @@ $ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l test.mp3
 }
 ```
 ## Working with arbituary tags
-`TagLib` provides a uniform set of property names across all tag formats which are shown in json output.  The `-P` flag can add/remove property tags but the user is responsible for verifying if such a property is valid for that tag type.
+`TagLib` provides a uniform set of property names across all tag formats which are shown in `json` output.  The `-P` flag can add/remove property tags but the user is responsible for verifying if such a property is valid for that tag type.
 ```
 $ audiotag  -l test.mp3
 {
@@ -224,9 +224,9 @@ $ audiotag  -P coke:,COMMENT:"an updated comment" -l test.mp3
   ]
 }
 ```
-## Adding artwork/Disc number
+## Adding artwork, Track and Disc number
 ```
-$ audiotag -w foo.jpg -K 1/3 disc1track1.mp3
+$ audiotag -w foo.jpg -y 1/10 -D 1/3 track1of10-on-disc1of3.mp3
 ```
  
 # Further Enhancements
