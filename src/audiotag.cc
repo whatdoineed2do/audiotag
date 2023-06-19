@@ -349,11 +349,6 @@ int main(int argc, char *argv[])
 			opts.iflds.date = optarg;
 		    }
 		}
-		else {
-		    static char  date[16];
-		    strcpy(date, AudioTag::Meta::DATE_REMOVE);
-		    opts.iflds.date = date;
-		}
 	    } break;
             case 'c':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.comment = optarg;  break;
             case 'T':
