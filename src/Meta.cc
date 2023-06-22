@@ -552,6 +552,8 @@ void MetaMP3::remove(const MetaTOI& toi_)
     if (toi_.all) {
         rmtag = TagLib::MPEG::File::AllTags;
         _svtag = TagLib::MPEG::File::NoTags;
+	_id3v1 = NULL;
+	_ape = NULL;
     }
     else
     {
