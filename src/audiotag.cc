@@ -171,7 +171,7 @@ const char*  _setlocale(const char*& locale_)
 
 
     const char*  what = NULL;
-    for (int i=0; i<sizeof(attempts)/sizeof(const char*); ++i)
+    for (unsigned i=0; i<sizeof(attempts)/sizeof(const char*); ++i)
     {
         what = attempts[i];
         if (what == NULL) {
@@ -536,7 +536,6 @@ int main(int argc, char *argv[])
 	f = argv[i++];
 
         AudioTag::File*  ff = NULL;
-	TagLib::Tag*  tag = NULL;
 
         int  err;
         try
@@ -570,16 +569,11 @@ int main(int argc, char *argv[])
             {
                 /* try to reset the timestamps on the file
                  */
-                struct utimbuf  ub;
-                ub.actime = ff->st().st_atime;
-                ub.modtime =  ff->st().st_mtime;
-
                 struct timeval  tv[2];
                 memset(&tv[0], 0, sizeof(struct timeval));
                 tv[1].tv_sec  = ff->st().st_mtim.tv_sec;
                 tv[1].tv_usec = ff->st().st_mtim.tv_nsec/1000;
 
-                //if ( utime(f, &ub) < 0) {
                 if ( utimes(f, tv) < 0) {
                     AUDIOTAG_WARN_VERBOSE("'" << f << "' unable to revert to original access times - " << strerror(errno));
                 }

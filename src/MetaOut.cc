@@ -68,7 +68,6 @@ std::ostream&  MetaOutJson::out(std::ostream& os_, const File& f_)
     const Meta&  m_ = f_.meta();
 
     std::string  s;
-    const char*  p = NULL;
     int  i = 0;
 
     char  mtime[50];
@@ -139,7 +138,7 @@ os_ << "      \"comment\": " << MetaOutJson::out(s, tag->comment()) << ",\n"
     << "      \"artwork\": " << (m_.coverart() ? "true" : "false") << ",\n"
     << "      \"properties\": {\n";
 	bool  fi = true;
-	for (const auto i : m)
+	for (const auto& i : m)
 	{
 	    if (fi) {
 		fi = false;

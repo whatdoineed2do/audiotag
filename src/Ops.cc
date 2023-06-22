@@ -72,7 +72,7 @@ namespace AudioTag
             TagLib::PropertyMap&  urgh = input_.properties;
 
             int  vl;
-            if ( (vl = strlen(value)) == 0 || (vl == 2 && (value[0] == '\'' && value[1] == '\'' || value[0] == '"' && value[1] == '"')) ) {
+            if ( (vl = strlen(value)) == 0 || (vl == 2 && ( (value[0] == '\'' && value[1] == '\'') || (value[0] == '"' && value[1] == '"')) ) ) {
                 urgh[prop].clear();
             }
             else

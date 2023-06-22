@@ -41,8 +41,8 @@ void  Input::populate(const TagLib::Tag* tag_)
     //disc = ..
     //albumartist = ..
 
-    sprintf(T, "%ld", tag_->track());
-    sprintf(y, "%ld", tag_->year());
+    sprintf(T, "%d", tag_->track());
+    sprintf(y, "%d", tag_->year());
     trackno = T;
     yr = y;
 }
@@ -53,12 +53,12 @@ bool  Input::validate() const
     if (good && trackno)
     {
 	unsigned x = 0;
-	good = sscanf(trackno, "%ld", &x) == 1;
+	good = sscanf(trackno, "%d", &x) == 1;
     }
     if (good && yr)
     {
 	unsigned x = 0;
-	good = sscanf(yr, "%ld", &x) == 1;
+	good = sscanf(yr, "%d", &x) == 1;
     }
     if (good && disc)
     {
@@ -102,7 +102,10 @@ TagLib::String  _cnvrt(const char* data_)
 
     wchar_t*      w = new wchar_t[n+1];
     memset(w, 0, n+1);
-    const size_t  len = mbstowcs(w, data_, n);
+#ifdef DEBUG
+    const size_t  len = 
+#endif
+    mbstowcs(w, data_, n);
 
 #ifdef DEBUG
     char  p[MB_CUR_MAX+1];
@@ -128,8 +131,6 @@ TagLib::String  _cnvrt(const char* data_)
 
 const char*  _strrep(const TagLib::String&  str_, TagLib::String* ptr_)
 {
-    /* so fucking stupid..
-     */
     if (str_ == taglib_string_null) {
         static const char*  tmp = "";
         return tmp;
@@ -307,7 +308,7 @@ void  Meta::trackno(TagLib::Tag& tag_, const unsigned data_)
 void  Meta::trackno(TagLib::Tag& tag_, const unsigned x_, const unsigned y_)
 {
     char buf[32];
-    snprintf(buf, sizeof(buf), "%lu/%lu", x_, y_);
+    snprintf(buf, sizeof(buf), "%u/%u", x_, y_);
     _property(tag_, "TRACKNUMBER", buf);
 }
 
@@ -357,8 +358,8 @@ void  multibyteConvert(Input& iflds_, const TagLib::Tag&  tag_, const TagLib::St
     iflds_.album  = (A == taglib_string_null) ? NULL : (vA = A.data(mbenc_)).data();
     iflds_.genre  = (g == taglib_string_null) ? NULL : (vg = g.data(mbenc_)).data();
 
-    sprintf(T, "%ld", tag_.track());
-    sprintf(y, "%ld", tag_.year());
+    sprintf(T, "%d", tag_.track());
+    sprintf(y, "%d", tag_.year());
     iflds_.trackno = T;
     iflds_.yr = y;
 }
@@ -647,7 +648,6 @@ void  MetaMP3::sanitize()
     /* need to strip the tag, no API call to clear down - the 
      * setProperties() only works on setters at top level
      */
-    TagLib::MPEG::File&  f = _tf;
     if (_id3v2 && !_id3v2->isEmpty())
     {
         Input  data(_id3v2);
