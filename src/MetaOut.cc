@@ -95,7 +95,7 @@ os_ << "    }\n"
 
     bool  any = false;
     bool  first = true;
-    const Meta::Tags&  tags = f_.meta().tags();
+    const Meta::Tags  tags = f_.meta().tags();
     for (const auto& t : tags)
     {
 	if (!any) {
