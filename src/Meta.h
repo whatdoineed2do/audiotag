@@ -551,6 +551,7 @@ class MetaM4a : public Meta
     static const char*  TAG_TRACK_NO;
     static const char*  TAG_COVERART;
     static const char*  TAG_RATE;
+    static const char*  TAG_DATE;
 };
 
 

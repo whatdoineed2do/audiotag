@@ -1039,6 +1039,7 @@ TagLib::PropertyMap  MetaFlac::properties(const TagLib::Tag& t_) const
 const char*  MetaM4a::TAG_TRACK_NO = "trkn";
 const char*  MetaM4a::TAG_COVERART = "covr";
 const char*  MetaM4a::TAG_RATE = "rate";
+const char*  MetaM4a::TAG_DATE = "\251day";
 
 
 MetaM4a::MetaM4a(FileM4a& f_, MetaOut& mo_)
@@ -1066,7 +1067,7 @@ void  MetaM4a::year(TagLib::Tag& tag_, const unsigned data_)
     // .. can't use symbolic DATE/TRACKNUMBER to remove
  
     if (data_ > 0) _tag->setYear ( data_);
-    else if (data_ == 0 && _tag == &tag_) _tag->removeItem("\251day");
+    else if (data_ == 0 && _tag == &tag_) _tag->removeItem(MetaM4a::TAG_DATE);
 }
 
 void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned data_)
