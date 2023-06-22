@@ -1070,6 +1070,17 @@ void  MetaM4a::year(TagLib::Tag& tag_, const unsigned data_)
     else if (data_ == 0 && _tag == &tag_) _tag->removeItem(MetaM4a::TAG_DATE);
 }
 
+void MetaM4a::date(TagLib::Tag& t_, const char* date_)
+{
+    if (strcmp(date_, Meta::DATE_REMOVE) == 0) {
+	_tag->removeItem(MetaM4a::TAG_DATE);
+    }
+    else {
+	_tag->setItem(MetaM4a::TAG_DATE, TagLib::StringList(date_));
+    }
+ }
+
+
 void  MetaM4a::trackno(TagLib::Tag& tag_, const unsigned data_)
 {
     if (data_ > 0) tag_.setTrack(data_);

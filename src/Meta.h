@@ -529,6 +529,7 @@ class MetaM4a : public Meta
     void  removeart();
 
     void     year(TagLib::Tag&, const unsigned)  override;
+    void     date(TagLib::Tag&, const char*)  override;
     void  trackno(TagLib::Tag&, const unsigned)  override;
     void  trackno(TagLib::Tag&, const unsigned, const unsigned)  override;
 
