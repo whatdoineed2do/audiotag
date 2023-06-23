@@ -70,18 +70,14 @@ void  _usage()
     cout << _argv0 << " " << _version() << endl
          << "usage: " << _argv0 << " [OPTION]... [FILES]\n"
 	 << endl
-	 << "  [tag encoding options]\n"
-	 << "    -e  --encoding-in   <encoding>            encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]\n"
-	 << "    -u  --locale        <locale>]             locale to use for multibyte conversion\n"
-	 << '\n'
 	 << "  [tagging options]\n"
 	 << "    -t  --title         <title>\n"
 	 << "    -a  --artist        <artist>\n"
-	 << "    -R  --album-artist  <albume artist>\n"
+	 << "    -R  --album-artist  <album artist>\n"
 	 << "    -A  --album         <album<\n"
 	 << "    -c  --comment       <comment>\n"
 	 << "    -g  --genre         <genre>\n"
-	 << "    -y  --date          <year/date>           YYYY [-MM-DD] format - 0000-00-00 unsets\n"
+	 << "    -y  --date          <year/date>           YYYY[-MM-DD] format - 0000-00-00 unsets\n"
 	 << "    -T  --track         <track number [/total tracks]>\n"
 	 << "    -D  --disc          <disc/disc total>\n"
 	 << "    -s  --rating        <Rating>              0..5 - 0 unsets\n"
@@ -97,8 +93,8 @@ void  _usage()
 	 << "    -w  --artwork       <artwork file>[:tag{covr,...}]\n"
 	 << '\n'
 	 << "  [maintainence options]\n"
-	 << "    -l  --list                                list tags (exclusive maintanence option\n"
-	 << "    -i  --tag           <[1|2|a|f|A]>         add meta to tags types\n"
+	 << "    -l  --list                                list tags\n"
+	 << "    -i  --tag           <[1|2|a|f|A]>         add meta to specified tag types\n"
 	 << "                                                1 - ID3v1\n"
 	 << "                                                2 - ID3v2   (default for mp3)\n"
 	 << "                                                a - APE\n"
@@ -106,10 +102,10 @@ void  _usage()
 	 << "                                                4 - m4a     (default for mp4 audio)\n"
 	 << "                                                d - default (use default tag for audio type)\n"
 	 << "                                                A - all\n"
-	 << "    -d  --delete        <[1|2|a|f|A]>         delete tags (ID3v1, ID3v2, ape, flac, all)\n"
+	 << "    -d  --delete        <[1|2|a|f|A]>         delete tags (see --tag)\n"
 	 << "    -m  --clone-from    <file>                clone dflt tag from file onto dflt tag type of files\n"
 	 << "    -n  --clone-tag     <X:Y>                 clone internal tag from X to Y only if X exists\n"
-	 << "    -r  --remove-art                          remove album art\n"
+	 << "    -r  --remove-art                          remove album artwork\n"
 	 << "    -C                                        clean tags, leaving only basic info\n"
 	 << "    -M  --encoding-in   <encoding>            parse current tags and convert from -M <E> -e <E'>\n"
 	 << "                                                [warn] will damage tags if you get the encoding wrong!\n"
@@ -124,11 +120,15 @@ void  _usage()
 	 << "                                                  json objects that have tags other than ID3v2\n"
 	 << "                                                    " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
 	 << '\n'
+	 << "  [tag encoding options]\n"
+	 << "    -e  --encoding-in   <encoding>            encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]\n"
+	 << "    -u  --locale        <locale>]             locale to use for multibyte conversion\n"
+	 << '\n'
 	 << "  [misc options]\n"
 #ifdef AUDIOTAG_HAVE_PRESERVE
 	 << "    -p  --preserve-date                       preserve previous modification times" << '\n'
 #endif
-	 << "    -V  --verbase" << endl;
+	 << "    -V  --verbose" << endl;
 
     exit(1);
 }
