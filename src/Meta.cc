@@ -790,45 +790,6 @@ void  MetaMP3::_tag(TagLib::ID3v2::Tag*  tag_, const Input&  flds_, TagLib::Stri
     }
 }
 
-MetaOGGFlac::MetaOGGFlac(FileOGGFlac& f_, MetaOut& mo_) 
-  : Meta(f_.taglibfile(), (TagLib::Tag**)&_tag, mo_), 
-    _f(f_),
-    _tf((TagLib::Ogg::FLAC::File&)_f.taglibfile()),
-    _tag(NULL)
-{
-    _tag = _tf.tag();  // always non null, even if disk may not have value
-}
-
-Meta::Tags  MetaOGGFlac::tags() const
-{
-    Meta::Tags  tag;
-    if ( ((TagLib::Ogg::FLAC::File&)_f.taglibfile()).hasXiphComment() && !_tag->isEmpty()) {
-        tag.push_back(Meta::Tags::value_type("Ogg/Xipth", _tag));
-    }
-    return tag;
-}
-
-void MetaOGGFlac::remove(const MetaTOI& toi_)
-{
-}
-
-int  MetaOGGFlac::rating() const
-{
-    return Meta::rating();
-}
-
-void MetaOGGFlac::rating(uint8_t r_)
-{
-}
-
-void  MetaOGGFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
-{
-    TagLib::Ogg::XiphComment*  t = dynamic_cast<TagLib::Ogg::XiphComment*>(&t_);
-    if (t)  _properties(*t, m_);
-    else    _properties(t_, m_);
-}
-
-
 
 // flac ////////////////////////////////////////////////////////////////////////
 const char*  MetaFlac::TAG_RATING = "RATING";

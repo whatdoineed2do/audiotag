@@ -25,7 +25,6 @@ static std::list<const char*>  ffmpeg_supported_fmts;
 namespace AudioTag
 {
 const char*  FileMP3::sffx[]     = { ".mp3", NULL };
-const char*  FileOGGFlac::sffx[] = { ".ogg", NULL };
 const char*  FileFlac::sffx[]    = { ".flac", NULL };
 /* drop .aac - this is a raw stream with no container and thus no meta 
  */

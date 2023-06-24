@@ -91,26 +91,6 @@ class FileMP3 : public File
 };
 
 
-class FileOGGFlac : public File
-{
-  public:
-    static const char*  sffx[];
-
-    FileOGGFlac(const char* f_, MetaOut& mo_, const std::string& hash_)
-        : _f(f_),
-          _m(*this, mo_),
-          File(_m, hash_, f_, _f)
-    { }
-
-    ~FileOGGFlac() = default;
-
-  private:
-    TagLib::Ogg::FLAC::File  _f;
-    MetaOGGFlac  _m;
-};
-
-
-
 class FileFlac : public File
 {
   public:

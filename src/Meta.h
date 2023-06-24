@@ -449,39 +449,6 @@ class MetaMP3 : public _MetaMulti
 };
 
 
-
-class MetaOGGFlac : public Meta
-{
-  public:
-    MetaOGGFlac(FileOGGFlac&, MetaOut&);
-
-    ~MetaOGGFlac() = default;
-    MetaOGGFlac(const MetaOGGFlac&) = delete;
-    void operator=(const MetaOGGFlac&) = delete;
-
-    const bool  empty() const;
-    //{ return _f.hasXiphComment(); }
-
-    Meta::Tags  tags() const;
-    void  remove(const MetaTOI&);
-
-    int   rating() const;
-    void  rating(uint8_t);
-
-    TagLib::PropertyMap  properties() const override
-    { return _tag->properties(); }
-
-    void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
-
-  private:
-    FileOGGFlac&  _f;
-    TagLib::Ogg::FLAC::File&  _tf;
-
-    TagLib::Ogg::XiphComment*  _tag;
-
-    // this can have id3v2/v1 but ignoring
-};
-
 class MetaFlac : public Meta
 {
   public:
