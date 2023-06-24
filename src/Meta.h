@@ -322,8 +322,7 @@ class Meta
     }
 
 
-    virtual TagLib::PropertyMap  properties(const TagLib::Tag& t_) const
-    { return t_.properties(); }
+    virtual TagLib::PropertyMap  properties() const = 0;
 
     virtual void                 properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     { t_.setProperties(m_); }
@@ -422,7 +421,11 @@ class MetaMP3 : public _MetaMulti
     void  rating(uint8_t);  // takes 0..255
     void  removerating();
 
-    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    TagLib::PropertyMap  properties() const override
+    {
+	return _id3v2 ? _id3v2->properties() : TagLib::PropertyMap();
+    }
+
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
@@ -465,7 +468,9 @@ class MetaOGGFlac : public Meta
     int   rating() const;
     void  rating(uint8_t);
 
-    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    TagLib::PropertyMap  properties() const override
+    { return _tag->properties(); }
+
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
@@ -499,7 +504,9 @@ class MetaFlac : public Meta
     int   rating() const;
     void  rating(uint8_t);
 
-    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    TagLib::PropertyMap  properties() const override
+    { return _tag->properties(); }
+
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
@@ -540,7 +547,9 @@ class MetaM4a : public Meta
     int   rating() const;
     void  rating(uint8_t);
 
-    TagLib::PropertyMap  properties(const TagLib::Tag&) const;
+    TagLib::PropertyMap  properties() const override
+    { return _tag->properties(); }
+
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:

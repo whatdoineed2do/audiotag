@@ -201,7 +201,7 @@ Input::Input(const Meta& meta_)
     // this is to deal with an apparent bug that we can't use the base class to
     // get the full propertiesMap so we overwrite it using our own method to
     // pull all properties
-    properties = meta_.properties(*meta_.tag());
+    properties = meta_.properties();
 }
 
 
@@ -241,7 +241,7 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
 
 void  Meta::_property(TagLib::Tag& tag_, const char* tagname_, const char* data_)
 {
-    TagLib::PropertyMap  m = properties(tag_);
+    TagLib::PropertyMap  m = properties();
     if (data_ == NULL || *data_ == '\0') {
         m.erase(tagname_);
     }
@@ -465,13 +465,6 @@ void  MetaMP3::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     TagLib::ID3v2::Tag*  t = dynamic_cast<TagLib::ID3v2::Tag*>(&t_);
     if (t)  _properties(*t, m_);
     else    _properties(t_, m_);
-}
-
-TagLib::PropertyMap  MetaMP3::properties(const TagLib::Tag& t_) const
-{
-    const TagLib::ID3v2::Tag*  t = dynamic_cast<const TagLib::ID3v2::Tag*>(&t_);
-    if (t) return _properties(*t);
-    else   return _properties(t_);
 }
 
 int  MetaMP3::rating() const
@@ -835,13 +828,6 @@ void  MetaOGGFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) co
     else    _properties(t_, m_);
 }
 
-TagLib::PropertyMap  MetaOGGFlac::properties(const TagLib::Tag& t_) const
-{
-    const TagLib::Ogg::XiphComment*  t = dynamic_cast<const TagLib::Ogg::XiphComment*>(&t_);
-    if (t) return _properties(*t);
-    else   return _properties(t_);
-}
-
 
 
 // flac ////////////////////////////////////////////////////////////////////////
@@ -895,7 +881,7 @@ void MetaFlac::remove(const MetaTOI& toi_)
 
 void MetaFlac::date(TagLib::Tag& t_, const char* date_)
 {
-    TagLib::PropertyMap  props = properties(*_tag);
+    TagLib::PropertyMap  props = properties();
 
     if (strcmp(date_, Meta::DATE_REMOVE) == 0) {
 	props.erase(MetaFlac::TAG_DATE);
@@ -970,7 +956,7 @@ void  MetaFlac::removeart()
 
 int  MetaFlac::rating() const
 {
-    const TagLib::PropertyMap  props = properties(*_tag);
+    const TagLib::PropertyMap  props = properties();
     const auto  prop = props.find(MetaFlac::TAG_RATING);
 
     if (prop == props.end()) {
@@ -1011,7 +997,7 @@ void  MetaFlac::rating(uint8_t r_)
 
     if (r == NULL) {
         // TODO the _property() merges but not deletes tags - prob need to handle that
-        TagLib::PropertyMap  m = properties(*_tag);
+        TagLib::PropertyMap  m = properties();
         m.erase(MetaFlac::TAG_RATING);
 	_tag->setProperties(m);
     }
@@ -1025,13 +1011,6 @@ void  MetaFlac::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     TagLib::Ogg::XiphComment*  t = dynamic_cast<TagLib::Ogg::XiphComment*>(&t_);
     if (t)  _properties(*t, m_);
     else    _properties(t_, m_);
-}
-
-TagLib::PropertyMap  MetaFlac::properties(const TagLib::Tag& t_) const
-{
-    const TagLib::Ogg::XiphComment*  t = dynamic_cast<const TagLib::Ogg::XiphComment*>(&t_);
-    if (t) return _properties(*t);
-    else   return _properties(t_);
 }
 
 
@@ -1187,13 +1166,6 @@ void  MetaM4a::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     TagLib::MP4::Tag*  t = dynamic_cast<TagLib::MP4::Tag*>(&t_);
     if (t)  _properties(*t, m_);
     else    _properties(t_, m_);
-}
-
-TagLib::PropertyMap  MetaM4a::properties(const TagLib::Tag& t_) const
-{
-    const TagLib::MP4::Tag*  t = dynamic_cast<const TagLib::MP4::Tag*>(&t_);
-    if (t) return _properties(*t);
-    else   return _properties(t_);
 }
 
 std::ostream&  Meta::out(std::ostream& os_, const File& f_) const

@@ -118,7 +118,7 @@ os_ << "    {\n"
 	/* this is a horrid hack - however, if you try to use the base class ref
 	 * to call properties() you can't seem to find the properties!
 	 */
-	const TagLib::PropertyMap  m = m_.properties(*tag);
+	const TagLib::PropertyMap  m = m_.properties();
 os_ << "      \"track\": ";
 	i = tag->track();
 	if (i > 0) { os_ << i; } else { os_ << "null"; }
