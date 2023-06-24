@@ -69,23 +69,42 @@ namespace AudioTag
             const char*  prop  = e.first;
             const char*  value = e.second;
 
+	    AUDIOTAG_DEBUG("prop='" << prop << "'  value='" << value << "'");
+
             TagLib::PropertyMap&  urgh = input_.properties;
 
             int  vl;
             if ( (vl = strlen(value)) == 0 || (vl == 2 && ( (value[0] == '\'' && value[1] == '\'') || (value[0] == '"' && value[1] == '"')) ) ) {
+		AUDIOTAG_DEBUG("clearing prop='" << prop << "'");
                 urgh[prop].clear();
             }
             else
             {
                 const TagLib::String  converted = AudioTag::_cnvrt(value);
+		AUDIOTAG_DEBUG("prop='" << prop << "'  converted value='" << value << "'");
                 auto  where = urgh.find(prop);
                 if (where == urgh.end()) {
+		    AUDIOTAG_DEBUG("inserting prop='" << prop << "'");
                     urgh.insert(prop, TagLib::StringList(converted) );
                 }
                 else {
+		    AUDIOTAG_DEBUG("replacing prop='" << prop << "'");
                     where->second.prepend(converted);
                 }
             }
+
+#ifdef DEBUG
+	    AUDIOTAG_DEBUG("properties:");
+	    for (const auto& i : urgh)
+	    {
+		std::stringstream  s;
+		for (const auto& j : i.second)
+		{
+		    s << " \"" << AudioTag::_strrep(j) << "\"";
+		}
+		AUDIOTAG_DEBUG("  [" << i.first.toCString() << "] = {" << s.str() << " }");
+	    }
+#endif
         });
     }
 
