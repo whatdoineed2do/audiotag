@@ -262,6 +262,8 @@ int main(int argc, char *argv[])
     TagLib::String::Type  enc = TagLib::String::UTF8;
 
     AudioTag::Ops  ops;
+    // ownership will be xfr'd to 'ops' if non-null
+    AudioTag::OpNested*  propops = nullptr;
 
     // we do this as we dont want to do anything wihtin taglib that deals with mbs
     std::list<char*>  propargs;
@@ -364,7 +366,15 @@ int main(int argc, char *argv[])
             case 'g':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.genre = optarg;  break;
             case 's':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.rating = optarg;  break;
 
-            case 'P':  propargs.push_back(optarg);  break;
+            case 'P':
+            {
+		if (propops == nullptr) {
+		    propops = new AudioTag::OpNested();
+		    ops.add(propops);
+		}
+		propargs.push_back(optarg);
+	    } break;
+
 	    case 255:  opts.propertiesTok = optarg;  break;
 
 	    case 'w':
@@ -493,7 +503,7 @@ int main(int argc, char *argv[])
     }
     AUDIOTAG_NOTICE_VERBOSE("using locale=" << l);
 
-    std::for_each(propargs.cbegin(), propargs.cend(), [&ops, &opts](char* optarg) {
+    std::for_each(propargs.cbegin(), propargs.cend(), [&ops, &opts, &propops](char* optarg) {
 	AudioTag::OpPropertyTags::Map  m;
 
 	char*  pc = NULL;
@@ -517,7 +527,7 @@ int main(int argc, char *argv[])
 
 	    m.insert(std::make_pair(prop, value));
 	}
-	ops.add(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
+	propops->_ops.push_back(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
     });
 
 

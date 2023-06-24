@@ -59,12 +59,11 @@ struct _OpWR : public Op
     _OpWR(_OpWR&& rhs_) = default;
 };
 
+using _Ops = std::list<const Op*>;
 
 class Ops
 {
   public:
-    using _Ops = std::list<const Op*>;
-
     Ops() : _readonly(true) { }
     ~Ops();
 
@@ -91,6 +90,16 @@ class Ops
     bool  _readonly;
     _Ops  _ops;
 };
+
+struct OpNested : public _OpWR
+{
+    OpNested() : _OpWR("nested tags") { }
+    ~OpNested();
+
+    _Ops  _ops;
+    void  _execute(File& f_, bool verbose_) const override;
+};
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -24,6 +24,20 @@ namespace AudioTag
         }
     }
 
+    OpNested::~OpNested()
+    {
+        for (auto i : _ops) {
+	    delete i;
+	}
+    }
+
+    void  OpNested::_execute(File& f_, bool verbose_) const
+    {
+        for (const auto i : _ops) {
+            i->execute(f_, _verbose);
+        }
+    }
+
     void  OpListTags::_execute(File& f_, bool verbose_) const
     {
         std::cout << f_;
