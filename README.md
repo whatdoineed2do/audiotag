@@ -1,21 +1,21 @@
 # audiotag
 Command line multi audio format meta tagging util
 
-Command line utility based on `TagLib (v1.11.1)` to read/write basic meta information to the follow file formats:
+Command line utility based on `TagLib (v1.11.1)` to read/write basic meta information to the following common audio file formats:
 - `MP3`
 - `flac`
-- `M4a` (.m4a MP4 audio)
+- `M4a`
 
 Basic functionality to:
-- unified interface across all supported formats: goodbye to different tag names in [`metaflac`](https://xiph.org/flac/documentation_tools_metaflac.html) vs [`id3tag`](https://man.archlinux.org/man/extra/id3lib/id3tag.1.en) etc for simple tagging
+- unified interface across all supported formats: goodbye to different tag names in [`metaflac`](https://xiph.org/flac/documentation_tools_metaflac.html) vs [`id3tag`](https://man.archlinux.org/man/extra/id3lib/id3tag.1.en) vs [`ffmpeg`](https://ffmpeg.org/ffmpeg-all.html#Metadata-1) etc for simple tagging
 - clean - strip all tags except for very basic artist/title/genre etc
-- sync - copy existing tag (ie ID3v2) to another tag (ie APE) for MP3
+- sync - copy existing tags from other files or within same file, ie `APE` to `ID3v2` on `MP3`
 - delete - delete tags from file
-- UTF8 tag data supported in tags which support it (NOT in ID3v1)
+- UTF8 tag data supported in tags which support it (NOT in `ID3v1`)
 
-`ffmpeg/libavfilter` will allow for more accurate file determination based on actual file container type, rather than file extension.
+Using `ffmpeg/libavfilter` will allow for more accurate file determination based on actual file container type, rather than file extension.
 
-Based heavily on the `tagwritter` util from `TabLib` and previous mp3tag
+Based heavily on the `tagwritter` util from `TabLib`.
 
 
 Multiple commands can be chained together in a single execution - however the file is only written to disk once.  The output can be of two useful forms:
@@ -23,50 +23,59 @@ Multiple commands can be chained together in a single execution - however the fi
 - old `id3tag` output
 
 ## Example Usage
-Add/change the `artist`, clear the `comment` and display the meta
+Drop the `ID3v2` tag, add/change the `artist`, clear the `comment` and display the meta
 ```
-$ audiotag -a "foo bar" -c "" -O json -l test.mp3
+$ audiotag -d2 -a "foo bar" -c "" -O json -l test.mp3
 {
   "file": {
     "name": "test.mp3",
-    "size": 58813,
-    "mod_time": "Thu 05 Jul 2018 08:51:07 AM BST"
+    "size": 59938,
+    "mod_time": "Thu 22 Jun 2023 07:05:06 PM BST",
+    "audio_properties": {
+      "length": 3.631,
+      "bitrate": 129,
+      "samplerate": 44100,
+      "channels": 2,
+      "hash": "223286320b511145cd4da6a789348bb9ae704f724e413ff950d3eae397f36820"
+    }
   },
   "meta": [
     {
       "tag_type": "ID3v1",
-      "artist": "ONEartist",
-      "title": "ONEtitle",
-      "album": null,
+      "artist": "foo",
+      "title": "Japan Nippon",
+      "album": "audiotag test files",
       "track": 2,
       "year": 2007,
       "genre": "Pop",
       "comment": "this is a comment",
       "artwork": false,
       "properties": {
-        "ARTIST": [ "ONEartist" ],
+        "ALBUM": [ "audiotag test files" ],
+        "ARTIST": [ "foo" ],
         "COMMENT": [ "this is a comment" ],
         "DATE": [ "2007" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "ONEtitle" ],
+        "TITLE": [ "Japan Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     },
     {
       "tag_type": "APE",
-      "artist": "VER2 foo 群星bar",
-      "title": "yep星 works",
-      "album": null,
+      "artist": "foo 香港 Hong Kong",
+      "title": "Japan 日本国 Nippon",
+      "album": "audiotag test files",
       "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": null,
       "artwork": false,
       "properties": {
-        "ARTIST": [ "VER2 foo 群星bar" ],
+        "ALBUM": [ "audiotag test files" ],
+        "ARTIST": [ "foo 香港 Hong Kong" ],
         "DATE": [ "1999" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
+        "TITLE": [ "Japan 日本国 Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     }
@@ -76,48 +85,58 @@ $ audiotag -a "foo bar" -c "" -O json -l test.mp3
 ## Cloning Tags
 With the example above, we can see there is an `ID3v1` and `APE` tag but no `ID3v2` tag - we can clone the `APE` tag onto the `ID3v2` whilst deleting the `ID3v1` tag (it can't hold unicode text anyway, as seen in the album tag) in one command:
 ```
-$ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l test.mp3 
+$ audiotag -d 1 -n "a:2" -A "music from 香港 by foo" -O json -l test.mp3 
 {
   "file": {
     "name": "test.mp3",
-    "size": 58813,
-    "mod_time": "Thu 05 Jul 2018 08:51:21 AM BST"
+    "size": 59938,
+    "mod_time": "Thu 22 Jun 2023 07:05:06 PM BST",
+    "audio_properties": {
+      "length": 3.631,
+      "bitrate": 129,
+      "samplerate": 44100,
+      "channels": 2,
+      "hash": "223286320b511145cd4da6a789348bb9ae704f724e413ff950d3eae397f36820"
+    }
   },
   "meta": [
     {
       "tag_type": "ID3v2",
-      "artist": "VER2 foo 群星bar",
-      "title": "yep星 works",
-      "album": "ハルカ",
+      "artist": "foo 香港 Hong Kong",
+      "title": "Japan 日本国 Nippon",
+      "album": "music from 香港 by foo",
       "track": 2,
       "year": 1999,
       "genre": "Pop",
-      "comment": null,
+      "comment": "id3v2 comment",
       "artwork": false,
       "properties": {
-        "ALBUM": [ "ハルカ" ],
-        "ARTIST": [ "VER2 foo 群星bar" ],
+        "ALBUM": [ "music from 香港 by foo" ],
+        "ARTIST": [ "foo 香港 Hong Kong" ],
+        "COMMENT": [ "id3v2 comment" ],
         "DATE": [ "1999" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
+        "RELEASEDATE": [ "1999-01-01" ],
+        "TITLE": [ "Japan 日本国 Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     },
     {
       "tag_type": "APE",
-      "artist": "VER2 foo 群星bar",
-      "title": "yep星 works",
-      "album": null,
+      "artist": "foo 香港 Hong Kong",
+      "title": "Japan 日本国 Nippon",
+      "album": "audiotag test files",
       "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": null,
       "artwork": false,
       "properties": {
-        "ARTIST": [ "VER2 foo 群星bar" ],
+        "ALBUM": [ "audiotag test files" ],
+        "ARTIST": [ "foo 香港 Hong Kong" ],
         "DATE": [ "1999" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
+        "TITLE": [ "Japan 日本国 Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     }
@@ -127,30 +146,39 @@ $ audiotag -d 1 -n "a:2" -A "ハルカ" -O json -l test.mp3
 ## Working with arbituary tags
 `TagLib` provides a uniform set of property names across all tag formats which are shown in `json` output.  The `-P` flag can add/remove property tags but the user is responsible for verifying if such a property is valid for that tag type.
 ```
-$ audiotag  -l test.mp3
+$ audiotag  test.mp3
 {
   "file": {
     "name": "test.mp3",
-    "size": 59721,
-    "mod_time": "Sun 10 Jun 2018 05:46:22 PM BST"
+    "size": 59938,
+    "mod_time": "Sat 24 Jun 2023 09:17:08 AM BST",
+    "audio_properties": {
+      "length": 3.631,
+      "bitrate": 129,
+      "samplerate": 44100,
+      "channels": 2,
+      "hash": "223286320b511145cd4da6a789348bb9ae704f724e413ff950d3eae397f36820"
+    }
   },
   "meta": [
     {
       "tag_type": "ID3v2",
-      "artist": "VER2 foo 群星bar",
-      "title": "yep星 works",
-      "album": null,
+      "artist": "foo 香港 Hong Kong",
+      "title": "Japan 日本国 Nippon",
+      "album": "audiotag test files",
       "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": "id3v2 comment",
-      "artwork": "false",
+      "artwork": false,
       "properties": {
-        "ARTIST": [ "VER2 foo 群星bar" ],
+        "ALBUM": [ "audiotag test files" ],
+        "ARTIST": [ "foo 香港 Hong Kong" ],
         "COMMENT": [ "id3v2 comment" ],
         "DATE": [ "1999" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
+        "RELEASEDATE": [ "1999-12-25" ],
+        "TITLE": [ "Japan 日本国 Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     }
@@ -159,32 +187,41 @@ $ audiotag  -l test.mp3
 ```
 ### Adding Properties
 ```
-$ audiotag  -P foo:bar,coke:cola -l test.mp3
+$ audiotag -P foo:bar,coke:cola -l test.mp3
 {
   "file": {
     "name": "test.mp3",
-    "size": 59721,
-    "mod_time": "Sun 10 Jun 2018 05:46:22 PM BST"
+    "size": 59938,
+    "mod_time": "Sat 24 Jun 2023 09:17:44 AM BST",
+    "audio_properties": {
+      "length": 3.631,
+      "bitrate": 129,
+      "samplerate": 44100,
+      "channels": 2,
+      "hash": "223286320b511145cd4da6a789348bb9ae704f724e413ff950d3eae397f36820"
+    }
   },
   "meta": [
     {
       "tag_type": "ID3v2",
-      "artist": "VER2 foo 群星bar",
-      "title": "yep星 works",
-      "album": null.
+      "artist": "foo 香港 Hong Kong",
+      "title": "Japan 日本国 Nippon",
+      "album": "audiotag test files",
       "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": "id3v2 comment",
       "artwork": false,
       "properties": {
-        "ARTIST": [ "VER2 foo 群星bar" ],
+        "ALBUM": [ "audiotag test files" ],
+        "ARTIST": [ "foo 香港 Hong Kong" ],
         "COKE": [ "cola" ],
         "COMMENT": [ "id3v2 comment" ],
         "DATE": [ "1999" ],
         "FOO": [ "bar" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
+        "RELEASEDATE": [ "1999-12-25" ],
+        "TITLE": [ "Japan 日本国 Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     }
@@ -197,27 +234,36 @@ $ audiotag  -P coke:,COMMENT:"an updated comment" -l test.mp3
 {
   "file": {
     "name": "test.mp3",
-    "size": 59721,
-    "mod_time": "Wed 04 Jul 2018 06:41:53 PM BST"
+    "size": 59938,
+    "mod_time": "Sat 24 Jun 2023 09:18:01 AM BST",
+    "audio_properties": {
+      "length": 3.631,
+      "bitrate": 129,
+      "samplerate": 44100,
+      "channels": 2,
+      "hash": "223286320b511145cd4da6a789348bb9ae704f724e413ff950d3eae397f36820"
+    }
   },
   "meta": [
     {
       "tag_type": "ID3v2",
-      "artist": "VER2 foo 群星bar",
-      "title": "yep星 works",
-      "album": null,
+      "artist": "foo 香港 Hong Kong",
+      "title": "Japan 日本国 Nippon",
+      "album": "audiotag test files",
       "track": 2,
       "year": 1999,
       "genre": "Pop",
       "comment": "an updated comment",
-      "artwork": "false",
+      "artwork": false,
       "properties": {
-        "ARTIST": [ "VER2 foo 群星bar" ],
+        "ALBUM": [ "audiotag test files" ],
+        "ARTIST": [ "foo 香港 Hong Kong" ],
         "COMMENT": [ "an updated comment" ],
         "DATE": [ "1999" ],
         "FOO": [ "bar" ],
         "GENRE": [ "Pop" ],
-        "TITLE": [ "yep星 works" ],
+        "RELEASEDATE": [ "1999-12-25" ],
+        "TITLE": [ "Japan 日本国 Nippon" ],
         "TRACKNUMBER": [ "2" ]
       }
     }
@@ -226,7 +272,7 @@ $ audiotag  -P coke:,COMMENT:"an updated comment" -l test.mp3
 ```
 ## Adding artwork, Track and Disc number
 ```
-$ audiotag -w foo.jpg -y 1/10 -D 1/3 track1of10-on-disc1of3.mp3
+$ audiotag -w foo.jpg  -y 1955-11-05  -T 1/10  -D 1/3  track1of10-on-disc1of3.mp3
 ```
  
 # Further Enhancements
