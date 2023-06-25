@@ -7,6 +7,7 @@
 #include <taglib/tstringlist.h>
 
 
+#include "audiotag.h"
 #include "Meta.h"
 #include "File.h"
 
@@ -21,6 +22,7 @@ MetaOut*  MetaOut::create(const char* optarg_)
 #ifdef HAVE_JSONC
     if (strcmp(optarg_, "json-c")  == 0)   return new MetaOutJsonC();
 #endif
+    AUDIOTAG_WARN("unknown output handler '" << optarg_ << "'\n");
 
     return new MetaOut();
 }
