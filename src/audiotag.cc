@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
 
 	    m.insert(std::make_pair(prop, value));
 	}
-	propops->_ops.push_back(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
+	propops->_ops.emplace_back(new AudioTag::OpPropertyTags(opts.toi, opts.iflds, m) );
     });
 
 

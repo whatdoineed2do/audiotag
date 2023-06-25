@@ -59,13 +59,13 @@ struct _OpWR : public Op
     _OpWR(_OpWR&& rhs_) = default;
 };
 
-using _Ops = std::list<const Op*>;
+using _Ops = std::list<std::unique_ptr<const Op>>;
 
 class Ops
 {
   public:
     Ops() : _readonly(true) { }
-    ~Ops();
+    ~Ops() = default;
 
     Ops(const Ops&)  = delete;
     Ops(const Ops&&) = delete;
@@ -91,10 +91,11 @@ class Ops
     _Ops  _ops;
 };
 
-struct OpNested : public _OpWR
+class OpNested : public _OpWR
 {
+  public:
     OpNested() : _OpWR("nested tags") { }
-    ~OpNested();
+    ~OpNested() = default;
 
     _Ops  _ops;
     void  _execute(File& f_, bool verbose_) const override;
