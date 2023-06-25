@@ -12,6 +12,7 @@ audiotag_SOURCES = \
 	audiotag.cc \
 	File.cc \
 	Meta.cc \
+	MetaMP3.cc MetaFlac.cc MetaM4a.cc \
 	MetaOut.cc \
 	Ops.cc
 
