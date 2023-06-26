@@ -3,11 +3,7 @@
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
 #endif
-#include <time.h>
-#include <stdio.h>
 #include <string.h>
-#include <iostream>
-#include <functional>
 #include <taglib/tstring.h>
 #include <taglib/tpropertymap.h>
 
@@ -16,7 +12,6 @@
 
 #include "audiotag.h"
 #include "File.h"
-#include "MetaOut.h"
 #include "Artwork.h"
 
 
@@ -174,9 +169,5 @@ void  MetaM4a::properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
     else    _properties(t_, m_);
 }
 
-std::ostream&  Meta::out(std::ostream& os_, const File& f_) const
-{
-    return _mo.out(os_, f_);
-}
 
 }

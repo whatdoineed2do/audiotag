@@ -417,4 +417,8 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
     return a_;
 }
 
+std::ostream&  Meta::out(std::ostream& os_, const File& f_) const
+{
+    return _mo.out(os_, f_);
+}
 };

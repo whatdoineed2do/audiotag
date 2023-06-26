@@ -3,11 +3,6 @@
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
 #endif
-#include <time.h>
-#include <stdio.h>
-#include <string.h>
-#include <iostream>
-#include <functional>
 #include <taglib/tstring.h>
 #include <taglib/tpropertymap.h>
 
@@ -16,7 +11,6 @@
 
 #include "audiotag.h"
 #include "File.h"
-#include "MetaOut.h"
 #include "Artwork.h"
 
 namespace AudioTag {
