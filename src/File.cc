@@ -141,6 +141,10 @@ File*  _ffmpeg_create(const char* file_, MetaOut& mo_)
     }
     else
     {
+#if LIBAVFORMAT_VERSION_MAJOR > 58
+	//lavf 59.0.100
+	const
+#endif
 	AVCodec*  audio_codec = nullptr;
 	const std::string  hash = _ffmpeg_audio_hash(ctx, av_find_best_stream(ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &audio_codec, 0));
 	switch (audio_codec->id)
