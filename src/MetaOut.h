@@ -2,6 +2,7 @@
 #define AUDIOTAG_META_OUT_H
 
 
+#include "../config.h"
 #include <iosfwd>
 
 namespace TagLib
