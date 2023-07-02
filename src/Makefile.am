@@ -16,3 +16,6 @@ audiotag_SOURCES = \
 	MetaOut.cc \
 	Ops.cc
 
+if HAVE_JSONC
+audiotag_LDADD += $(JSONC_LIBS)
+endif

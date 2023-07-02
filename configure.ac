@@ -20,7 +20,6 @@ AX_CXX_COMPILE_STDCXX([14], [noext], [mandatory])
 
 
 PKG_CHECK_MODULES(TAGLIB, [taglib >= 1.11.1])
-#PKG_CHECK_MODULES(JSONC, [json-c])
 PKG_CHECK_MODULES(FFMPEG, libavformat libavcodec libavutil, have_ffmpeg=yes, have_ffmpeg=no)
 if test x"$have_ffmpeg" = x"yes"; then
     AH_TEMPLATE([HAVE_FFMPEG], [Whether ffmpeg is installed, used for more accurate input file assessment])
@@ -29,6 +28,16 @@ fi
 AC_SUBST(FFMPEG_CFLAGS)
 AC_SUBST(FFMPEG_LIBS)
 AM_CONDITIONAL(HAVE_FFMPEG, test x"$have_ffmpeg" = x"yes")
+
+AC_ARG_WITH([json-c], [AS_HELP_STRING([--with-json-c], [Do not build json-c out module])], [], [with_json_c=no])
+
+AS_IF([test x"$with_json_c" != x"no"],
+        [PKG_CHECK_MODULES([JSONC], [json-c], [], [AC_ERROR([json-c not found])])]
+	[AC_DEFINE([HAVE_JSONC], [1], [Provde json-c as output module])]
+     )
+AC_SUBST(JSONC_CFLAGS)
+AC_SUBST(JSONC_LIBS)
+AM_CONDITIONAL([HAVE_JSONC], [test x"$with_json_c" != x"no"])
 
 
 AC_ARG_ENABLE([debug],
