@@ -19,10 +19,15 @@ jobs:
         libtag1-dev \
         libavformat-dev libavutil-dev \
         libjson-c-dev
-    - name: configure
+    - name: configure, build without json-c
+      run: |
+        autoreconf --install
+        autoconf
+        ./configure --without-json-c
+        make
+    - name: configure, build
       run: |
         autoreconf --install
         autoconf
         ./configure
-    - name: make
-      run: make
+        make
