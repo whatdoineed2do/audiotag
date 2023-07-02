@@ -189,6 +189,8 @@ std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
     const char*  p = NULL;
     int  i;
 
+    const Meta&  m_ = f_.meta();
+
     json_object*  jroot = json_object_new_object();
 
     json_object*  jfile = json_object_new_object();
@@ -199,6 +201,19 @@ std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
 	char  mtime[50];
 	strftime(mtime, sizeof(mtime)-1, "%c", localtime(&st.st_mtime));
 	json_object_object_add(jfile, "mod_time", json_object_new_string(mtime));
+
+	json_object*  jaudioprop = json_object_new_object();
+	{
+	    const TagLib::AudioProperties*  ap = m_.file().audioProperties();
+
+	    json_object_object_add(jaudioprop, "length", json_object_new_int64(ap->lengthInMilliseconds()/1000.0));
+	    json_object_object_add(jaudioprop, "bitrate", json_object_new_int64(ap->bitrate()));
+	    json_object_object_add(jaudioprop, "samplerate", json_object_new_int64(ap->sampleRate()));
+	    json_object_object_add(jaudioprop, "channels", json_object_new_int64(ap->channels()));
+	    json_object_object_add(jaudioprop, "hash", json_object_new_string(f_.hash().c_str()));
+
+	    json_object_object_add(jfile, "audio_properties", jaudioprop);
+	}
     }
 
     json_object*  jtags = json_object_new_array();
@@ -229,10 +244,10 @@ std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
 		/* this is a horrid hack - however, if you try to use the base class ref
 		 * to call properties() you can't seem to find the properties!
 		 */
-		const TagLib::PropertyMap  m = f_.meta().properties(*tag.second);
+		const TagLib::PropertyMap  m = m_.properties();
 		json_object*           jmetaprop = json_object_new_object();
 		{
-		    for (const auto i : m)
+		    for (const auto& i : m)
 		    {
 			json_object*  jmp = json_object_new_array();
 			for (const auto& j : i.second) {

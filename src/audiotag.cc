@@ -111,7 +111,11 @@ void  _usage()
 	 << "                                                [warn] will damage tags if you get the encoding wrong!\n"
          << '\n'
 	 << "  [out options]\n"
+#ifdef HAVE_JSONC
+	 << "    -O  --format        <[json,json-c,basic}> output format\n"
+#else
 	 << "    -O  --format        <[json,basic}>        output format\n"
+#endif
 	 << "                                              json is very useful for parsing number of files and\n"
 	 << "                                              processing with 'jq' to select\n"
 	 << "                                                ie.\n"
