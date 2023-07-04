@@ -88,7 +88,11 @@ os_ << "      \"length\": " << ap->lengthInMilliseconds()/1000.0 << ",\n"
     << "      \"bitrate\": " << ap->bitrate() << ",\n"
     << "      \"samplerate\": " << ap->sampleRate() << ",\n"
     << "      \"channels\": " << ap->channels() << ",\n"
+#ifdef HAVE_FFMPEG
     << "      \"hash\": \"" << f_.hash() << "\"\n";
+#else
+    << "      \"hash\": null\n";
+#endif
     }
 os_ << "    }\n"
     << "  },\n"
@@ -210,7 +214,12 @@ std::ostream&  MetaOutJsonC::out(std::ostream& os_, const File& f_)
 	    json_object_object_add(jaudioprop, "bitrate", json_object_new_int64(ap->bitrate()));
 	    json_object_object_add(jaudioprop, "samplerate", json_object_new_int64(ap->sampleRate()));
 	    json_object_object_add(jaudioprop, "channels", json_object_new_int64(ap->channels()));
-	    json_object_object_add(jaudioprop, "hash", json_object_new_string(f_.hash().c_str()));
+	    json_object_object_add(jaudioprop, "hash",
+#ifdef HAVE_FFMPEG
+						json_object_new_string(f_.hash().c_str()));
+#else
+						NULL);
+#endif
 
 	    json_object_object_add(jfile, "audio_properties", jaudioprop);
 	}

@@ -209,12 +209,13 @@ File*  FileFactory::create(const char* f_, int& errno_, MetaOut& mo_)
         return NULL;
     }
 
+    const std::string  hash = "";
     std::string  tmp = p;
     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
     p = tmp.c_str();
-    if (f == NULL && _match(p,  FileMP3::sffx))  f = new FileMP3(f_, mo_);
-    if (f == NULL && _match(p, FileFlac::sffx))  f = new FileFlac(f_, mo_);
-    if (f == NULL && _match(p,  FileM4a::sffx))  f = new FileM4a(f_, mo_);
+    if (f == NULL && _match(p,  FileMP3::sffx))  f = new FileMP3(f_, mo_, hash);
+    if (f == NULL && _match(p, FileFlac::sffx))  f = new FileFlac(f_, mo_, hash);
+    if (f == NULL && _match(p,  FileM4a::sffx))  f = new FileM4a(f_, mo_, hash);
     //if (f == NULL && _match(p, FileOGGFlac::sffx))  f = new FileOGGFlac(f_, mo_);
 #endif
 
