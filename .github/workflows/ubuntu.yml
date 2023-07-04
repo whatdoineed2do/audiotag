@@ -19,15 +19,17 @@ jobs:
         libtag1-dev \
         libavformat-dev libavutil-dev \
         libjson-c-dev
-    - name: configure, build without json-c
+    - name: configure, build without ffmpeg/json-c
       run: |
         autoreconf --install
         autoconf
-        ./configure --without-json-c
+        ./configure --disable-ffmpeg --without-json-c
+        make clean
         make
     - name: configure, build
       run: |
         autoreconf --install
         autoconf
         ./configure
+        make clean
         make
