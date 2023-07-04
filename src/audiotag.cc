@@ -550,12 +550,12 @@ int main(int argc, char *argv[])
     {
 	f = argv[i++];
 
-        AudioTag::File*  ff = NULL;
+        AudioTag::File*  fp = nullptr;
 
         int  err;
         try
         {
-            if ( !(ff = AudioTag::FileFactory::create(f, err, *opts.mout))) {
+            if ( !(fp = AudioTag::FileFactory::create(f, err, *opts.mout))) {
                 AUDIOTAG_WARN("failed to open - " << f << " - " << AudioTag::FileFactory::what(err) << " - ignored");
             }
         }
@@ -565,9 +565,11 @@ int main(int argc, char *argv[])
         }
 
 
-        if (ff == NULL) {
+        if (fp == nullptr) {
             continue;
         }
+
+        const std::unique_ptr<AudioTag::File>  ff(fp);
 
         if ( !ops.readonly() && access(ff->taglibfile().name(), W_OK) < 0) {
             AUDIOTAG_ERR(ff->taglibfile().name() << ": no write permissions, all operations skipped");
@@ -595,7 +597,6 @@ int main(int argc, char *argv[])
             }
 #endif
         }
-        delete ff;
     }
     return 0;
 }
