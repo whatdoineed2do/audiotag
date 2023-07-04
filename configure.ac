@@ -43,7 +43,7 @@ AM_CONDITIONAL([HAVE_JSONC], [test x"$with_json_c" != x"no"])
 AC_ARG_ENABLE([debug],
 	[AS_HELP_STRING([--enable-debug],
 	[enable debug (default is no)])],
-	[no_debug=false],
+	[no_debug=$enableval],
 	[no_debug=true])
 if test "$no_debug" = true; then
         building_debug=no
