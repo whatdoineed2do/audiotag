@@ -123,6 +123,7 @@ void  _usage()
 	 << "                                                    " << _argv0 << " ... | jq 'select(.meta[] | .tag_type | . and contains(\"ID3\") ) | .file.name'\n"
 	 << "                                                  json objects that have tags other than ID3v2\n"
 	 << "                                                    " << _argv0 << " ... | jq 'select(.meta[] | .tag_type != \"ID3v2\")'\n"
+	 << "                                              use 'audiotag .... | jq -s.' to generate arrays of objects if required\n"
 	 << '\n'
 	 << "  [tag encoding options]\n"
 	 << "    -e  --encoding-in   <encoding>            encoding= utf16be [latin1|utf8|utf16|utf16be|utf18le]\n"
