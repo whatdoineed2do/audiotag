@@ -24,34 +24,34 @@ class File;
 class MetaOut
 {
   public:
-    MetaOut()  { }
-    ~MetaOut() { }
+    MetaOut() = default;
+    virtual ~MetaOut() = default;
+
+    MetaOut(const MetaOut&) = default;
+    MetaOut& operator=(const MetaOut&) = default;
+    MetaOut(MetaOut&&) = default;
+    MetaOut& operator=(MetaOut&&) = default;
 
     virtual std::ostream&  out(std::ostream&, const File&);
 
     static MetaOut*  create(const char*);
-
-
-  private:
-    MetaOut(const MetaOut&);
-    void  operator=(const MetaOut&);
 };
 
 struct MetaOutBasic : public MetaOut
 {
-    std::ostream&  out(std::ostream&, const File&);
+    std::ostream&  out(std::ostream&, const File&)  override;
 };
 
 struct MetaOutJson: public MetaOut
 {
-    std::ostream&  out(std::ostream&, const File&);
+    std::ostream&  out(std::ostream&, const File&)  override;
     static const char*  out(std::string& buf_, const TagLib::String& src_);
 };
 
 #ifdef HAVE_JSONC
 struct MetaOutJsonC: public MetaOut
 {
-    std::ostream&  out(std::ostream&, const File&);
+    std::ostream&  out(std::ostream&, const File&)  override;
 };
 #endif
 
