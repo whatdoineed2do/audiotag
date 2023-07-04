@@ -224,13 +224,27 @@ int main(int argc, char *argv[])
 {
     AudioTag::_argv0 = basename(argv[0]);
 
-    struct {
-        bool  list;
-        bool  listP;
-        bool  clean;
-        bool  mbconvert;
-        bool  preserve;
-        bool  removeart;
+    enum RequestedOps {
+	NA        = 0,
+	PRESERVE  = 1 << 1
+    };
+
+    struct Opts {
+	Opts() :
+	    flags(RequestedOps::NA),
+	    mout(std::make_unique<AudioTag::MetaOutJson>()),
+	    locale(NULL), iop(nullptr),
+	    propertiesTok(":")
+	{ }
+
+	~Opts() = default;
+
+	Opts(const Opts&) = delete;
+	Opts& operator=(const Opts&) = delete;
+	Opts(const Opts&&) = delete;
+	Opts& operator=(const Opts&&) = delete;
+
+	uint32_t  flags;
 
         AudioTag::MetaTOI  toi;
 
@@ -248,16 +262,6 @@ int main(int argc, char *argv[])
 
         const char*  locale;
     } opts;
-    opts.list = false;
-    opts.listP = false;
-    opts.clean = false;
-    opts.mbconvert = false;
-    opts.preserve = false;
-    opts.removeart = false;
-    opts.mout = std::make_unique<AudioTag::MetaOutJson>();
-    opts.locale = NULL;
-    opts.iop = NULL;
-    opts.propertiesTok = ":";
 
     /* what we're encoding from */
     TagLib::String::Type  mbenc = TagLib::String::UTF8;
@@ -337,8 +341,6 @@ int main(int argc, char *argv[])
             {
                 ops.add(new AudioTag::OpListTags());
             } break;
-
-	    case 'L':  opts.listP = true;  break;
 
             case 't':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.title = optarg;  break;
             case 'a':  AudioTag::_addupdop(opts.iop, opts.toi, opts.iflds, ops);  opts.iflds.artist = optarg;  break;
@@ -447,25 +449,22 @@ int main(int argc, char *argv[])
 
 	    case 'C':
             {
-                opts.clean = true;
                 ops.add(new AudioTag::OpCleanTags());
             } break;
 
 	    case 'M':
 	    {
-		opts.mbconvert = true;
 		mbenc = AudioTag::parseEnc(optarg, TagLib::String::Latin1);
 	    } break;
 
             case 'r':
             {
-                opts.removeart = true;
                 ops.add(new AudioTag::OpRemoveArt());
             } break;
 
 #ifdef AUDIOTAG_HAVE_PRESERVE
             case 'p':
-                opts.preserve = true;
+                opts.flags |= RequestedOps::PRESERVE;
                 break;
 #endif
 
@@ -582,7 +581,7 @@ int main(int argc, char *argv[])
 
 #ifdef AUDIOTAG_HAVE_PRESERVE
 	    // macos doesnt have st_mtim
-            if (opts.preserve)
+            if (opts.flags & RequestedOps::PRESERVE)
             {
                 /* try to reset the timestamps on the file
                  */
