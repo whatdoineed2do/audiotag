@@ -20,9 +20,8 @@ const char*  MetaFlac::TAG_DATE = "DATE";
 
 
 MetaFlac::MetaFlac(FileFlac& f_, MetaOut& mo_) 
-  : Meta(f_.taglibfile(), (TagLib::Tag**)&_tag, mo_), 
-    _f(f_),
-    _tf((TagLib::FLAC::File&)_f.taglibfile()),
+  : Meta(f_, (TagLib::Tag**)&_tag, mo_), 
+    _tf((TagLib::FLAC::File&)f_.taglibfile()),
     _tag(NULL)
 {
     _tag = _tf.xiphComment();  // always non null, even if disk may not have value

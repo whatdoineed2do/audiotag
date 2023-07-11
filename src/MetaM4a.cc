@@ -23,9 +23,8 @@ const char*  MetaM4a::TAG_DATE = "\251day";
 
 
 MetaM4a::MetaM4a(FileM4a& f_, MetaOut& mo_)
-  : Meta(f_.taglibfile(), (TagLib::Tag**)&_tag, mo_), 
-    _f(f_),
-    _tf((TagLib::MP4::File&)_f.taglibfile()),
+  : Meta(f_, (TagLib::Tag**)&_tag, mo_), 
+    _tf((TagLib::MP4::File&)f_.taglibfile()),
     _tag(NULL)
 {
     _tag = _tf.tag();  // always non null, even if disk may not have value

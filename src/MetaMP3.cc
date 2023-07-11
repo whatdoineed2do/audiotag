@@ -308,9 +308,8 @@ Meta::Tags  MetaMP3::tags() const
 
 
 MetaMP3::MetaMP3(FileMP3& f_, MetaOut& mo_) 
-  : _MetaMulti(f_.taglibfile(), (TagLib::Tag**)&_id3v2, mo_),
-    _f(f_),
-    _tf((TagLib::MPEG::File&)_f.taglibfile()),
+  : _MetaMulti(f_, (TagLib::Tag**)&_id3v2, mo_),
+    _tf((TagLib::MPEG::File&)f_.taglibfile()),
     _id3v1(NULL), _id3v2(NULL), _ape(NULL),
     _svtag(0)
 {

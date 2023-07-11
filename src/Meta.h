@@ -269,8 +269,7 @@ class Meta
     void operator=(const Meta&) = delete;
 
 
-    const TagLib::File&  file() const
-    { return _file; }
+    const TagLib::File&  file() const;
 
     const TagLib::Tag*  tag() const
     { return *_tag; }
@@ -322,6 +321,8 @@ class Meta
     }
 
 
+    // we need this since TagLib::Tag::properties() is not virtual
+    // this method will give us properties of the concrete type
     virtual TagLib::PropertyMap  properties() const = 0;
 
     virtual void                 properties(TagLib::Tag& t_, const TagLib::PropertyMap& m_) const
@@ -331,8 +332,11 @@ class Meta
 
 
   protected:
-    Meta(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_)
-        : _file(file_), _tag(tag_), _mo(mo_)
+    // this wraps the underlying TagLib::File whilst providing some utility info
+    AudioTag::File&  _f;
+
+    Meta(AudioTag::File& file_, TagLib::Tag** tag_, MetaOut& mo_)
+        : _f(file_), _tag(tag_), _mo(mo_)
     {
         if (false && *_tag == NULL) {
             throw std::invalid_argument("Tag is NULL");
@@ -374,7 +378,6 @@ class Meta
 
 
   private:
-    TagLib::File&  _file;
     // default tag of file (for files that support multi tags); may not exist on disk
     TagLib::Tag**   _tag;
 
@@ -388,7 +391,7 @@ class _MetaMulti : public Meta
     virtual ~_MetaMulti() = default;
 
   protected:
-    _MetaMulti(TagLib::File& file_, TagLib::Tag** tag_, MetaOut& mo_) : Meta(file_, tag_, mo_) { }
+    _MetaMulti(AudioTag::File& file_, TagLib::Tag** tag_, MetaOut& mo_) : Meta(file_, tag_, mo_) { }
 };
 
 
@@ -429,7 +432,6 @@ class MetaMP3 : public _MetaMulti
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    FileMP3&  _f;
     TagLib::MPEG::File&  _tf;
 
     TagLib::ID3v2::Tag*  _id3v2;
@@ -477,7 +479,6 @@ class MetaFlac : public Meta
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    FileFlac&  _f;
     TagLib::FLAC::File&  _tf;
 
     TagLib::Ogg::XiphComment*  _tag;
@@ -520,7 +521,6 @@ class MetaM4a : public Meta
     void                 properties(TagLib::Tag&, const TagLib::PropertyMap&) const;
 
   private:
-    FileM4a&  _f;
     TagLib::MP4::File&  _tf;
 
     TagLib::MP4::Tag*  _tag;

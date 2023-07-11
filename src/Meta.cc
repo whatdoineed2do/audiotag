@@ -222,10 +222,14 @@ void  Meta::sanitize()
     }
 }
 
+const TagLib::File&  Meta::file() const
+{
+    return _f.taglibfile();
+}
 
 void  Meta::save()
 {
-    _file.save();
+    _f.taglibfile().save();
 }
 
 void  Meta::artist(TagLib::Tag& tag_, const char* data_)
