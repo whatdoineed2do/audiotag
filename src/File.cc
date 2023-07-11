@@ -243,4 +243,56 @@ const char*  FileFactory::what(int err_)
     }
 }
 
+// hide 1.x non virtual tag
+TagLib::Tag*  File::tag()
+{
+#if TAGLIB_MAJOR_VERSION < 2
+    // same ugly cast as taglib/tfile.cpp
+    if (dynamic_cast<TagLib::FLAC::File* >(&_taglibfile))
+	return  dynamic_cast<TagLib::FLAC::File* >(&_taglibfile)->tag();
+
+    if (dynamic_cast<TagLib::MPEG::File* >(&_taglibfile))
+	return  dynamic_cast<TagLib::MPEG::File* >(&_taglibfile)->tag();
+
+    if (dynamic_cast<TagLib::MP4::File* >(&_taglibfile))
+	return  dynamic_cast<TagLib::MP4::File* >(&_taglibfile)->tag();
+#endif
+
+    return _taglibfile.tag();
+}
+
+TagLib::PropertyMap  File::properties() const
+{
+#if TAGLIB_MAJOR_VERSION < 2
+    // same ugly cast as taglib/tfile.cpp
+    if (dynamic_cast<const TagLib::FLAC::File* >(&_taglibfile))
+	return  dynamic_cast<const TagLib::FLAC::File* >(&_taglibfile)->properties();
+
+    if (dynamic_cast<const TagLib::MPEG::File* >(&_taglibfile))
+	return  dynamic_cast<const TagLib::MPEG::File* >(&_taglibfile)->properties();
+
+    if (dynamic_cast<const TagLib::MP4::File* >(&_taglibfile))
+	return  dynamic_cast<const TagLib::MP4::File* >(&_taglibfile)->properties();
+#endif
+
+    return _taglibfile.properties();
+}
+
+void File::properties(const TagLib::PropertyMap& props_)
+{
+#if TAGLIB_MAJOR_VERSION < 2
+    // same ugly cast as taglib/tfile.cpp
+    if (dynamic_cast<TagLib::FLAC::File* >(&_taglibfile))
+	dynamic_cast<TagLib::FLAC::File* >(&_taglibfile)->setProperties(props_);
+
+    if (dynamic_cast<TagLib::MPEG::File* >(&_taglibfile))
+	dynamic_cast<TagLib::MPEG::File* >(&_taglibfile)->setProperties(props_);
+
+    if (dynamic_cast<TagLib::MP4::File* >(&_taglibfile))
+	dynamic_cast<TagLib::MP4::File* >(&_taglibfile)->setProperties(props_);
+#endif
+
+    _taglibfile.setProperties(props_);
+}
+
 };

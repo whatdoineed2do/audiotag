@@ -55,6 +55,12 @@ class File
     { return _hash; }
 
 
+    TagLib::Tag*  tag();
+
+    TagLib::PropertyMap  properties() const;
+    void properties(const TagLib::PropertyMap&);
+
+
   protected:
     File(Meta& m_, const std::string&  hash_, const char* fn_, TagLib::File& f_) : _m(m_), _taglibfile(f_), _hash(hash_)
     {
