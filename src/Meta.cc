@@ -246,7 +246,7 @@ void  Meta::album(TagLib::Tag& tag_, const char* data_)
 void  Meta::_property(TagLib::Tag& tag_, const char* tagname_, const char* data_)
 {
     TagLib::PropertyMap  m = properties();
-    if (data_ == NULL || *data_ == '\0') {
+    if (data_ == NULL) {
         m.erase(tagname_);
     }
     else {
@@ -395,7 +395,7 @@ TagLib::PropertyMap& Meta::_mergeproperties(TagLib::PropertyMap& a_, const TagLi
     }
     dump("target (cleaned)", a_);
 
-    for (auto i : b_) {
+    for (auto& i : b_) {
         auto  j = a_.find(i.first);
 
         if (i.second.isEmpty())
