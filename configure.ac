@@ -2,8 +2,8 @@
 # autoconf
 #
 
-AC_PREREQ(2.64)
-AC_INIT([audiotag], [m4_esyscmd([git describe --tags --dirty --always | tr -d '\n'])], [https://github.com/whatdoineed2do/audiotag/issues], [https://github.com/whatdoineed2do/audiotag], [whatdoineed2do@nospam-github.com])
+AC_PREREQ([2.69])
+AC_INIT([audiotag],[m4_esyscmd([git describe --tags --dirty --always | tr -d '\n'])],[https://github.com/whatdoineed2do/audiotag/issues],[https://github.com/whatdoineed2do/audiotag],[whatdoineed2do@nospam-github.com])
 AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip])
 AC_CONFIG_MACRO_DIRS([m4])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -41,7 +41,7 @@ AM_CONDITIONAL(HAVE_FFMPEG, test x"$have_ffmpeg" = x"yes")
 AC_ARG_WITH([json-c], [AS_HELP_STRING([--with-json-c], [Do not build json-c out module])], [], [with_json_c=no])
 
 AS_IF([test x"$with_json_c" != x"no"],
-        [PKG_CHECK_MODULES([JSONC], [json-c], [], [AC_ERROR([json-c not found])])]
+        [PKG_CHECK_MODULES([JSONC], [json-c], [], [AC_MSG_ERROR(json-c not found)])]
 	[AC_DEFINE([HAVE_JSONC], [1], [Provde json-c as output module])]
      )
 AC_SUBST(JSONC_CFLAGS)
@@ -82,8 +82,9 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
      )
 
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 src/Makefile
 tests/Makefile
 ])
+AC_OUTPUT
