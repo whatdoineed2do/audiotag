@@ -1,3 +1,5 @@
+#include "version.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -60,9 +62,11 @@ const char*  _argv0 = NULL;
 bool  _verbose = false;
 
 
-const char*  _version()
+std::string  _version()
 {
-    return VERSION;
+    ostringstream  version;
+    version << GIT_TAG << "-" << GIT_COMMIT;
+    return version.str();
 }
 
 void  _usage()
@@ -312,6 +316,7 @@ int main(int argc, char *argv[])
 	{ "verbose",		0, 0, 'V' },
 
 	{ "help", 		0, 0, 'h' },
+	{ "version", 		0, 0, 'v' },
 
 	{ 0, 0, 0,  0 }
     };

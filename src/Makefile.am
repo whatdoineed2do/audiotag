@@ -1,5 +1,12 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
+BUILT_SOURCES = version.h
+CLEANFILES = version.h
+
+version.h: FORCE
+	@$(srcdir)/git-version.sh
+FORCE:
+
 AM_CXXFLAGS = $(TAGLIB_CFLAGS) $(FFMPEG_CFLAGS) -Wall -Wno-reorder -Wno-unused-but-set-variable -Wno-conversion-null -Wno-deprecated
 
 bin_PROGRAMS = audiotag
