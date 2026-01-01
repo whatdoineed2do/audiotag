@@ -315,13 +315,16 @@ int main(int argc, char *argv[])
 
 	{ 0, 0, 0,  0 }
     };
-    char  opt_args[1+ sizeof(long_opts)*2] = { 0 };
+    char  opt_args[1+ sizeof(long_opts)*3] = { 0 };
     {
 	char*  og = opt_args;
 	const struct option* op = long_opts;
 	while (op->name) {
 	    *og++ = op->val;
 	    if (op->has_arg != no_argument) {
+		if (op->has_arg == optional_argument) {
+                    *og++ = ':';
+                }
 		*og++ = ':';
 	    }
 	    ++op;
